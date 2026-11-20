@@ -10,9 +10,10 @@ namespace MegabonkAP.Plugin
     /// <summary>
     /// Attaches to the game's methods by name, after each has run, and hands what it sees to the
     /// GameReader. A method that is not found costs the feature named next to it and a line in the
-    /// log; the others still attach. Nothing here changes what the game does.
+    /// log; the others still attach. Only one hook ever changes the game: a received DeathLink
+    /// calls the game's own KillPlayer.
     ///
-    /// Where each name comes from is in docs/hooks.md. None has been run on the real game yet.
+    /// The names are those of game version 1.0.69. docs/hooks.md says which were seen working.
     /// </summary>
     internal static class Hooks
     {
@@ -20,26 +21,32 @@ namespace MegabonkAP.Plugin
 
         private static readonly Hook[] All =
         {
-            new("MapController", "StartNewMap", 1, nameof(AfterStartNewMap), "knowing which character, map and tier a run is"),
-            new("TrackStats", "OnEnemyDied", 2, nameof(AfterEnemyDiedStatic), "boss, miniboss and tier checks"),
-            new("PlayerXp", "AddXp", null, nameof(AfterAddXp), "character level checks"),
-            new("WeaponInventory", "AddWeapon", null, nameof(AfterInventory), "weapon level checks"),
-            new("TomeInventory", "AddTome", null, nameof(AfterInventory), "tome level checks"),
-            new("LevelupScreen", "OnClose", null, nameof(AfterInventory), "weapon and tome levels after each level-up"),
+            new("MapController", "StartNewMap", 1, nameof(AfterStartNewMap), "knowing which map and tier a run is"),
+            new("MapController", "RestartRun", 0, nameof(AfterRestartRun), "noticing a restarted run"),
+            new("MyPlayer", "StartPlayer", 2, nameof(AfterStartPlayer), "knowing which character is played"),
+            new("TrackStats", "OnEnemyDied", 2, nameof(AfterEnemyDiedStatic), "miniboss and hidden boss checks"),
+            new("GameManager", "OnStageBossDied", 0, nameof(AfterStageBossDied), "tier and run completion"),
+            new("PlayerXp", "AddXp", 1, nameof(AfterAddXp), "character level checks"),
+            new("WeaponInventory", "AddWeapon", null, nameof(AfterAddWeapon), "weapon level checks"),
+            new("TomeInventory", "AddTome", null, nameof(AfterAddTome), "tome level checks"),
+            new("LevelupScreen", "OnClose", null, nameof(AfterLevelup), "weapon and tome levels after each level-up"),
             new("PlayerHealth", "PlayerDied", 0, nameof(AfterPlayerDied), "sending DeathLink"),
-            new("GraveyardBossRoom", "Activate", null, nameof(AfterCrypt), "the Crypt Keys check"),
-            new("GameManager", "StopDungeon", null, nameof(AfterStopDungeon), "knowing when a run is over"),
+            new("PlayerHealth", "Tick", 0, nameof(AfterHealthTick), "dying when a DeathLink arrives"),
+            new("GraveyardBossRoom", "Activate", 0, nameof(AfterCrypt), "the Crypt Keys check"),
+            new("GraveyardBossRoom", "OnEnemyDied", 2, nameof(AfterGraveyardEnemyDied), "the Big Bob check and Graveyard runs"),
+            new("ChallengesTracker", "CompleteChallenge", 0, nameof(AfterChallenge), "challenge checks"),
         };
 
         // only used when TrackStats.OnEnemyDied is not there
         private static readonly Hook EnemyFallback =
-            new("Enemy", "EnemyDied", 0, nameof(AfterEnemyDiedInstance), "boss, miniboss and tier checks");
+            new("Enemy", "EnemyDied", 0, nameof(AfterEnemyDiedInstance), "miniboss and hidden boss checks");
 
         public static int Wanted => All.Length;
 
         private static GameReader? _reader;
         private static ILog? _log;
         private static readonly HashSet<string> Failed = new();
+        private static long _killBefore;        // a DeathLink waits here for the game's own thread: ticks, 0 = none
 
         public static int Attach(Harmony harmony, GameReader reader, TypeFinder finder, ILog log)
         {
@@ -48,11 +55,17 @@ namespace MegabonkAP.Plugin
             int attached = 0;
             foreach (Hook hook in All)
             {
-                if (Attach(harmony, finder, log, hook)) { attached++; continue; }
-                if (hook.Type == "TrackStats" && Attach(harmony, finder, log, EnemyFallback)) attached++;
+                bool ok = Attach(harmony, finder, log, hook);
+                if (!ok && hook.Type == "TrackStats") ok = Attach(harmony, finder, log, EnemyFallback);
+                if (ok && hook.Method == "OnStageBossDied") reader.StageBossEvent = true;
+                if (ok) attached++;
             }
             return attached;
         }
+
+        /// <summary>Another player died. The player dies at the next health tick, if one comes within ten seconds.</summary>
+        public static void RequestKill() =>
+            System.Threading.Interlocked.Exchange(ref _killBefore, DateTime.UtcNow.AddSeconds(10).Ticks);
 
         private static bool Attach(Harmony harmony, TypeFinder finder, ILog log, Hook hook)
         {
@@ -101,26 +114,52 @@ namespace MegabonkAP.Plugin
         private static void AfterStartNewMap(object[] __args) =>
             Safely(nameof(AfterStartNewMap), r => r.RunStarted(__args.Length > 0 ? __args[0] : null));
 
+        private static void AfterRestartRun() =>
+            Safely(nameof(AfterRestartRun), r => r.RunRestarted());
+
+        private static void AfterStartPlayer(object[] __args) =>
+            Safely(nameof(AfterStartPlayer), r => r.PlayerStarted(__args.Length > 0 ? __args[0] : null));
+
         private static void AfterEnemyDiedStatic(object[] __args) =>
             Safely(nameof(AfterEnemyDiedStatic), r => r.EnemyDied(__args.Length > 0 ? __args[0] : null));
 
         private static void AfterEnemyDiedInstance(object __instance) =>
             Safely(nameof(AfterEnemyDiedInstance), r => r.EnemyDied(__instance));
 
+        private static void AfterStageBossDied() =>
+            Safely(nameof(AfterStageBossDied), r => r.StageBossDied());
+
         private static void AfterAddXp(object __instance) =>
             Safely(nameof(AfterAddXp), r => r.XpChanged(__instance));
 
-        private static void AfterInventory() =>
-            Safely(nameof(AfterInventory), r => r.InventoryChanged());
+        private static void AfterAddWeapon(object __instance) =>
+            Safely(nameof(AfterAddWeapon), r => r.WeaponsChanged(__instance));
+
+        private static void AfterAddTome(object __instance) =>
+            Safely(nameof(AfterAddTome), r => r.TomesChanged(__instance));
+
+        private static void AfterLevelup() =>
+            Safely(nameof(AfterLevelup), r => r.InventoryChanged());
 
         private static void AfterPlayerDied() =>
             Safely(nameof(AfterPlayerDied), r => r.PlayerDied());
 
+        private static void AfterHealthTick(object __instance)
+        {
+            if (_killBefore == 0) return;                   // every frame: nothing else may happen here
+            long before = System.Threading.Interlocked.Exchange(ref _killBefore, 0);
+            if (before == 0 || DateTime.UtcNow.Ticks > before) return;
+            Safely(nameof(AfterHealthTick), r => r.Kill(__instance));
+        }
+
         private static void AfterCrypt() =>
             Safely(nameof(AfterCrypt), r => r.CryptOpened());
 
-        private static void AfterStopDungeon() =>
-            Safely(nameof(AfterStopDungeon), r => r.RunEnded());
+        private static void AfterGraveyardEnemyDied(object __instance, object[] __args) =>
+            Safely(nameof(AfterGraveyardEnemyDied), r => r.GraveyardEnemyDied(__instance, __args.Length > 0 ? __args[0] : null));
+
+        private static void AfterChallenge() =>
+            Safely(nameof(AfterChallenge), r => r.ChallengeCompleted());
 
         private static void Safely(string where, Action<GameReader> action)
         {

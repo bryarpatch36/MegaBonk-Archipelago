@@ -3,7 +3,7 @@
 Megabonk as a game in an [Archipelago](https://archipelago.gg) multiworld. It has two parts:
 
 - **A Manual world.** Nothing is installed into the game. You play Megabonk normally, the items you are sent decide which characters, weapons, tomes and maps you may use, and you tick off what you have done in Archipelago's Manual Client.
-- **MegabonkAP, a mod (in progress).** A BepInEx plugin that sends the checks for you as you play. It is built but has not been loaded into the game yet: see [mod/README.md](mod/README.md).
+- **MegabonkAP, a mod (in progress).** A BepInEx plugin that sends the checks for you as you play. It loads in the game, attaches its hooks and connects; reading the game correctly is still being worked through, one test run at a time: see [mod/README.md](mod/README.md).
 
 This is an unofficial fan project. It is not affiliated with or endorsed by vedinad or the Archipelago project.
 
@@ -14,10 +14,10 @@ This is an unofficial fan project. It is not affiliated with or endorsed by vedi
 | Generating a multiworld with every option combination | Works (automated test) |
 | Hosting a seed, connecting as the slot, sending checks, receiving items, reaching the goal | Works against a local Archipelago 0.6.8 server (automated test, no game involved) |
 | Playing it with the Manual Client and the real game | Not yet tried |
-| Checks sent by themselves (the mod) | Its rules and its Archipelago connection pass their tests without the game; the plugin has never been loaded into Megabonk ([mod/README.md](mod/README.md)) |
+| Checks sent by themselves (the mod) | Loads in Megabonk 1.0.69, attaches its hooks and connects. No check has been sent from the game yet ([mod/README.md](mod/README.md)) |
 | Rules enforced by the game | Not built |
 
-The lists of characters, weapons and tomes come from a public Megabonk database as of November 2026. Megabonk was not available on the PC this was built on, so three things were taken from guides rather than seen in the game and may need a correction after a first session: the challenge names, the Graveyard checks, and the level numbers the checks ask for (see "Building and changing it").
+The lists of characters, weapons and tomes come from a public Megabonk database as of November 2026, and all match the game's own code (version 1.0.69). The game's code also names four tomes the world does not have (Bounce, Balance, Gambler, Hoarder); whether they can be obtained has not been checked. Megabonk was not available on the PC this was built on, so three things were taken from guides rather than seen in the game and may need a correction after a first session: the challenge names, the Graveyard checks, and the level numbers the checks ask for (see "Building and changing it").
 
 ## What you need
 

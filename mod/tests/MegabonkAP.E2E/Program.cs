@@ -71,16 +71,14 @@ internal static class Program
         // 1. strict rules, a run the starting items permit
         tracker.RunStarted(character, "Forest", 1);
         tracker.PlayerLevel(30);
-        tracker.EnemyKilled("ForestBoss1", true);
+        tracker.StageBossDied(true);
         string tier1 = list.Maps["Forest"].TierChecks[0];
         Expect(Wait(() => link.IsChecked(tier1) && link.IsChecked(who.RunCheck) && link.IsChecked(who.LevelCheck)),
             $"the server took: {tier1}; {who.RunCheck}; {who.LevelCheck}");
-        tracker.RunEnded();
 
         // 2. strict rules, a run they do not permit (Desert without a Desert tier)
         tracker.RunStarted(character, "Desert", 1);
-        tracker.EnemyKilled("DesertBoss1", true);
-        tracker.RunEnded();
+        tracker.StageBossDied(true);
         Thread.Sleep(1500);
         Expect(!link.IsChecked(list.Maps["Desert"].TierChecks[0]), "a Desert run without the Desert tier item sent nothing");
         Expect(log.Lines.Any(l => l.Contains("This run does not count")), "and the log said why");
@@ -95,10 +93,9 @@ internal static class Program
         foreach (string map in new[] { "Forest", "Desert" })
         {
             tracker.RunStarted(character, map, 2);
-            tracker.EnemyKilled("StageBossOne", true);
-            tracker.EnemyKilled("StageBossTwo", true);
-            tracker.RunEnded();
-        }
+            tracker.StageBossDied(false);
+            tracker.StageBossDied(true);
+            }
         Expect(Wait(() => link.IsChecked(list.Maps["Forest"].TierChecks[1]) && link.IsChecked(list.Maps["Desert"].TierChecks[1])),
             "the server took Tier 2 on Forest and on Desert");
         Expect(log.Lines.Any(l => l.Contains("Goal reached: Tier 2 Bosses")), "the goal was sent");

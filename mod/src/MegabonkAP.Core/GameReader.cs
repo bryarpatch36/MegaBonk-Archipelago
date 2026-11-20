@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace MegabonkAP.Core
 {
     /// <summary>
     /// Takes the game's own objects from the plugin's hooks, reads what the tracker needs out of
-    /// them by member name, and passes it on. Every member name used here is listed in
-    /// docs/hooks.md with where it comes from; when one is missing the log says which, and lists
-    /// the members the object really has.
+    /// them by member name, and passes it on. The names are those of game version 1.0.69
+    /// (docs/probes/probe-1.0.69.txt); docs/hooks.md says which have been seen working. When a
+    /// member is missing the log says which, and lists the members the object really has.
     /// </summary>
     public sealed class GameReader
     {
@@ -22,7 +23,14 @@ namespace MegabonkAP.Core
         private readonly Queue<long> _recentOrder = new();
         private readonly HashSet<long> _recent = new();                 // enemies whose death was already counted
         private int _playerLevel = -1;
-        private bool _characterKnown;
+        private int _deaths;
+        private int _bossDeaths;
+
+        /// <summary>
+        /// Set by the plugin when the game's own "stage boss died" method is hooked. When it is
+        /// not, stage bosses are recognised among the enemy deaths instead.
+        /// </summary>
+        public bool StageBossEvent { get; set; }
 
         public GameReader(Tracker tracker, ILog log, Func<string, Type?> findType)
         {
@@ -40,6 +48,8 @@ namespace MegabonkAP.Core
                 _recent.Clear();
                 _recentOrder.Clear();
                 _playerLevel = -1;
+                _deaths = 0;
+                _bossDeaths = 0;
 
                 if (runConfig == null)
                 {
@@ -48,21 +58,27 @@ namespace MegabonkAP.Core
                     return;
                 }
 
-                string? map = Dyn.Name(Dyn.First(runConfig, "mapData.eMap", "mapData.name"));
+                string? map = Dyn.Name(Dyn.Get(runConfig, "mapData.eMap"));
                 if (map == null) Missing(runConfig, "the map (mapData.eMap)");
 
-                int tier = Tier(runConfig);
-                string? character = Dyn.Name(Dyn.First(runConfig,
-                    "characterData.eCharacter", "character.eCharacter", "eCharacter", "characterData.name"))
-                    ?? CharacterFromPlayer();
-                _characterKnown = character != null;
+                // the menu's Tier 1, 2, 3 is mapTierIndex 0, 1, 2
+                int? tierIndex = Dyn.Int(Dyn.Get(runConfig, "mapTierIndex"));
+                if (tierIndex == null) Missing(runConfig, "the tier (mapTierIndex)");
+                int tier = tierIndex == null ? 0 : tierIndex.Value + 1;
 
-                string? challenge = Dyn.Name(Dyn.First(runConfig,
-                    "challengeData.name", "challengeData", "challenge.name", "challenge"));
+                object? challenge = Dyn.Get(runConfig, "challenge");
+                string? challengeName = challenge == null ? null : ChallengeNames(challenge).FirstOrDefault(n => n != null);
 
-                _tracker.RunStarted(character, map, tier, challenge);
+                // the player does not exist yet on a new run; MyPlayer.StartPlayer names the character shortly
+                _tracker.RunStarted(CharacterFromPlayer(), map, tier, challengeName);
             }
         }
+
+        /// <summary>MapController.RestartRun(): the same run settings again.</summary>
+        public void RunRestarted() => RunStarted(Dyn.GetStatic(_findType("MapController"), "runConfig"));
+
+        /// <summary>MyPlayer.StartPlayer(ECharacter, Vector3): the player appears, and the game names the character.</summary>
+        public void PlayerStarted(object? character) => _tracker.CharacterSeen(Dyn.Name(character));
 
         /// <summary>TrackStats.OnEnemyDied(Enemy, DamageContainer) or Enemy.EnemyDied(): an enemy died.</summary>
         public void EnemyDied(object? enemy)
@@ -71,19 +87,31 @@ namespace MegabonkAP.Core
             lock (_gate)
             {
                 if (!FirstTime(enemy)) return;
+                _deaths++;
 
-                string? name = Dyn.Name(Dyn.First(enemy, "enemyData.enemyName", "enemyData.name"));
+                string? name = Dyn.Name(Dyn.Get(enemy, "enemyData.enemyName"));
                 if (name == null) { Missing(enemy, "the enemy's name (enemyData.enemyName)"); return; }
 
-                bool stageBoss;
-                if (Dyn.Has(enemy.GetType(), "IsStageBoss()"))
-                    stageBoss = Dyn.Bool(Dyn.Get(enemy, "IsStageBoss()")) || Dyn.Bool(Dyn.Get(enemy, "IsFinalBoss()"));
-                else
-                {
-                    int flags = Dyn.Int(Dyn.Get(enemy, "enemyFlag")) ?? 0;      // EEnemyFlag: StageBoss 4, FinalBoss 32
-                    stageBoss = (flags & (4 | 32)) != 0;
-                }
-                _tracker.EnemyKilled(name, stageBoss);
+                // EEnemyFlag: Boss 2, StageBoss 4, SummonerMiniboss 16, FinalBoss 32
+                int flags = Dyn.Int(Dyn.Get(enemy, "enemyFlag")) ?? 0;
+                bool boss = (flags & (2 | 4 | 16 | 32)) != 0;
+                if (boss) _bossDeaths++;
+                _tracker.EnemyKilled(name, boss);
+
+                if (!StageBossEvent && (flags & (4 | 32)) != 0) _tracker.StageBossDied(TierFinal());
+            }
+        }
+
+        /// <summary>GameManager.OnStageBossDied(): the boss that ends a stage is dead.</summary>
+        public void StageBossDied()
+        {
+            lock (_gate)
+            {
+                bool? tierFinal = TierFinal();
+                if (tierFinal == null) Say("The game did not say whether this was the tier's last stage (MapController.IsTierFinalStage)."
+                    + " Stage bosses are counted against the tier instead.");
+                _tracker.StageBossDied(tierFinal);
+                _log.Info("Stage boss dead. " + Summary());
             }
         }
 
@@ -92,8 +120,7 @@ namespace MegabonkAP.Core
         {
             lock (_gate)
             {
-                int? level = Dyn.Int(Dyn.First(playerXp, "level", "currentLevel", "Level", "GetLevel()"))
-                    ?? Dyn.Int(Dyn.First(Player(), "inventory.playerXp.level", "playerXp.level", "inventory.level"));
+                int? level = Dyn.Int(Dyn.Get(playerXp, "level"));
                 if (level == null)
                 {
                     if (playerXp != null) Missing(playerXp, "the player's level (level)");
@@ -101,88 +128,150 @@ namespace MegabonkAP.Core
                 }
                 if (level.Value == _playerLevel) return;
                 _playerLevel = level.Value;
-                if (!_characterKnown)
-                {
-                    string? character = CharacterFromPlayer();
-                    if (character != null) { _characterKnown = true; _tracker.CharacterSeen(character); }
-                }
                 _tracker.PlayerLevel(level.Value);
             }
         }
 
-        /// <summary>
-        /// WeaponInventory.AddWeapon, TomeInventory.AddTome, LevelupScreen.OnClose: a weapon or tome
-        /// was taken or upgraded. Reads every weapon's and tome's level and passes on what changed.
-        /// </summary>
-        public void InventoryChanged()
+        /// <summary>WeaponInventory.AddWeapon(...): a weapon was taken or upgraded.</summary>
+        public void WeaponsChanged(object? weaponInventory)
         {
+            if (weaponInventory == null) return;
             lock (_gate)
             {
-                object? inventory = Dyn.First(Player(), "inventory");
-                if (inventory == null) { Say("The player's inventory could not be read (GameManager.Instance.player.inventory)."); return; }
+                int seen = 0;
+                Array? all = Dyn.EnumOfFirstArgument(weaponInventory.GetType(), "GetWeaponLevel");
+                object? owned = Dyn.Get(weaponInventory, "weapons");
+                if (all != null && owned != null && Dyn.Method(owned.GetType(), "ContainsKey", 1) != null)
+                {
+                    // ask about each weapon in turn: the game's dictionary is awkward to walk from outside
+                    foreach (object weapon in all)
+                    {
+                        if (!Dyn.Bool(Dyn.Call(owned, "ContainsKey", weapon))) continue;
+                        int? level = Dyn.Int(Dyn.Call(weaponInventory, "GetWeaponLevel", weapon));
+                        if (level == null) continue;
+                        seen++;
+                        if (Changed("weapon:" + weapon, level.Value)) _tracker.WeaponLevel(weapon.ToString(), level.Value);
+                    }
+                    return;
+                }
 
-                object? weapons = Dyn.Get(inventory, "weaponInventory.weapons");
-                if (weapons == null) Missing(inventory, "the weapons (weaponInventory.weapons)");
-                foreach ((object? key, object? value) in Dyn.Pairs(weapons))
+                foreach ((object? key, object? value) in Dyn.Pairs(owned))
                 {
                     string? name = Dyn.Name(key);
-                    int? level = Dyn.Int(value) ?? Dyn.Int(Dyn.First(value, "level", "Level"));
+                    int? level = Dyn.Int(Dyn.First(value, "level", "Level"));
                     if (name == null || level == null) continue;
+                    seen++;
                     if (Changed("weapon:" + name, level.Value)) _tracker.WeaponLevel(name, level.Value);
                 }
-
-                object? tomes = Dyn.First(inventory, "tomeInventory.tomeLevels", "tomeInventory.tomes");
-                if (tomes == null) Missing(inventory, "the tomes (tomeInventory.tomeLevels)");
-                foreach ((object? key, object? value) in Dyn.Pairs(tomes))
-                {
-                    string? name = Dyn.Name(key);
-                    int? level = Dyn.Int(value) ?? Dyn.Int(Dyn.First(value, "level", "Level"));
-                    if (name == null || level == null) continue;
-                    if (Changed("tome:" + name, level.Value)) _tracker.TomeLevel(name, level.Value);
-                }
+                if (seen == 0) Missing(weaponInventory, "the weapons (GetWeaponLevel and weapons)");
             }
         }
 
-        /// <summary>PlayerHealth.PlayerDied().</summary>
-        public void PlayerDied() => _tracker.PlayerDied();
+        /// <summary>TomeInventory.AddTome(...): a tome was taken or upgraded.</summary>
+        public void TomesChanged(object? tomeInventory)
+        {
+            if (tomeInventory == null) return;
+            lock (_gate)
+            {
+                Type type = tomeInventory.GetType();
+                Array? all = Dyn.EnumOfFirstArgument(type, "GetTomeLevel");
+                if (all != null && Dyn.Method(type, "HasTome", 1) != null)
+                {
+                    foreach (object tome in all)
+                    {
+                        if (!Dyn.Bool(Dyn.Call(tomeInventory, "HasTome", tome))) continue;
+                        int? level = Dyn.Int(Dyn.Call(tomeInventory, "GetTomeLevel", tome));
+                        if (level == null) continue;
+                        if (Changed("tome:" + tome, level.Value)) _tracker.TomeLevel(tome.ToString(), level.Value);
+                    }
+                    return;
+                }
+
+                int seen = 0;
+                foreach ((object? key, object? value) in Dyn.Pairs(Dyn.Get(tomeInventory, "tomeLevels")))
+                {
+                    string? name = Dyn.Name(key);
+                    int? level = Dyn.Int(value);
+                    if (name == null || level == null) continue;
+                    seen++;
+                    if (Changed("tome:" + name, level.Value)) _tracker.TomeLevel(name, level.Value);
+                }
+                if (seen == 0) Missing(tomeInventory, "the tomes (HasTome, GetTomeLevel and tomeLevels)");
+            }
+        }
+
+        /// <summary>LevelupScreen.OnClose(): look at every weapon and tome again.</summary>
+        public void InventoryChanged()
+        {
+            object? inventory = Dyn.Get(Player(), "inventory")
+                ?? Dyn.GetStatic(_findType("MapController"), "inventory");
+            if (inventory == null) return;      // between runs, or before the player exists
+            WeaponsChanged(Dyn.Get(inventory, "weaponInventory"));
+            TomesChanged(Dyn.Get(inventory, "tomeInventory"));
+        }
+
+        /// <summary>
+        /// GraveyardBossRoom.OnEnemyDied(Enemy, DamageContainer): an enemy died while the Graveyard's
+        /// boss room exists. When it is the room's own boss, that is Big Bob, and the run is complete.
+        /// </summary>
+        public void GraveyardEnemyDied(object? room, object? enemy)
+        {
+            if (room == null || enemy == null) return;
+            object? boss = Dyn.Get(room, "bossEnemy");
+            if (boss == null || Identity(boss) != Identity(enemy)) return;
+            _log.Info($"The Graveyard's boss is dead: the game calls it '{Dyn.Name(Dyn.Get(enemy, "enemyData.enemyName"))}'.");
+            _tracker.BossDefeated("Big Bob", endsRun: true);
+        }
 
         /// <summary>GraveyardBossRoom.Activate().</summary>
         public void CryptOpened() => _tracker.CryptOpened();
 
-        /// <summary>GameManager.StopDungeon().</summary>
-        public void RunEnded() => _tracker.RunEnded();
+        /// <summary>ChallengesTracker.CompleteChallenge(): the run's challenge is done.</summary>
+        public void ChallengeCompleted()
+        {
+            object? challenge = Dyn.GetStatic(_findType("ChallengesTracker"), "GetCurrentChallenge()");
+            _tracker.ChallengeCompleted(challenge == null ? Array.Empty<string?>() : ChallengeNames(challenge).ToArray());
+        }
+
+        /// <summary>PlayerHealth.PlayerDied().</summary>
+        public void PlayerDied()
+        {
+            lock (_gate) _log.Info("You died. " + Summary());
+            _tracker.PlayerDied();
+        }
+
+        /// <summary>DeathLink: end the player through the game's own PlayerHealth.KillPlayer().</summary>
+        public void Kill(object? playerHealth)
+        {
+            if (playerHealth == null || Dyn.Method(playerHealth.GetType(), "KillPlayer", 0) == null)
+            {
+                Say("DeathLink: the game's KillPlayer could not be found, so nothing happened.");
+                return;
+            }
+            Dyn.Call(playerHealth, "KillPlayer");
+        }
 
         // ------------------------------------------------------------------ inside
 
-        /// <summary>
-        /// The tier is the place of the chosen stage in the map's list of stages: what the menu
-        /// calls Tier 1, 2, 3 the game keeps as mapData.stages[0], [1], [2]. 0 when it cannot be read.
-        /// </summary>
-        private int Tier(object runConfig)
+        /// <summary>What the mod has seen this run, in one line: enough to tell which hooks are alive.</summary>
+        private string Summary()
         {
-            object? stage = Dyn.Get(runConfig, "stageData");
-            object? stages = Dyn.Get(runConfig, "mapData.stages");
-            if (stage == null || stages == null)
-            {
-                Missing(runConfig, "the tier (stageData and mapData.stages)");
-                return 0;
-            }
-            long wanted = Identity(stage);
-            string? wantedName = Dyn.Name(stage);
-            int index = 0, byName = 0;
-            foreach (object? candidate in Dyn.Items(stages))
-            {
-                index++;
-                if (candidate == null) continue;
-                if (ReferenceEquals(candidate, stage) || Identity(candidate) == wanted) return index;
-                if (byName == 0 && wantedName != null && Dyn.Name(candidate) == wantedName) byName = index;
-            }
-            if (byName == 0) Say("The chosen stage is not in the map's list of stages, so the tier is unknown.");
-            return byName;
+            string levels = string.Join(", ", _levels.OrderBy(l => l.Key).Select(l => $"{l.Key.Split(':')[1]} {l.Value}"));
+            return $"Seen this run: {_deaths} enemy deaths ({_bossDeaths} bosses), player level "
+                + (_playerLevel < 0 ? "unknown" : _playerLevel.ToString()) + ", weapons and tomes: " + (levels.Length > 0 ? levels : "none") + ".";
         }
 
-        private string? CharacterFromPlayer() => Dyn.Name(Dyn.First(Player(),
-            "characterData.eCharacter", "character.eCharacter", "eCharacter", "characterData.name"));
+        /// <summary>A challenge under each name it might match by: the one shown to the player, then the asset's.</summary>
+        private static IEnumerable<string?> ChallengeNames(object challenge)
+        {
+            yield return Dyn.Get(challenge, "GetDisplayName()") as string;
+            yield return Dyn.Get(challenge, "name") as string;
+        }
+
+        private bool? TierFinal() => Dyn.GetStatic(_findType("MapController"), "IsTierFinalStage()") as bool?;
+
+        private string? CharacterFromPlayer() =>
+            Dyn.Name(Dyn.First(Player(), "character", "inventory.characterData.eCharacter"));
 
         private object? Player() => Dyn.GetStatic(_findType("GameManager"), "Instance.player");
 

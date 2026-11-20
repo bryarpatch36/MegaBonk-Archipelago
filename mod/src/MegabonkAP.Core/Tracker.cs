@@ -68,7 +68,10 @@ namespace MegabonkAP.Core
 
         // ------------------------------------------------------------------ what the plugin reports
 
-        /// <summary>A run began. Any argument may be null or 0 when the plugin could not read it.</summary>
+        /// <summary>
+        /// A run began. Any argument may be null or 0 when it could not be read; the character
+        /// usually follows a moment later through CharacterSeen.
+        /// </summary>
         public void RunStarted(string? character, string? map, int tier, string? challenge = null)
         {
             lock (_gate)
@@ -81,20 +84,22 @@ namespace MegabonkAP.Core
                 _stageBosses = 0;
                 _runCounted = false;
                 _refusalSaid = false;
-                _log.Info($"Run started: {_character ?? "unknown character"} on {_map ?? "unknown map"}"
-                    + (_tier > 0 ? $" Tier {_tier}" : "") + (_challenge != null ? $", challenge {_challenge}" : ""));
-                RunCounts();
+                _log.Info($"Run started: {_map ?? "unknown map"}" + (_tier > 0 ? $" Tier {_tier}" : "")
+                    + (_character != null ? $" as {_character}" : "") + (_challenge != null ? $", challenge {_challenge}" : ""));
             }
         }
 
-        /// <summary>The character being played, for when it could not be read at the start of the run.</summary>
+        /// <summary>The character being played. The game says so when the player appears, after the run began.</summary>
         public void CharacterSeen(string? character)
         {
             lock (_gate)
             {
-                if (_character != null) return;
-                _character = Known("character", character);
-                if (_character != null) _log.Info($"Playing as {_character}.");
+                string? name = Known("character", character);
+                if (name == null || name == _character) return;
+                _character = name;
+                _refusalSaid = false;
+                _log.Info($"Playing as {_character}.");
+                if (_inRun) RunCounts();        // say at once when this run will not count
             }
         }
 
@@ -139,31 +144,72 @@ namespace MegabonkAP.Core
             }
         }
 
-        /// <summary>An enemy died. stageBoss: the game marks it as the boss that ends a stage (or the final boss).</summary>
-        public void EnemyKilled(string? name, bool stageBoss)
+        /// <summary>
+        /// An enemy died, under the game's own name for it. boss: the game marks it as some kind of
+        /// boss, which only matters for the log: a boss the list does not know is written down once.
+        /// </summary>
+        public void EnemyKilled(string? name, bool boss)
+        {
+            lock (_gate)
+            {
+                if (!_inRun) return;
+                string? check = _list.EnemyCheck(name);
+                if (check != null)
+                {
+                    if (RunCounts()) Earn(check);
+                }
+                else if (boss && _said.Add("boss:" + _map + name))
+                {
+                    _log.Info($"Boss killed on {_map ?? "an unknown map"}: the game calls it '{name}'.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// The boss that ends a stage died. tierFinal: whether the game says this was the last stage
+        /// of the chosen tier; null when that could not be read, and then stage bosses are counted
+        /// against the tier instead.
+        /// </summary>
+        public void StageBossDied(bool? tierFinal)
+        {
+            lock (_gate)
+            {
+                if (!_inRun) return;
+                _stageBosses++;
+                if (tierFinal == true) { RunWon(); return; }
+                if (tierFinal == false) { _log.Info($"Stage boss {_stageBosses} down; the tier is not finished yet."); return; }
+                if (_tier > 0 && _stageBosses >= _tier) RunWon();
+                else if (_tier <= 0) SayOnce("A stage boss died, but the tier of this run could not be read, so no tier check is sent.");
+            }
+        }
+
+        /// <summary>A boss the mod recognises by what happened ("Big Bob"). endsRun: beating it completes the run.</summary>
+        public void BossDefeated(string boss, bool endsRun)
+        {
+            lock (_gate)
+            {
+                if (!_inRun) return;
+                if (_list.BossChecks.TryGetValue(boss, out string? check) && RunCounts()) Earn(check);
+                if (endsRun) RunWon();
+            }
+        }
+
+        /// <summary>The game says the run's challenge is complete. name: the game's name for it, or null to use the one the run began with.</summary>
+        public void ChallengeCompleted(params string?[] names)
         {
             lock (_gate)
             {
                 if (!_inRun || _map == null) return;
-                CheckList.Map map = _list.Maps[_map];
-
-                string? boss = _list.ResolveBoss(_map, name);
-                if (boss != null && map.BossChecks.TryGetValue(boss, out string? bossCheck) && RunCounts())
+                var candidates = new List<string?>(names) { _challenge };
+                foreach (string? candidate in candidates)
                 {
-                    Earn(bossCheck);
-                    if (_map == "Graveyard" && boss == "Big Bob") RunWon();     // Big Bob ends the Graveyard
+                    string? check = _list.ResolveChallenge(_map, candidate);
+                    if (check == null) continue;
+                    if (RunCounts()) Earn(check);
+                    return;
                 }
-                else if (stageBoss && boss == null)
-                {
-                    if (_said.Add("boss:" + _map + name)) _log.Info($"Stage boss killed on {_map}: the game calls it '{name}'.");
-                }
-
-                if (stageBoss && map.TierChecks.Count > 0)
-                {
-                    _stageBosses++;
-                    if (_tier > 0 && _stageBosses >= _tier) RunWon();
-                    else if (_tier <= 0) SayOnce("A stage boss died, but the tier of this run could not be read, so no tier check is sent.");
-                }
+                string called = string.Join("' / '", candidates.Where(c => !string.IsNullOrWhiteSpace(c)).Distinct());
+                SayOnce($"Challenge finished on {_map}: the game calls it '{called}', which matches no check.");
             }
         }
 
@@ -189,12 +235,6 @@ namespace MegabonkAP.Core
                 {
                     CheckList.Map map = _list.Maps[_map];
                     if (_tier >= 1 && _tier <= map.TierChecks.Count) Earn(map.TierChecks[_tier - 1]);
-                    if (_challenge != null)
-                    {
-                        string? challenge = _list.ResolveChallenge(_map, _challenge);
-                        if (challenge != null) Earn(challenge);
-                        else SayOnce($"Challenge finished on {_map}: the game calls it '{_challenge}', which matches no check.");
-                    }
                 }
                 if (_character != null) Earn(_list.Characters[_character].RunCheck);
                 CheckGoal();
@@ -211,12 +251,6 @@ namespace MegabonkAP.Core
                 _log.Info("You died. Telling the others.");
                 _link.SendDeath("got bonked");
             }
-        }
-
-        /// <summary>The run is over, however it ended.</summary>
-        public void RunEnded()
-        {
-            lock (_gate) { _inRun = false; }
         }
 
         /// <summary>Try again to send what is still owed. Call it every few seconds.</summary>
@@ -289,7 +323,7 @@ namespace MegabonkAP.Core
         {
             if (!Strict) return true;
             string? reason = null;
-            if (_character == null) reason = "the character could not be read";
+            if (_character == null) reason = "the game has not said which character this is";
             else if (!Holds(_list.Characters[_character].Item)) reason = $"you do not hold {_list.Characters[_character].Item}";
             else if (_map == null) reason = "the map could not be read";
             else
@@ -382,7 +416,7 @@ namespace MegabonkAP.Core
         {
             if (string.IsNullOrWhiteSpace(gameName)) return null;
             string? name = _list.Resolve(kind, gameName);
-            if (name == null) SayOnce($"The game named a {kind} '{gameName}' that matches nothing in the list.");
+            if (name == null && !_list.IsIgnored(kind, gameName)) SayOnce($"The game named a {kind} '{gameName}' that matches nothing in the list.");
             return name;
         }
 

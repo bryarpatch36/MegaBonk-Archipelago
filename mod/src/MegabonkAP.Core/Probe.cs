@@ -49,7 +49,7 @@ namespace MegabonkAP.Core
     /// </summary>
     public static class Probe
     {
-        public const int Format = 1;
+        public const int Format = 2;
 
         /// <summary>The types the mod hooks or reads, and the enums whose value names it matches against.</summary>
         public static readonly string[] Wanted =
@@ -58,11 +58,14 @@ namespace MegabonkAP.Core
             "WeaponInventory", "TomeInventory", "ItemInventory", "PlayerXp", "PlayerHealth", "Enemy", "EnemyData",
             "TrackStats", "LevelupScreen", "UpgradePicker", "CharacterMenu", "CharacterData", "GraveyardBossRoom",
             "FinalFightController", "ChallengeSummoner", "SaveManager", "DataManager",
-            "EMap", "ECharacter", "EWeapon", "ETome", "EEnemy", "EEnemyFlag",
+            "ChallengesTracker", "ChallengeData", "MyAchievement", "DeathScreen", "WeaponBase", "WeaponData",
+            "TomeData", "UnlockableBase", "InteractableCoffin", "InteractableCrypt", "GraveyardBossMetalGate",
+            "InteractableGhostBossLeave", "InteractableCharacterFight", "UnlocksUi", "UnlockContainer",
+            "EMap", "ECharacter", "EWeapon", "ETome", "EEnemy", "EEnemyFlag", "EItem", "EDungeonType",
         };
 
         /// <summary>Words that mark types worth a look for what is still unknown.</summary>
-        public const string Words = "win|victory|complete|gameover|deathscreen|runend|endscreen|challenge|tier|toggl|unlock|crypt|key";
+        public const string Words = "victory|gameover|runend|endscreen|challenge|tier|toggl|unlock|crypt|coffin|ghost|portal|swarm|banish|upgradepick|encounter";
 
         public static IEnumerable<Type> TypesOf(Assembly assembly)
         {
@@ -112,10 +115,10 @@ namespace MegabonkAP.Core
 
                 IEnumerable<string> properties = type.GetProperties(Declared)
                     .Where(p => !Noise(p.Name))
-                    .Select(p => $"{Short(p.PropertyType)} {p.Name}");
+                    .Select(p => $"{((p.GetMethod ?? p.SetMethod)?.IsStatic == true ? "static " : "")}{Short(p.PropertyType)} {p.Name}");
                 IEnumerable<string> fields = type.GetFields(Declared)
                     .Where(f => !Noise(f.Name))
-                    .Select(f => $"{Short(f.FieldType)} {f.Name}");
+                    .Select(f => $"{(f.IsStatic ? "static " : "")}{Short(f.FieldType)} {f.Name}");
                 IEnumerable<string> methods = type.GetMethods(Declared)
                     .Where(m => !m.IsSpecialName && !Noise(m.Name))
                     .Select(m => $"{(m.IsStatic ? "static " : "")}{Short(m.ReturnType)} {m.Name}("

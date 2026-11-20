@@ -1,0 +1,2344 @@
+MegabonkAP probe, format 1: 1221 types read
+
+== Types the mod uses ==
+type GameManager : MonoBehaviour
+    Int32 _cryptIndex_k__BackingField
+    Single _dungeonTimeToComplete_k__BackingField
+    Boolean _isCrypt_k__BackingField
+    Boolean _isDungeonOvertime_k__BackingField
+    Boolean _isDungeonTimerStarted_k__BackingField
+    Boolean _isGameOver_k__BackingField
+    Action A_DungeonEnded
+    Action A_DungeonStarted
+    Action A_GameOver
+    Action A_RunStarted
+    Action A_StageStarted
+    Int32 bossCurses
+    Int32 cryptIndex
+    Boolean cutscene
+    Single dungeonTimeToComplete
+    Single gameTimer
+    Single getMaxStageTimeInterval
+    Boolean hasSetMapDifficulty
+    Boolean inited
+    GameManager Instance
+    Boolean isCrypt
+    Boolean isDungeonOvertime
+    Boolean isDungeonTimerStarted
+    Boolean isGameOver
+    Boolean isPlaying
+    Single lastFoundStageTime
+    Single nextGetStageTime
+    MyPlayer player
+    PlayerCamera playerCamera
+    UiManager uiManager
+    LayerMask whatIsBlockingRails
+    LayerMask whatIsCameraCollision
+    LayerMask whatIsEnemy
+    LayerMask whatIsGround
+    LayerMask whatIsGroundAndObjects
+    LayerMask whatIsObjects
+    LayerMask whatIsPlayer
+    LayerMask whatIsProjectileObstruction
+    LayerMask whatIsProjectileRaycast
+    Boolean HasEnteredBossRoom()
+    Boolean IsFinalBossDead()
+    Boolean IsFinalSwarm()
+    Boolean IsPlaying()
+    Boolean IsTimeFreeze()
+    IEnumerator DoDeathAnimation()
+    MyPlayer GetPlayer()
+    PlayerInventory GetPlayerInventory()
+    PlayerMovement GetPlayerMovement()
+    Single GetAliveTime()
+    Single GetStageTimeMax()
+    static Single GetEnemyTeleportDistance()
+    static Single GetEnemyTeleportDistanceSqr()
+    static Single GetViewDistance()
+    static Single GetViewDistanceSqr()
+    Void Awake()
+    Void CreateInstances()
+    Void OnDestroy()
+    Void OnDied()
+    Void OnPlayerInit(PlayerInventory inventory)
+    Void OnStageBossDied()
+    Void OnTeleportAway()
+    Void ResumeEnemyGroundCollision()
+    Void Start()
+    Void StartDungeon(Single timeToComplete)
+    Void StartDungeonOvertime()
+    Void StartDungeonTimer()
+    Void StartPlaying()
+    Void StopDungeon()
+    Void TryInit()
+    Void Update()
+
+type Assets.Scripts.Managers.MapController : Object
+    MapData _currentMap_k__BackingField
+    StageData _currentStage_k__BackingField
+    Action A_NewRunStarted
+    MapData currentMap
+    StageData currentStage
+    String finalBossMapName
+    Int32 index
+    PlayerInventory inventory
+    Boolean isFinalBossStage
+    String mainMenuSceneName
+    Boolean reseting
+    RunConfig runConfig
+    static Boolean HasPlayerInventory()
+    static Boolean IsFinalBossStage()
+    static Boolean IsFirstStage()
+    static Boolean IsLastStage()
+    static Boolean IsMainMenu()
+    static Boolean IsTierFinalStage()
+    static Int32 GetStageIndex()
+    static PlayerInventory GetPlayerInventory(CharacterData data)
+    static Void LoadFinalStage()
+    static Void LoadNextStage()
+    static Void RestartRun()
+    static Void StartNewMap(RunConfig newRunConfig)
+    static Void TestFinalBoss()
+    static Void TestMap(MapData mapData, StageData stageData)
+    static Void TestMap(RunConfig testConfig)
+    static Void TryCleanupInventory()
+
+type Assets.Scripts.Game.Other.RunConfig : Object
+    ChallengeData challenge
+    MapData mapData
+    Int32 mapTierIndex
+    Int32 musicTrackIndex
+    StageData stageData
+    Dictionary<Int32, Single> tierSilverMultipliers
+    Int32 GetIndexToMultiplier()
+    Single GetEnemyDamage(Single value)
+    Single GetEnemyHp(Single hp)
+    Single GetEnemySpeed(Single speed)
+    Single GetSilverMultiplier()
+    String GetFormattedSilverMultiplier()
+
+type MapData : UnlockableBase
+    MyAchievement achievementRequirement
+    AudioClip ambience
+    MusicTrack bossTrack
+    EMap eMap
+    Material finalStageMaterial
+    Texture icon
+    Boolean isWaterDamaging
+    Texture mapIconBig
+    EMapType mapType
+    Il2CppReferenceArray<MusicTrack> musicTracks
+    Single numChestsMultiplier
+    Single numShrinesMultiplier
+    Single numShrinesPotsAndOtherMultiplier
+    Il2CppReferenceArray<RandomMapObject> randomObjectsOverride
+    Il2CppReferenceArray<GameObject> shrines
+    Single stageDuration
+    Il2CppReferenceArray<StageData> stages
+    Int32 unlockOrder
+    MyAchievement GetUnlockRequirement()
+    String GetInternalName()
+    String GetUnlockableTypeDisplayString()
+    Texture GetIcon()
+    UnlockableBase GetUnlockableRequirement()
+
+type StageData : ScriptableObject
+    Color ambienceColor
+    Il2CppReferenceArray<ChallengeData> challenges
+    Single farClipPlane
+    Il2CppReferenceArray<Material> flatMaterials
+    Color fogColor
+    Single fogIntensity
+    Material grassMaterial
+    Int32 grassPerChunk
+    Boolean isWaterDamage
+    Color lightColor
+    Single lightIntensity
+    LocalizedString localizedDescription
+    LocalizedString localizedName
+    Material m_fillMiddle
+    Material m_fillMiddleEdge
+    Material m_fillTop
+    Material m_fillTopEdge
+    Material m_stairs
+    MapEdgeFillType mapEdgeFillType
+    MapParameters mapParameters
+    GameObject particles
+    Single proceduralMapScale
+    NoiseData proceduralNoiseData
+    TerrainData proceduralTerrainData
+    Il2CppReferenceArray<RandomMapObject> randomMapObjects
+    Material skybox
+    StageTilePrefabs stageTilePrefabs
+    StageTimeline stageTimeline
+    Material triplanarMaterial
+    Material waterMaterial
+    GameObject waterSplashFx
+    GameObject SpawnParticles()
+    Material GetSideMaterial(EFillType eFillType, Boolean useEdgeTextures)
+    Material GetTopMaterial()
+    String GetDescription()
+    String GetName()
+    Void ApplyFogAndSky(Light sunLight)
+
+type Assets.Scripts.Actors.Player.MyPlayer : MonoBehaviour
+    Single _baseMovementSpeed_k__BackingField
+    Action A_Collided
+    Action A_CollidedEnemy
+    Action<PlayerInventory> A_PlayerInventoryInitialized
+    Action A_PrePlayerSpawn
+    Transform arrow
+    Vector3 averageMovingDirection
+    Vector3 averageMovingDirectionShooting
+    Single baseDamage
+    Single baseMovementSpeed
+    Single biasMoveSpeed
+    ECharacter character
+    Single damageCooldownOverAtTime
+    Single defaultBaseDamage
+    Single enemyAttackCooldown
+    Dictionary<GameObject, Single> enemyCooldowns
+    Int32 enemyLayer
+    Transform feet
+    GameObject fogOfWar
+    Boolean hasStarted
+    Transform head
+    Single height
+    Boolean inited
+    MyPlayer Instance
+    PlayerInventory inventory
+    Boolean isInvincible
+    Boolean isTeleporting
+    Single lastCalledTime
+    ParticleSystem levelupParticles
+    AudioSource levelupSfx
+    Single maxVectorSize
+    Single maxVectorSizeShooting
+    Camera minimapCamera
+    MinimapCamera minimapCameraScript
+    Single movingDirectionBias
+    Single nextChangeTime
+    AuraAttacks playerConstantAttacks
+    PlayerEffects playerEffects
+    PlayerInput playerInput
+    PlayerMovement playerMovement
+    PlayerRenderer playerRenderer
+    PlayerSfxs playerSfxs
+    Transform shootingArrow
+    Single shootingDirectionBias
+    Vector3 spawnDir
+    Boolean started
+    GameObject teleportEffect
+    Single width
+    Boolean CanTakeDamage()
+    Boolean IsDead()
+    Single GetBaseDamage()
+    Single GetSpawnDirectionBias()
+    Vector3 GetAverageMovingDirection()
+    Vector3 GetAverageMovingDirectionTarget()
+    Vector3 GetFeetPosition()
+    Void Awake()
+    Void CalculateBaseDamage()
+    Void DamageCooldownOver()
+    Void FixedUpdate()
+    Void LateUpdate()
+    Void OnCollisionStay(Collision other)
+    Void OnDamage(PlayerHealth ph, DamageContainer dc, Boolean shieldDamage)
+    Void OnDestroy()
+    Void OnGUI()
+    Void OnLevelUp()
+    Void OnPlayerDied()
+    Void PauseInventory(Boolean b)
+    Void RefreshSize(CharacterData characterData, Vector3 direction, Single sizeMultiplier)
+    Void Spawn(Vector3 position, Vector3 direction, Boolean useHeightOffset)
+    Void Start()
+    Void StartPlayer(ECharacter character, Vector3 direction)
+    Void StopLevelupParticles()
+    Void TeleportEnd()
+    Void TeleportPlayerImmediate(Vector3 position, Vector3 dir, Vector3 cameraDir, Single cameraPitch)
+    Void TeleportPlayerNextStage()
+    Void TryInit()
+    Void Update()
+    Void UpdateSpawnDirectionBias()
+
+type PlayerInventory : Object
+    Single _gold_k__BackingField
+    Int32 _goldInt_k__BackingField
+    Action<PlayerInventory, Int32> A_GoldChange
+    ActiveAbility activeAbility
+    Int32 banishes
+    Int32 banishesUsed
+    CharacterData characterData
+    Single gold
+    Int32 goldInt
+    Int32 goldThisFrame
+    Boolean hasHitGoldCap
+    ItemInventory itemInventory
+    Int32 maxGoldPerFrame
+    PassiveAbility passiveAbility
+    Boolean pause
+    Int32 pendingXp
+    PlayerHealth playerHealth
+    PlayerStatsNew playerStats
+    PlayerXp playerXp
+    Int32 refreshes
+    Int32 refreshesUsed
+    Int32 skips
+    Int32 skipsUsed
+    StatInventory statInventory
+    PlayerStatusEffects statusEffects
+    TomeInventory tomeInventory
+    WeaponInventory weaponInventory
+    Boolean HasPassive(EPassive passive)
+    Int32 GetCharacterLevel()
+    Void AddLevel()
+    Void AddSilver(Int32 amount)
+    Void AddUpgrade(IUpgradable upgradable, List<StatModifier> upgradeOffer, ERarity rarity)
+    Void AddXp(Int32 amount)
+    Void ChangeGold(Int32 amount)
+    Void Cleanup()
+    Void InitSkipRefreshBanish()
+    Void LateUpdate()
+    Void PhysicsTick()
+    Void Update()
+
+type Assets.Scripts.Inventory__Items__Pickups.Weapons.WeaponInventory : Object
+    Action<WeaponBase> A_WeaponAdded
+    Action<WeaponBase> A_WeaponRemoved
+    Action<WeaponBase> A_WeaponToggled
+    Boolean hasAimableWeapon
+    Boolean isMaxed
+    Dictionary<EWeapon, WeaponBase> weapons
+    Boolean HasAimableWeapon()
+    Boolean IsMaxed()
+    Boolean IsMaxLevel(EWeapon eWeapon)
+    Int32 GetNumWeapons()
+    Int32 GetWeaponLevel(EWeapon eWeapon)
+    Void AddWeapon(WeaponData weaponData, List<StatModifier> upgradeOffer)
+    Void CheckMaxed()
+    Void Cleanup()
+    Void RemoveWeapon()
+    Void Tick()
+    Void ToggleWeapon(EWeapon eWeapon, Boolean enable)
+
+type Assets.Scripts.Inventory__Items__Pickups.TomeInventory : Object
+    Action<ETome, EStat> A_TomeUpgrade
+    Boolean isMaxed
+    Dictionary<EStat, HashSet<ETome>> statToTomes
+    Dictionary<ETome, Int32> tomeLevels
+    Dictionary<ETome, StatModifier> tomeUpgrade
+    Boolean HasTome(ETome eTome)
+    Boolean IsMaxed()
+    Boolean IsMaxLevel(ETome eTome)
+    Int32 GetNumTomes()
+    Int32 GetTomeLevel(ETome tome)
+    Void AddMaxedTome(TomeData tomeData)
+    Void AddTome(TomeData tomeData, List<StatModifier> upgradeOffer, ERarity rarity)
+    Void CheckMaxed()
+
+type Assets.Scripts.Inventory__Items__Pickups.Items.ItemInventory : Object
+    Action<EItem> A_ItemAdded
+    Action<EItem, Boolean> A_ItemRemoved
+    Action<EStat> A_StatsChanged
+    Dictionary<EItem, ItemBase> items
+    List<EItem> itemsSorted
+    HashSet<EItem> itemsWithOnHitProcs
+    List<EItem> itemsWithOnHitSorted
+    HashSet<EItem> itemsWithPreAttackProcs
+    Dictionary<EItem, String> itemToStringCache
+    DamageContainer postDamageDc
+    Int32 _SortItems_b__13_0(EItem a, EItem b)
+    Int32 _SortOnHitItems_b__14_0(EItem a, EItem b)
+    Int32 GetAmount(EItem eItem)
+    Int32 GetUniqueItemsInRarity(EItemRarity itemRarity)
+    ItemBase GetItem(EItem eItem)
+    StatComponents PreAttack(DamageContainer dc, StatComponents itemModifierStatComponents)
+    Void AddItem(EItem eItem, Int32 count)
+    Void AddItem(EItem eItem)
+    Void Cleanup()
+    Void OnLateFixedUpdate()
+    Void PostDamage(DamageContainer dc)
+    Void RemoveItem(EItem eItem, Boolean showEffect)
+    Void SortItems()
+    Void SortOnHitItems()
+    Void StatWasModified(EStat stat)
+    Void Tick()
+
+type Inventory__Items__Pickups.Xp_and_Levels.PlayerXp : Object
+    Action<Int32> A_LevelUp
+    Action<PlayerXp, Int32> A_XpAdded
+    Single leftOverXp
+    Int32 level
+    Single maxXpMultiplier
+    Int32 xp
+    Int32 GetXpInt()
+    Void AddXp(Int32 amount)
+
+type Assets.Scripts.Inventory__Items__Pickups.PlayerHealth : Object
+    Action<DamageContainer, Boolean> A_CheckStopDamage
+    Action A_CooldownOver
+    Action A_DamagePlayerCalled
+    Action A_Died
+    Action<Enemy> A_Evaded
+    Action<PlayerHealth, Single, Boolean> A_Heal
+    Action<Int32> A_LifestealHealing
+    Action<Enemy, Int32> A_LifestealProc
+    Action<PlayerHealth> A_MaxValuesChanged
+    Action<PlayerHealth> A_OverhealUpdate
+    Action A_StoppedDamage
+    Action<PlayerHealth, DamageContainer, Boolean> A_TakeDamage
+    Single baseHp
+    Single baseShield
+    Single checkDeadInterval
+    Single damageCooldown
+    Single damageCooldownTime
+    String externalDamageSource
+    String fallDamageSource
+    Single fallDamageTakenAtTime
+    Single healingPerMinute
+    Single healingTime
+    Single healingValue
+    Single healInterval
+    Single healPerInterval
+    String healthRegenDamageSource
+    Int32 hp
+    Single leftOverHeal
+    Int32 lifestealHeal
+    String lvlHpMovingStatName
+    Single maxFallDamageSpeed
+    Int32 maxHp
+    Int32 maxIntervalsPerMinute
+    Int32 maxMaxHp
+    Single maxOverheal
+    Single maxShield
+    Single minFallDamageSpeed
+    Single nextCheckDeadTime
+    Single overheal
+    Single overhealRemovalFractionPerSecond
+    HashSet<String> selfDamageSources
+    Single shield
+    Single shieldHealingPerTick
+    Single shieldHealingValue
+    Single shieldRechargeAtTime
+    Single shieldRegenCooldownTime
+    String thornsDamageSource
+    Boolean CanHeal()
+    Boolean CanLifesteal()
+    Boolean CanTakeDamage()
+    Boolean CheckStopDamage(DamageContainer dc, Boolean ignoreShield)
+    Boolean DamageCooldown()
+    Boolean IsDead()
+    Boolean WillDamageKill(DamageContainer dc, Boolean ignoreShield)
+    Boolean WillDamageKill(Single damage, Boolean ignoreShield)
+    Int32 GetCombinedHp()
+    Int32 GetCombinedMaxHp()
+    Int32 Heal(Single amount, Boolean allowOverheal)
+    Single GetDamageCooldown()
+    Single GetHpRatio()
+    Void ApplyLifesteal()
+    Void CheckDamageCooldown(DamageContainer dc)
+    Void CheckDead()
+    Void CheckShieldRecharge(DamageContainer dc)
+    Void Damage(DamageContainer dc, Boolean ignoreShield)
+    Void DamagePlayer(Enemy enemy, Vector3 direction, DcFlags flags)
+    Void DamagePlayerExternal(Single damage, Single knockback, Vector3 direction, Boolean ignoreShield, String damageSource, DcFlags flags, EDamageEffect damageEffect, Enemy enemy)
+    Void Evade(DamageContainer dc)
+    Void KillPlayer()
+    Void OnDestroy()
+    Void OnEnemyDamaged(Enemy enemy, DamageContainer dc)
+    Void OnLevelUp(Int32 lvl)
+    Void OnPickup(Pickup pickup)
+    Void OnPlayerLanded(Single speed)
+    Void OnStatUpdate(EStat stat)
+    Void PlayerDied()
+    Void Retaliate(DamageContainer dc)
+    Void Tick()
+    Void TryLifestealHit(Enemy enemy, DamageContainer dc)
+    Void UpdateHealthRegen()
+    Void UpdateMaxValues()
+    Void UpdateRegenValues(Single forceValue)
+    Void UseAegis(DamageContainer dc, Color color, String text)
+
+type Assets.Scripts.Actors.Enemies.Enemy : MonoBehaviour
+    Int32 _armorCurrent_k__BackingField
+    Int32 _armorMax_k__BackingField
+    EnemyData _enemyData_k__BackingField
+    Single _extraKnockbackRes_k__BackingField
+    Vector3 _feetOffset_k__BackingField
+    Transform _followTarget_k__BackingField
+    Single _hp_k__BackingField
+    UInt32 _id_k__BackingField
+    Single _meshHeight_k__BackingField
+    Single _meshRadius_k__BackingField
+    Single _spawnedAtTime_k__BackingField
+    Rigidbody _target_k__BackingField
+    List<AddDebuffContainer> _toAddBuffer
+    Int32 _waveNumber_k__BackingField
+    Action<Enemy, Int32, Int32> A_ArmorChanged
+    Action<Enemy, DamageContainer> A_Damage
+    Action<Enemy, DamageContainer> A_DamageNonStatic
+    Action<EDebuff> A_DebuffAdded
+    Action<EDebuff> A_DebuffRemoved
+    Action<Enemy, DamageContainer> A_EnemyDied
+    Action<Enemy> A_EnemyDiedPre
+    Action<Enemy> A_EnemyReleasedFromPool
+    Action<Enemy> A_EnemySpawned
+    Action<Enemy> A_HealthChange
+    Action A_HpTamper
+    Action<Enemy, Boolean> A_InvulnerableChanged
+    Action<Enemy> A_TargetOfInterestSpawn
+    Boolean allowSpecialAttacks
+    AnimatedMesh animatedMesh
+    Single armor
+    Int32 armorCurrent
+    Int32 armorMax
+    Single basePowerupDropChance
+    Single bossTeleportTime
+    CapsuleCollider collider
+    Single controlHp
+    Boolean deathFunctionCalled
+    Int32 deaths
+    Dictionary<EDebuff, Int32> debuffCounts
+    Dictionary<EDebuff, EnemyDebuff> debuffs
+    Dictionary<EDebuff, AddDebuffContainer> debuffsToAdd
+    HashSet<EDebuff> debuffsToRemove
+    Vector3 defaultScale
+    Single defaultTeleportTime
+    Single despawnAtTime
+    EnemyDissolve dissolve
+    Single echoDamage
+    EEnemyFlag eliteChallengeFlags
+    Single eliteScaleMultiplier
+    EnemyData enemyData
+    EEnemyFlag enemyFlag
+    EnemyMovementRb enemyMovement
+    EnemyRenderer enemyRenderer
+    Single extraKnockbackRes
+    Vector3 feetOffset
+    Boolean flashing
+    Single flashInterval
+    Single flashTime
+    Transform followTarget
+    Single hp
+    UInt32 id
+    Boolean isDyingNextFrame
+    Boolean isInvulnerable
+    Single lastTeleportTime
+    Single maxDespawnTime
+    Single maxHp
+    Single maxStayAtDistance
+    Single meshHeight
+    Single meshRadius
+    Single minStayAtDistance
+    Single nextTeleportTimeCheck
+    Single nextVerifyTime
+    Outline outline
+    Rigidbody rb
+    Single readyToFlashTime
+    Renderer renderer
+    Single spawnedAtTime
+    SpecialAttackController specialAttackController
+    Single speedMultiplier
+    Single startTeleportThresholdDistance
+    EEnemyState state
+    EnemyStatusSymbols statusSymbols
+    Single stopFlashTime
+    Rigidbody target
+    Single teleportCheckInterval
+    Single teleportTime
+    Int32 waveNumber
+    Material whiteMaterial
+    Boolean CanMove()
+    Boolean CanTakeDamage()
+    Boolean HasDebuff(EDebuff debuff)
+    Boolean IsBoss()
+    Boolean IsChallenge()
+    Boolean IsDead()
+    Boolean IsDeadOrDyingNextFrame()
+    Boolean IsElite()
+    Boolean IsEliteChallenge()
+    Boolean IsFinalBoss()
+    Boolean IsImportantEnemy()
+    Boolean IsRunningFromPlayer()
+    Boolean IsStageBoss()
+    Boolean IsStationary()
+    Boolean IsTeleporting()
+    IEnumerator Despawn()
+    IEnumerator StartTeleporting(Vector3 toPosition, Boolean skipStart)
+    Int32 GetMoney()
+    Int32 GetXp()
+    Single GetExtraKnockback()
+    Single GetHeight()
+    Single GetHpRatio()
+    Single GetPowerupDropChance()
+    Single GetSpeed()
+    Vector3 GetBottomPosition()
+    Vector3 GetCenterPosition()
+    Vector3 GetFeetPosition()
+    Vector3 GetGroundCheckPosition()
+    Vector3 GetHeadPosition()
+    Void AddDebuff(EDebuff eDebuff, DamageContainer dc, Single duration, Int32 stacks)
+    Void AddDebuffImplementation(AddDebuffContainer debuffContainer)
+    Void AddStatusSymbols()
+    Void Awake()
+    Void Charm(DamageContainer dc, Single duration)
+    Void CheckScale()
+    Void CheckStatusSymbols()
+    Void ClearAllDebuffs()
+    Void Damage(DamageContainer damageContainer)
+    Void DamageExternal(DamageContainer dc)
+    Void DamageFromPlayerOther(DamageContainer dc)
+    Void DamageFromPlayerWeapon(DamageContainer dc)
+    Void DebuffTick()
+    Void DiedNextFrame()
+    Void DisableSpecialAttacks()
+    Void EndSpecialAttack()
+    Void EnemyDied()
+    Void EnemyDied(DamageContainer dc)
+    Void FindTarget()
+    Void FollowTarget(Transform target)
+    Void Freeze()
+    Void Heal(Int32 amount)
+    Void InitEnemy(UInt32 id, EnemyData enemyData, Vector3 pos, Int32 waveNumber, EEnemyFlag flag, Boolean canBeElite, Single extraSizeMultiplier)
+    Void Kill(String damageSource)
+    Void MakeChallenge()
+    Void MakeInvulnerable(Boolean invulnerable)
+    Void MakeWhite()
+    Void MyFixedUpdate()
+    Void MyUpdate()
+    Void OnDestroy()
+    Void OnDissolveFinished()
+    Void OnPaused(Boolean paused)
+    Void OnStatusEffectAdded(EStatusEffect eStatusEffect, Boolean newEffect)
+    Void OnStatusEffectRemoved(EStatusEffect eStatusEffect)
+    Void QueueClearAllDebuffs()
+    Void ReleaseCharm()
+    Void ReleaseEcho()
+    Void ReleaseToPool()
+    Void ReleaseToPoolNextFrame()
+    Void RemoveDebuff(EDebuff debuff, Boolean fromDeath)
+    Void RemoveStatusSymbols()
+    Void ResetMaterial()
+    Void ResetUi()
+    Void SetArmor(Single newArmor, Int32 current, Int32 max)
+    Void SetBoss()
+    Void SetMinibossGoon(Single hp)
+    Void SetSpeedMultiplier(Single f)
+    Void SetSummonerMiniboss()
+    Void SetSwarmMultiplierHp(Single f)
+    Void StartSpecialAttack()
+    Void TeleportToPlayer()
+    Void TryDespawn()
+    Void TryTeleport()
+    Void UnFreeze()
+    Void VerifyPosition()
+
+type EnemyData : ScriptableObject
+    AnimatedMeshScriptableObject animation
+    Boolean canBeElite
+    Boolean canBeExecuted
+    Single canSpawnAfterTime
+    Vector3 colliderCenter
+    Single colliderRadius
+    Single creditCost
+    Int32 damage
+    Single despawnTime
+    EEnemy enemyName
+    LocalizedString forceName
+    Int32 hp
+    Boolean isFlying
+    Boolean isPoison
+    Boolean isRunningFromPlayer
+    Single knockbackResistance
+    EMap maps
+    Single mass
+    Material material
+    Single maxStayAtDistance
+    Single maxSuckTime
+    Int32 minStage
+    Single minStayAtDistance
+    Boolean nukeProtection
+    Single overrideHeight
+    Vector3 rendererOffset
+    Vector3 rendererRotationOffset
+    Single rendererScale
+    Int32 shield
+    Il2CppReferenceArray<EnemySpecialAttack> specialAttacks
+    Single speed
+    Single teleportCooldown
+    Int32 xp
+    Int32 GetEliteXp()
+    Int32 GetGold()
+    Int32 GetXp()
+    Single GetDamage()
+    Single GetKnockback()
+    String GetName()
+
+type Assets.Scripts.Saves___Serialization.Progression.Stats.TrackStats : Object
+    Action A_PotBroken
+    String minesWeaponDamageSource
+    HashSet<EPickup> nonPowerupPickups
+    Dictionary<EMyStat, String> statStrings
+    String tornadoDamageSource
+    static String GetCharacterRunsString(ECharacter character)
+    static String GetStatString(EMyStat stat)
+    static Void AddValue(EMyStat stat, Int32 value)
+    static Void AddValue(String statKey, Int32 value)
+    static Void Cleanup()
+    static Void Init()
+    static Void OnAchievementUnlocked(MyAchievement ach)
+    static Void OnChallengeShrineCompleted()
+    static Void OnChestBought()
+    static Void OnChestOpened()
+    static Void OnDead()
+    static Void OnEnemyDamage(Enemy enemy, DamageContainer dc)
+    static Void OnEnemyDied(Enemy enemy, DamageContainer deathSource)
+    static Void OnEvade(Enemy attacker)
+    static Void OnGoldChange(PlayerInventory inv, Int32 amount)
+    static Void OnIcecubeFreezeEnemy()
+    static Void OnInteracted(BaseInteractable interactable, Boolean success)
+    static Void OnItemAdded(EItem eItem)
+    static Void OnLifestealHealing(Int32 amount)
+    static Void OnMicrowaveExploded()
+    static Void OnPickup(Pickup pickup)
+    static Void OnPlayerTakeDamage(PlayerHealth ph, DamageContainer dc, Boolean brokeShield)
+    static Void OnProjectileSpawned(ProjectileBase projectileBase)
+    static Void OnPunchedByKevin(Int32 times)
+    static Void OnShadyGuyUsed(InteractableShadyGuy shadyGuy)
+    static Void OnShrineCharged(Boolean notInterrupted)
+    static Void OnSilverChange(Int32 change)
+    static Void OnUnlockPurchased(UnlockableBase unlock)
+    static Void OnXpAdded(PlayerXp playerXp, Int32 amount)
+
+type LevelupScreen : BaseEncounterWindow
+    Action A_LevelUpClose
+    Action A_LevelupEnabled
+    AudioSource audioLevel
+    AudioSource audioShadyGuy
+    MyButtonOffersUtility b_banish
+    MyButtonNormal b_leave
+    MyButtonOffersUtility b_refresh
+    MyButtonOffersUtility b_skip
+    GameObject button
+    Int32 currentLevel
+    GameObject effects
+    EEncounter encounterType
+    Boolean hasBanishes
+    Boolean hasInitedThisStage
+    Boolean hasRefreshes
+    Boolean hasSkips
+    Boolean isLevelingUp
+    Int32 level
+    Single refreshTime
+    TextMeshProUGUI t_description
+    TextMeshProUGUI t_title
+    UpgradeInventoryUI upgradeInventoryUi
+    UpgradePicker upgradePicker
+    GameObject window
+    Window windowScript
+    Int32 GetBanishes()
+    Int32 GetBanishesUsed()
+    Int32 GetRefreshes()
+    Int32 GetRefreshesUsed()
+    Int32 GetShopToolPrice(Int32 numUses)
+    Int32 GetSkips()
+    Int32 GetSkipsUsed()
+    String GetMoaiText(Int32 level)
+    String GetShadyGuyText()
+    Void Banish()
+    Void ChooseOffer(Int32 index)
+    Void CloseLevelupScreen()
+    Void DecrementBanishes()
+    Void Leave()
+    Void OnClose()
+    Void Open(EEncounter encounterType)
+    Void Refresh()
+    Void RefreshUtilityButtons()
+    Void ShowLevelupScreen()
+    Void Skip()
+    Void StartBanish()
+    Void TryInit()
+    Void Update()
+
+type UpgradePicker : MonoBehaviour
+    Boolean _banishMode_k__BackingField
+    Action A_ShadyGuyDone
+    Single banishCooldownOverAtTime
+    Boolean banishMode
+    GameObject banisModeOverlay
+    Il2CppReferenceArray<UpgradeButton> buttons
+    EEncounter encounterType
+    LevelupScreen levelupScreen
+    Int32 moaiLuckMode
+    Int32 numUpgrades
+    Single openedAtTime
+    TabsExplicitNavigation tabsExplicitNavigation
+    GameObject window
+    Int32 GetNumUpgrades()
+    static Void AutoSelectUpgrade()
+    Void Banish()
+    Void KeyboardInput()
+    Void SelectItem(ItemData itemData)
+    Void SelectUpgrade(IUpgradable upgradable, List<StatModifier> upgradeOffer, UpgradeButton btn, ERarity rarity)
+    Void SetMoaiLuck(Int32 luckMode)
+    Void ShuffleUpgrades(EEncounter encounterType)
+    Void StartBanishMode()
+    Void StopBanishMode()
+    Void Update()
+
+type CharacterMenu : Window
+    MyButton b_back
+    MyButton b_confirm
+    MyButton b_hatPrev
+    MyButton b_hats
+    MyButton b_purchase
+    List<MyButtonCharacter> characterButtons
+    Transform characterGridParent
+    GameObject characterPrefabUi
+    GameObject hatSelection
+    MainMenu mainMenu
+    MyButtonCharacter selectedButton
+    ECharacter selectedCharacter
+    UnlocksUi shopUi
+    SkinSelection skinSelection
+    BackEscape windowBackEscape
+    Void Awake()
+    Void BuyCharacter()
+    Void DisableNavigationStatWindow()
+    Void EnableNavigationStatWindow()
+    Void FocusWindow()
+    Void OnConfirmCharacter(MyButtonCharacter characterButton)
+    Void OnDestroy()
+    Void OnDisable()
+    Void OnEnable()
+    Void OnSelectCharacter(MyButtonCharacter characterButton)
+    Void SetupButtonNavigation()
+    Void TryInit()
+    Void Update()
+
+type CharacterData : UnlockableBase
+    MyAchievement achievementRequirement
+    Il2CppReferenceArray<AudioClip> audioFootsteps
+    Dictionary<EStatCategory, Single> categoryRatios
+    Dictionary<EStatCategory, Single> categoryScores
+    Single colliderHeight
+    Single colliderWidth
+    ECharacter eCharacter
+    Texture icon
+    Mesh meshDefault
+    Mesh meshLow
+    Mesh meshLowest
+    Int32 numQuestsRequiredForVisibilityInCharacterSelection
+    PassiveData passive
+    GameObject prefab
+    List<StatCategoryRatio> StatCategoryRatios
+    List<StatModifier> statModifiers
+    MusicTrack themeSong
+    WeaponData weapon
+    Boolean IsBlackedOutInCharacterSelectionScreen()
+    Int32 GetDisplayRank()
+    MyAchievement GetUnlockRequirement()
+    String GetInternalName()
+    String GetUnlockableTypeDisplayString()
+    Texture GetIcon()
+    UnlockableBase GetUnlockableRequirement()
+    Void Init()
+
+type GraveyardBossRoom : MonoBehaviour
+    Boolean _hasSpawnedBoss_k__BackingField
+    Boolean _isFightingBoss_k__BackingField
+    Action A_BossDied
+    Single bdLightFadeDuration
+    Single bdLightIntensity
+    Single bdLightStartFadeDelay
+    Single bdLightStartIntensity
+    Single bossDeadAtTime
+    Single bossDeadGracePeriod
+    Enemy bossEnemy
+    AegisRenderer bossShields
+    Transform bossSpawnTransform
+    Single currentLightIntensity
+    Single darknessLightIntensityMultiplier
+    Color defaultAmbientLight
+    Single defaultLightIntensity
+    Light directionalLight
+    Boolean hasOpenedGate
+    Boolean hasSpawnedBoss
+    Boolean hasUsedDamageOtherThanLamps
+    InteractableGhostBossLeave interactableGhostBossLeave
+    Boolean isBossDefeated
+    Boolean isFightingBoss
+    Boolean isPlayerInsideLight
+    Int32 lampCount
+    Il2CppReferenceArray<BossLamp> lamps
+    Transform lava
+    Single lavaDuration
+    Single lavaEndTime
+    Single lavaInterval
+    Vector3 lavaPosDefault
+    Vector3 lavaPosUp
+    Single lavaRiseTime
+    Single lavaRiseTimer
+    Single lavaStartTime
+    ELavaState lavaState
+    Single lightDropFromLamps
+    GraveyardBossMetalGate metalGate
+    MusicTrack musicTrackBoss
+    Single openGateDelay
+    Transform pillars
+    Vector3 pillarsPosDefault
+    Vector3 pillarsPosUp
+    Transform playerTeleportTransform
+    Transform risingObjects
+    Vector3 risingObjectsPositionDefault
+    Vector3 risingObjectsPositionUp
+    ShakePreset rumbleShake
+    AudioSource sfxRumble
+    Single spawnBossAtTime
+    Single timer
+    static Boolean IsDarknessAttack()
+    static Single GetDarknessIntensityMultiplier()
+    Void Activate()
+    Void Awake()
+    Void BossFightOver()
+    Void CheckIfBossDead()
+    Void CheckSpawnBoss()
+    Void DarknessAttackStarted()
+    Void DarknessExplosion()
+    Void FindNextLavaRise()
+    Void FixedUpdate()
+    Void LampActivate()
+    Void LampDeactivate()
+    Void OnDestroy()
+    Void OnDisable()
+    Void OnEnemyDamage(Enemy enemy, DamageContainer dc)
+    Void OnEnemyDied(Enemy enemy, DamageContainer dc)
+    Void OnEnemyReleased(Enemy enemy)
+    Void OnLightIntensityChangeFromDarknessAttack(Single i)
+    Void PostBossDeadUpdate()
+    Void RefreshBossArmor()
+    Void RefreshLighting()
+    Void Start()
+    Void Update()
+    Void UpdateLava()
+    Void UpdateShields()
+
+type FinalFightController : MonoBehaviour
+    Int32 _currentPhase_k__BackingField
+    Action<Boolean> A_BossDefeated
+    Action<Single> A_BossDefeatedTime
+    Action A_PylonsStarted
+    List<BossPylon> activePylons
+    AudioSource audioPylonsSpawn
+    Enemy boss
+    Single bossDeadGracePeriod
+    Transform bossSpawnPoint
+    Int32 currentPhase
+    List<Enemy> goons
+    Single goonsDeadAtTime
+    Single goonSpawnInterval
+    Single healInterval
+    Boolean isBossDefeated
+    Boolean isFightingFinalBoss
+    Single lastSpecialAttackTime
+    Single nextHealTime
+    Single nextOrbsBleedTime
+    Single nextOrbsFollowingTime
+    Single nextOrbsShootyTime
+    Int32 numWeaponsTaken
+    Int32 numWeaponsToTake
+    GameObject orbBleed
+    GameObject orbFollowing
+    GameObject orbShooty
+    Il2CppReferenceArray<BossPylon> pylons
+    GameObject stealWeaponWui
+    Single takeWeaponAtTime
+    Single weaponTakeInterval
+    Boolean ArePylonsActive()
+    Int32 GetNumOrbs()
+    Void Awake()
+    Void FixedUpdate()
+    Void GiveWeaponBack()
+    Void IgnoreCollisions(List<GameObject> orbs)
+    Void OnDestroy()
+    Void OnEnemyDamage(Enemy enemy, DamageContainer dc)
+    Void OnEnemyReleasedFromPool(Enemy enemy)
+    Void OnPlayerDied()
+    Void OnPylonCharged(BossPylon pylon)
+    Void PylonHealing()
+    Void PylonsDone()
+    Void SpawnBoss()
+    Void SpawnGoons()
+    Void SpawnOrbsBleed()
+    Void SpawnOrbsFollowing()
+    Void SpawnOrbsShooty()
+    Void SpecialAttacks()
+    Void StartPhase(Int32 phase)
+    Void StartPylons()
+    Void TakeWeapon()
+    Void TakeWeapons()
+
+type Assets.Scripts.Game.Spawning.New.Summoners.ChallengeSummoner : BaseSummoner
+    List<EEnemy> enemyPool
+    Vector3 pos
+    Boolean ForceSpawn()
+    Boolean UseDirectionBias()
+    Int32 GetNumTargetEnemies()
+    List<EEnemy> GetEnemies()
+    List<Enemy> SpawnEnemies(Boolean onlyElites, Vector3 position)
+    List<Enemy> SpendCredits(Boolean useWeights)
+    Single GetBaseCreditsPerSecond()
+    Single GetInitialCredits()
+    Single GetSummonInterval()
+    Void Init()
+
+type SaveManager : MonoBehaviour
+    SaveManager _Instance_k__BackingField
+    Action A_ProgressionSaved
+    Action A_SavesLoaded
+    String cloudDirectory
+    ConfigSaveFile config
+    String configName
+    String controllersName
+    String defaultSavesPath
+    SaveManager Instance
+    String lastSteamIdKey
+    Boolean loaded
+    String localDirectory
+    ProgressionSaveFile progression
+    String progressionName
+    Int32 settingsVersion
+    StatsSaveFile stats
+    String statsName
+    UInt64 steamIdSave
+    Boolean TEST_SAVES
+    String TEST_SAVES_VERSION
+    String testingSavesPath
+    Boolean USE_ENCRYPTION
+    Boolean usingNoSave
+    Boolean Load(UInt64 steamId, Boolean loadBackup, String& failReason, String& failPath)
+    static String GetCloudFolder()
+    static String GetControllersDir()
+    static String GetControllersPath()
+    static String GetDataPath()
+    static String GetDataPathDefault()
+    static String GetLocalFolder()
+    static Void CopyDirectory(String sourceDir, String destinationDir, Boolean recursive)
+    String GetConfigPath()
+    String GetProgressionPath()
+    String GetStatsPath()
+    Void Awake()
+    Void Init()
+    Void Load(Boolean loadBackup)
+    Void LoadControllers()
+    Void LoadNoSave()
+    Void NewSaveConfig()
+    Void OnApplicationQuit()
+    Void OnDestroy()
+    Void ResetAll()
+    Void SaveConfig()
+    Void SaveControllers()
+    Void SaveProgression()
+    Void SaveStats()
+    Void SaveTemp(String serializedJson, String filePath, Boolean encrypt)
+
+type DataManager : MonoBehaviour
+    Dictionary<EShopItem, ShopItemData> _shopItems_k__BackingField
+    Action A_DataLoaded
+    Dictionary<String, MyAchievement> achievementsData
+    Dictionary<ECharacter, CharacterData> characterData
+    Dictionary<EEncounter, EncounterData> encounterData
+    Dictionary<EEnemy, EnemyData> enemyData
+    Dictionary<EHat, HatData> hatData
+    DataManager Instance
+    Dictionary<EItem, ItemData> itemData
+    List<MapData> maps
+    Dictionary<EShopItem, ShopItemData> shopItems
+    Dictionary<ECharacter, List<SkinData>> skinData
+    Dictionary<ETome, TomeData> tomeData
+    List<MyAchievement> unsortedAchievements
+    List<CharacterData> unsortedCharacterData
+    List<EncounterData> unsortedEncounters
+    List<EnemyData> unsortedEnemies
+    List<HatData> unsortedHats
+    List<ItemData> unsortedItems
+    List<MusicTrack> unsortedMusic
+    List<ShopItemData> unsortedShopItems
+    List<SkinData> unsortedSkins
+    List<TomeData> unsortedTomes
+    List<UnlockableBase> unsortedUnlockables
+    List<WeaponData> unsortedWeapons
+    Dictionary<EWeapon, WeaponData> weapons
+    CharacterData GetCharacterData(ECharacter character)
+    EncounterData GetEncounter(EEncounter encounter)
+    EnemyData GetEnemyData(EEnemy eEnemy)
+    HatData GetHat(EHat eHat)
+    ItemData GetItem(EItem item)
+    List<SkinData> GetSkins(ECharacter character)
+    List<TomeData> GetAllTomes()
+    List<UnlockableBase> GetAllPurchasable()
+    List<WeaponData> GetAllWeapons()
+    MapData GetMap(EMap map)
+    MyAchievement GetAchievement(String internalName)
+    ShopItemData GetShopItemData(EShopItem item)
+    SkinData GetSkin(ECharacter character, Int32 savedIndex)
+    String GetCharactersPath()
+    String GetDataPath()
+    String GetTomePath()
+    TomeData GetTome(ETome eTome)
+    Void Load()
+    WeaponData GetWeapon(EWeapon weapon)
+
+enum Assets.Scripts._Data.MapsAndStages.EMap
+    None = 0
+    Forest = 1
+    Desert = 2
+    Hell = 4
+    Graveyard = 8
+
+enum ECharacter
+    Fox = 0
+    Calcium = 1
+    SirOofie = 2
+    Cl4nk = 3
+    Megachad = 4
+    Ogre = 5
+    Robinette = 6
+    Athena = 7
+    Birdo = 8
+    Bush = 9
+    Bandit = 10
+    Monke = 11
+    Noelle = 12
+    TonyMcZoom = 13
+    Amog = 14
+    Spaceman = 15
+    Ninja = 16
+    Vlad = 17
+    Dicehead = 18
+    SirChadwell = 19
+    Roberto = 20
+
+enum EWeapon
+    FireStaff = 0
+    Bone = 1
+    Sword = 2
+    Revolver = 3
+    Aura = 4
+    Axe = 5
+    Bow = 6
+    Aegis = 7
+    Test = 8
+    LightningStaff = 9
+    Flamewalker = 10
+    Rockets = 11
+    Bananarang = 12
+    Tornado = 13
+    Dexecutioner = 14
+    Sniper = 15
+    Frostwalker = 16
+    SpaceNoodle = 17
+    DragonsBreath = 18
+    Chunkers = 19
+    Mine = 20
+    PoisonFlask = 21
+    BlackHole = 22
+    Katana = 23
+    BloodMagic = 24
+    BluetoothDagger = 25
+    Dice = 26
+    HeroSword = 27
+    CorruptSword = 28
+    Shotgun = 29
+    Scythe = 30
+    None = -1
+
+enum Assets.Scripts._Data.Tomes.ETome
+    Damage = 0
+    Agility = 1
+    Cooldown = 2
+    Quantity = 3
+    Knockback = 4
+    Armor = 5
+    Health = 6
+    Regeneration = 7
+    Size = 8
+    ProjectileSpeed = 9
+    Duration = 10
+    Evasion = 11
+    Attraction = 12
+    Luck = 13
+    Xp = 14
+    Golden = 15
+    Precision = 16
+    Shield = 17
+    Blood = 18
+    Thorns = 19
+    Bounce = 20
+    Cursed = 21
+    Silver = 22
+    Balance = 23
+    Chaos = 24
+    Gambler = 25
+    Hoarder = 26
+
+enum Actors.Enemies.EEnemy
+    Skeleton = 0
+    GoldenSkeleton = 1
+    XpSkeleton = 2
+    ArmoredSkeleton = 3
+    SkeletonDusty = 4
+    ArmoredSkeletonDusty = 5
+    Ghoul = 6
+    MinibossPig = 7
+    Mummy = 8
+    Slime = 9
+    Test = 10
+    Test2 = 11
+    Goblin = 12
+    GoblinStrong = 13
+    GoblinTank = 14
+    MinibossGolem = 15
+    Ghost = 16
+    GreaterGhost = 17
+    SkeletonMage = 18
+    Ent1 = 19
+    Ent2 = 20
+    Ent3 = 21
+    BoomerSpider = 22
+    Golem = 23
+    Bee = 24
+    MinibossGolemSand = 25
+    Scorpion = 26
+    MinibossScorpion = 27
+    Wisp = 28
+    CactusShooter = 29
+    ScorpionMedium = 30
+    MummyTank = 31
+    MummyAncient = 32
+    Tumblebone = 33
+    Pharaoh1 = 34
+    Pharaoh2 = 35
+    Pharaoh3 = 36
+    Bandit = 37
+    Bush = 38
+    GhostRed = 39
+    GhostPurple = 40
+    Zombie = 41
+    Head = 42
+    GhostKing = 43
+    GhostGrave1 = 44
+    GhostGrave2 = 45
+    GhostGrave3 = 46
+    GhostGrave4 = 47
+    GhostInvincible = 48
+    Ghostham = 49
+    CalciumDad = 50
+    FrogGreen = 51
+    FrogBlue = 52
+    FrogRed = 53
+
+enum Assets.Scripts.Actors.Enemies.EEnemyFlag
+    None = 0
+    Elite = 1
+    Boss = 2
+    StageBoss = 4
+    Challenge = 8
+    SummonerMiniboss = 16
+    FinalBoss = 32
+    AnyBoss = 54
+
+== Types whose name suggests something still needed ==
+type Assets.Scripts._Data.Progression.Achievements.Challenges.ChallengeModifiers.ChallengeModifierBlind : ChallengeModifier
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+    Void OnGenerationComplete()
+
+type Assets.Scripts._Data.Progression.Achievements.Challenges.ChallengeModifiers.ChallengeModifierCryptEscape : ChallengeModifier
+    ChallengeData challengeData
+    Single timeLimit
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+    Void Tick()
+
+type Assets.Scripts._Data.Progression.Achievements.Challenges.ChallengeModifiers.ChallengeModifierInvertedControls : ChallengeModifier
+    Boolean disableInvertedControlsOptions
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+
+type Assets.Scripts._Data.Progression.Achievements.Challenges.ChallengeModifiers.ChallengeModifierLava : ChallengeModifier
+    Single cycleDuration
+    GameObject lavaObject
+    Single lowerTime
+    Vector3 lowPosition
+    Single riseTime
+    Single startDelay
+    Single startTime
+    Single stayBottom
+    Single stayTop
+    Vector3 topPosition
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+    Void OnGenerationComplete()
+    Void Tick()
+
+type Assets.Scripts._Data.Progression.Achievements.Challenges.ChallengeModifiers.ChallengeModifierNoDamage : ChallengeModifier
+    Boolean hasBeenCalled
+    Boolean hasBeenKilled
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+    Void OnDamagePlayer()
+    Void Tick()
+
+type Assets.Scripts._Data.Progression.Achievements.Challenges.ChallengeModifiers.ChallengeModifierNoItems : ChallengeModifier
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+
+type Assets.Scripts._Data.Progression.Achievements.Challenges.ChallengeModifiers.ChallengeModifierNoMovement : ChallengeModifier
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+
+type Assets.Scripts._Data.Progression.Achievements.Challenges.ChallengeWinConditions.ChallengeWinConditionEscapeFirstCrypt : ChallengeWinCondition
+    ChallengeData challengeData
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+    Void OnCryptCompleted(Single time)
+
+type Assets.Scripts._Data.Progression.Achievements.Challenges.ChallengeWinConditions.ChallengeWinConditionKillTierBoss : ChallengeWinCondition
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+    Void OnGhostBossDied()
+    Void OnStageBossDied(Boolean didPortalOpen)
+
+type Assets.Scripts._Data.Progression.Achievements.Challenges.ChallengeWinConditions.ChallengeWinConditionReachFinalSwarm : ChallengeWinCondition
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+
+type Assets.Scripts.Game.Combat.EnemySpecialAttacks.Implementations.EnemySpecialAttackFollowing : EnemySpecialAttackPrefab
+    Single delayBetweenHits
+    Boolean grounded
+    Int32 numHits
+    Int32 numSpawned
+    Boolean predictive
+    IEnumerator DoAttack()
+    Void Init()
+    Void SpawnHitEffect(Vector3 pos)
+
+type Assets.Scripts.Game.Spawning.New.Summoners.ChallengeSummoner : BaseSummoner
+    List<EEnemy> enemyPool
+    Vector3 pos
+    Boolean ForceSpawn()
+    Boolean UseDirectionBias()
+    Int32 GetNumTargetEnemies()
+    List<EEnemy> GetEnemies()
+    List<Enemy> SpawnEnemies(Boolean onlyElites, Vector3 position)
+    List<Enemy> SpendCredits(Boolean useWeights)
+    Single GetBaseCreditsPerSecond()
+    Single GetInitialCredits()
+    Single GetSummonInterval()
+    Void Init()
+
+type Assets.Scripts.Inventory__Items__Pickups.Items.ItemImplementations.ItemKey : ItemBase
+    Single chancePerStack
+    Single currentChance
+    Boolean HasOnHitEffectProc()
+    Boolean HasPreAttackProc()
+    Single GetChance()
+    String GetDescription(LocalizedString localizedString)
+    Void Cleanup()
+    Void Init()
+    Void OnInitOrAmountChanged()
+    Void PreAttack(DamageContainer dc, StatComponents itemAttackModifier)
+    Void ProcOnHitEffects(DamageContainer dc)
+    Void Tick()
+
+type Assets.Scripts.Inventory__Items__Pickups.Progression.UnlockUtility : Object
+    Single UNLOCKABLE_PRICE_MULTIPLIER
+    static HashSet<TomeData> GetAvailableTomes()
+    static List<WeaponData> GetAvailableWeapons()
+
+type Assets.Scripts.Inventory__Items__Pickups.RunUnlockables : Object
+    Action A_Inited
+    Dictionary<EItemRarity, List<ItemData>> availableItems
+    HashSet<ItemData> banishedItems
+    HashSet<UnlockableBase> banishedUpgradables
+    Int32 maxAnvils
+    Int32 maxOverpoweredLamps
+    Dictionary<EItem, Int32> numItemsPickedupThisRun
+    static Void AddItemToPool(ItemData item)
+    static Void BanishItem(ItemData unlockable)
+    static Void BanishUpgradable(UnlockableBase upgradable)
+    static Void Cleanup()
+    static Void Init()
+    static Void OnAchievementUnlocked(MyAchievement ach)
+    static Void OnItemAdded(EItem eItem)
+    static Void OnItemRemoved(EItem eItem, Boolean whatever)
+    static Void OnNewRunStarted()
+    static Void Testing()
+
+type Assets.Scripts.Saves___Serialization.Progression.Achievements.UnlockableBase : ScriptableObject
+    String author
+    Boolean canAlwaysToggle
+    Boolean isEnabled
+    LocalizedString localizedDescription
+    LocalizedString localizedName
+    Int32 price
+    List<LocalizationKey> serializedLocalizationKeys
+    List<LocalizationKey> serializedLocalizationKeysName
+    Boolean showInUnlocks
+    Int32 sortingPriority
+    Boolean CanBuy()
+    Dictionary<String, String> GetKeysDesc()
+    Dictionary<String, String> GetKeysName()
+    Int32 CompareTo(UnlockableBase other)
+    Int32 GetPrice()
+    MyAchievement GetUnlockRequirement()
+    String GetDescription()
+    String GetInternalName()
+    String GetName()
+    String GetUnlockableTypeDisplayString()
+    Texture GetIcon()
+    UnlockableBase GetUnlockableRequirement()
+
+type Assets.Scripts.Saves___Serialization.Progression.Challenges.ChallengesTracker : Object
+    Action<ChallengeData> A_ChallengeCompleted
+    Il2CppReferenceArray<ChallengeModifier> challengeModifiers
+    String MODIFIER_BLIND
+    String MODIFIER_CRYPT
+    String MODIFIER_INVERTED_CONTROLS
+    String MODIFIER_MINIMALIST
+    String MODIFIER_NO_ITEMS
+    String MODIFIER_NO_MOVEMENT
+    String MODIFIER_NO_WEAPONS
+    String MODIFIER_NO_XP
+    String MODIFIER_SPEEDRUN
+    HashSet<String> modifierNames
+    Single silverAddPerChallenge
+    Boolean victory
+    ChallengeWinCondition winCondition
+    static Boolean HasChallenge()
+    static Boolean HasChallengeModifier(String internalName)
+    static ChallengeData GetCurrentChallenge()
+    static List<String> GetChallengeModifiers()
+    static Void Cleanup()
+    static Void CleanupChallengeModifiers()
+    static Void CompleteChallenge()
+    static Void Init()
+    static Void OnGameOver()
+    static Void OnInventoryInitialized(PlayerInventory pinv)
+    static Void OnNewRunStarted()
+    static Void OnStagebossDefeated()
+    static Void Tick()
+
+type Assets.Scripts.Saves___Serialization.Progression.LocalizationKey : Object
+    String key
+    LocalizedString localizedValue
+
+type Assets.Scripts.UI.DynamicWindows.DWindow : DWindowBase
+    TextMeshProUGUI t_button
+    TextMeshProUGUI t_content
+    TextMeshProUGUI t_header
+    Void Close()
+    Void Set(String header, String content, String buttonText)
+
+type Assets.Scripts.UI.DynamicWindows.DWindowBase : MonoBehaviour
+    Int32 rebuildAfterFrames
+    Void LateUpdate()
+    Void QueueRebuild()
+
+type Assets.Scripts.UI.DynamicWindows.DWindowPrompt : DWindowBase
+    Action A_Accept
+    TextMeshProUGUI t_content
+    TextMeshProUGUI t_header
+    Void Accept()
+    Void Close()
+    Void Set(String header, String content, Action A_Accept)
+
+type Assets.Scripts.UI.InGame.Levelup.EncounterWindows : MonoBehaviour
+    Boolean _encounterInProgress_k__BackingField
+    Action A_WindowClosed
+    Action A_WindowOpened
+    BaseEncounterWindow activeEncounterWindow
+    BaseEncounterWindow chestWindow
+    Boolean closedEncounterThisFrame
+    Int32 currentLevel
+    Boolean encounterInProgress
+    BaseEncounterWindow genericEncounterWindow
+    BaseEncounterWindow itemPickWindow
+    BaseEncounterWindow levelupScreen
+    BaseEncounterWindow microwaveWindow
+    List<EEncounter> nextMapQueue
+    Queue<EEncounter> rewardQueue
+    Boolean HasEncounter()
+    Boolean IsPlayerMaxed()
+    Boolean QueueEncountersForNextMap()
+    Void AddEncounter(EEncounter rewardWindowType)
+    Void Awake()
+    Void LateUpdate()
+    Void OnDestroy()
+    Void OnGameOver()
+    Void OnInventoryInitialized(PlayerInventory inventory)
+    Void OnLevelUp(Int32 level)
+    Void OnPortalClosed()
+    Void PopReward()
+    Void RewardFinished()
+    Void Start()
+
+enum Assets.Scripts.UI.InGame.Levelup.ERewardWindowType
+    Levelup = 0
+    ChargeShrine = 1
+
+type Assets.Scripts.UI.InGame.Rewards.BaseEncounterWindow : MonoBehaviour
+    Void ChooseOffer(Int32 index)
+    Void OnClose()
+    Void Open(EEncounter encounterType)
+
+type ChallengeCompletedUi : MonoBehaviour
+    Single animatorSpeed
+    Single animatorTime
+    Image background
+    CanvasGroup canvasGroup
+    Single cardDesiredScale
+    GameObject challengeBox
+    GameObject content
+    Single desiredAlpha
+    Single fadeInTime
+    Single fadeOutTime
+    GameObject particles
+    AudioSource sfx
+    RawImage shadow
+    TextMeshProUGUI t_description
+    TextMeshProUGUI t_header
+    GameObject text
+    Single textDesiredScale
+    TextSizer textSizer
+    IEnumerator StartAnimate()
+    Void Animate()
+    Void Awake()
+    Void OnAchievementUnlocked(ChallengeData challenge)
+    Void OnDestroy()
+    Void Test()
+    Void Update()
+
+type ChallengeData : MyAchievement
+    Il2CppReferenceArray<ChallengeModifier> challengeModifiers
+    EMap map
+    ChallengeData prerequisiteChallenge
+    Int32 requiresNumChallengesCompleted
+    Single silverMultiplier
+    String suggestionAuthor
+    Int32 tier
+    ChallengeWinCondition winCondition
+    Boolean CanShow()
+    Int32 CompareTo(MyAchievement otherAch)
+    String GetDisplayName()
+    String GetSilverMultiplier()
+    String GetUnlockRequirement()
+
+type ChallengeModifier : ScriptableObject
+    String internalName
+    Il2CppReferenceArray<StatModifier> statModifiers
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+    Void OnStatsApplied()
+    Void Tick()
+
+type ChallengeModifierMinimalist : ChallengeModifier
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+
+type ChallengeModifierNoDamageToEnemies : ChallengeModifier
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+    Void OnDamageEnemy(Enemy arg1, DamageContainer arg2)
+
+type ChallengeModifierNoWeapons : ChallengeModifier
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+
+type ChallengeModifierNoXp : ChallengeModifier
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+
+type ChallengeModifierSmolBoi : ChallengeModifier
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+    Void OnPlayerInit(PlayerInventory obj)
+
+type ChallengeModifierSpeedrun : ChallengeModifier
+    Single _timeLeftOnStage_k__BackingField
+    Boolean isFinalBossKilled
+    Single timeLeftOnStage
+    Single timeLimitMinutes
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+    Void OnFinalBossDefeated(Boolean obj)
+    Void OnStageBossDied(Boolean obj)
+    Void OnStageStarted()
+    Void Tick()
+
+type ChallengeModifierStats : ChallengeModifier
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+
+type ChallengesUi : Window
+    MyButton btn_confirm
+    GameObject challengeButtonPrefab
+    List<SelectionGroupToggleSingleButtonChallenge> challengeButtons
+    SelectionGroupToggleSingle challengesSelectionGroup
+    Color completedColor
+    SelectionGroupToggleSingleButton hoverBtn
+    MapSelectionUi mapSelectionUi
+    Color notCompletedColor
+    TextMeshProUGUI t_author
+    TextMeshProUGUI t_completed
+    TextMeshProUGUI t_description
+    TextMeshProUGUI t_header
+    TextMeshProUGUI t_leaderboards
+    TextMeshProUGUI t_name
+    TextMeshProUGUI t_reward
+    TextMeshProUGUI t_silver
+    TextMeshProUGUI t_stats
+    TextMeshProUGUI t_winCondition
+    static Boolean IsNegativeModifier(StatModifier statModifier)
+    static Boolean IsOppositeStat(EStat stat)
+    Void Awake()
+    Void OnChallengeHovered(SelectionGroupToggleSingleButtonChallenge btn)
+    Void OnChallengeSelected(SelectionGroupToggleSingleButton btn)
+    Void OnDestroy()
+    Void OnEnable()
+    Void Refresh()
+    Void SetEmpty()
+    Void SetHidden(ChallengeData challengeData)
+    Void SetNone()
+    Void Start()
+    Void UpdateStatsText(ChallengeData challengeData)
+
+type ChallengeWinCondition : ScriptableObject
+    Boolean _completed_k__BackingField
+    Boolean completed
+    LocalizedString localizedString
+    String GetDescription()
+    Void ChallengeCompleted()
+    Void Cleanup()
+    Void Init(ChallengeData challengeData)
+
+type ChestWindowUi : BaseEncounterWindow
+    Action A_Close
+    Action A_Open
+    MyButtonOffersUtility b_banish
+    MyButton b_leave
+    MyButton b_open
+    MyButton b_take
+    ChestOpening chestOpening
+    EChest chestType
+    ItemData itemData
+    LevelupScreen levelupScreen
+    TextMeshProUGUI t_itemDesc
+    TextMeshProUGUI t_itemName
+    TextMeshProUGUI t_itemRarity
+    Window window
+    IEnumerator AnimateSingleTextObject(TextMeshProUGUI text, Single fadeTime)
+    IEnumerator AnimateText()
+    Void Awake()
+    Void BanishButton()
+    Void ChooseOffer(Int32 index)
+    Void DiscardButton()
+    Void OnClose()
+    Void OnDestroy()
+    Void Open(EEncounter encounterType)
+    Void OpenButton()
+    Void OpeningFinished(ItemData unused)
+    Void ShowOpenButton()
+    Void TakeButton()
+
+type CreditsWindow : MonoBehaviour
+    Single cooldownTimer
+    Int32 holdingDir
+    Single multiplier
+    Single nextUpdateTime
+    ScrollRect scrollRect
+    Void ResetCooldown()
+    Void Update()
+
+type CryptDetectStart : MonoBehaviour
+    Void OnTriggerEnter(Collider other)
+
+type DeathScreen : MonoBehaviour
+    String _newRecordLbName_k__BackingField
+    Int32 _newRecordRank_k__BackingField
+    AudioSource audio
+    UiAnimation b_continue
+    GameObject background
+    DeathScreenBlocksUI blocksUi
+    CanvasGroup canvasGroup
+    GameObject deadUiWindow
+    Single fadeInTime
+    Single fadeTimer
+    Boolean hasNewRecord
+    GameObject leaderboardsWindow
+    String newRecordLbName
+    Int32 newRecordRank
+    RawImage playerOnlyRender
+    GameObject restartBtn
+    GameObject statsWindow
+    UiAnimation t_dead
+    Boolean tierVictory
+    GameObject victoryScreen
+    IEnumerator DoTransition()
+    Void Awake()
+    Void GoToMenu()
+    Void HideVictoryScreen()
+    Void OnBossDefeated(Boolean canSpawnPortal)
+    Void OnDestroy()
+    Void OnLeaderboardScoreUploaded(String lbName, Int32 rank)
+    Void PlayAudio()
+    Void Restart()
+    Void ShowLeaderboard()
+    Void ShowStats()
+    Void StartDeathScreen()
+    Void Update()
+
+type DeathScreenBlocksUI : MonoBehaviour
+    AudioSource audio
+    Material material
+    Boolean started
+    Single timer
+    Single transitionTime
+    Void StartTransition(Single transitionTime)
+    Void Update()
+
+type DynamicWindows : MonoBehaviour
+    Transform contentParent
+    GameObject dynamicWindowPrefab
+    GameObject dynamicWindowPromptPrefab
+    Transform overlay
+    Boolean HasWindows()
+    Void Awake()
+    Void NewWindow(String header, String content)
+    Void NewWindowPrompt(String header, String content, Action A_Accept)
+    Void OnDestroy()
+    Void OnNewSceneLoaded(Scene scene, LoadSceneMode mode)
+    Void Update()
+
+type GameOverDamageSourcesUi : MonoBehaviour
+    Transform damageSourceParent
+    GameObject damageSourcePrefab
+    Void Start()
+
+type HatSelectionPopupWindow : Window
+    MyButton b_hats
+    GameObject hatButtonPrefab
+    List<MyButtonHat> hatButtons
+    HatData hatDataHover
+    HatSelection hatSelection
+    HatData selectedHatBeforeOpenWindow
+    RectTransform windowRect
+    Void ClickButton(HatData hatData)
+    Void CloseWindow()
+    Void FindStartButton(HatData hatData)
+    Void HoverButton(HatData hatData)
+    Void OnDisable()
+    Void RefreshHatButtons(List<HatData> availableHats, HatData selectedHat)
+    Void StopHoverButton(HatData hatData)
+    Void Update()
+
+type InputSettingNew+InputKey : ValueType
+    Int32 controllerId
+    ControllerType controllerType
+    Int32 elementId
+    Boolean Equals(InputKey other)
+    Boolean Equals(Object obj)
+    Int32 GetHashCode()
+    Object BoxIl2CppObject()
+
+type InteractableCageKey : BaseInteractable
+    Boolean done
+    EItem eItem
+    GameObject fx
+    Boolean Interact()
+    String GetInteractString()
+
+type InteractableCrypt : BaseInteractable
+    Enemy bossEnemy
+    Boolean isDone
+    LocalizedString stringFailed
+    LocalizedString stringOpen
+    Boolean CanInteract()
+    Boolean Interact()
+    Boolean IsOpen()
+    String GetInteractString()
+    Void Teleport()
+    Void Update()
+
+type InteractableCryptLeave : BaseInteractable
+    Action<Single> A_FirstDungeonCompleted
+    EDungeonType dungeonType
+    Boolean hasInteracted
+    LocalizedString stringLeave
+    Vector3 teleportDir
+    Vector3 teleportDirCamera
+    Vector3 teleportPosition
+    Boolean CanInteract()
+    Boolean Interact()
+    String GetInteractString()
+    Void SetTeleportTransform(Vector3 pos, Vector3 dir, Vector3 cameraDir)
+    Void SetType(EDungeonType dungeonType)
+    Void ShowTime()
+    Void Teleport()
+    Void Update()
+
+type InteractableShrineChallenge : BaseInteractable
+    Action A_Completed
+    GameObject alertIcon
+    String debugName
+    Boolean done
+    HashSet<Enemy> enemies
+    GameObject fx
+    Boolean hasGivenReward
+    GameObject minimapIcon
+    Boolean CanInteract()
+    Boolean Interact()
+    Boolean ShowInDebug()
+    String GetDebugName()
+    String GetInteractString()
+    Void Awake()
+    Void EnemyDied(Enemy enemy)
+    Void OnDestroy()
+
+type InteractableUnlock : BaseInteractable
+    Boolean done
+    GameObject fx
+    RawImage icon
+    UnlockableBase unlock
+    Boolean useUnlock
+    Boolean Interact()
+    String GetInteractString()
+    Void Start()
+
+enum Inventory__Items__Pickups.Pickups.XpVisuals+XpTier
+    Low = 0
+    Medium = 10
+    High = 50
+
+type KeyDisplay : MonoBehaviour
+    RawImage background
+    Dictionary<KeyCode, String> buttonMappings
+    RawImage glyph
+    TextMeshProUGUI text
+    TextSizer textSizer
+    static String GetControllerButtonName(KeyCode keycode)
+    static String GetKeyName(KeyCode key)
+    Void Refresh()
+    Void SetGlyph(Texture glyphTexture)
+    Void SetKey(KeyCode key)
+    Void SetNonGlyph(KeyCode keycode)
+
+type KeyListener : MonoBehaviour
+    Boolean _isListening_k__BackingField
+    Boolean _justClosed_k__BackingField
+    Action A_MapChanged
+    TextMeshProUGUI alertText
+    List<Context> contexts
+    InputSettingNew currentlyChanging
+    EventSystem eventSystem
+    GameObject focusedObject
+    Boolean hasChangedKey
+    Boolean hasSet
+    KeyListener Instance
+    Boolean isListening
+    Boolean justClosed
+    List<InputMapper> mappers
+    RawImage overlay
+    Single readyForKeyTime
+    Boolean result
+    TextMeshProUGUI t_countdown
+    Single timeout
+    GameObject window
+    Boolean CanChange()
+    Boolean IsListening()
+    Boolean OnIsElementAllowed(ControllerPollingInfo info)
+    Void Awake()
+    Void Close()
+    Void CloseListener(ActionElementMap newActionElementMap)
+    Void Cooldown()
+    Void OnDestroy()
+    Void OnInputMapped(InputMappedEventData mapEvent)
+    Void StartListening(InputSettingNew listener, List<Context> contexts)
+    Void StartMappers()
+    Void StopMappers()
+    Void Update()
+
+type LanguageWindow : Window
+    List<SelectionGroupToggleSingleButton> buttons
+    GameObject languageButtonPrefab
+    SelectionGroupToggleSingle selectionGroup
+    Void Awake()
+    Void OnDestroy()
+    Void OnEnable()
+    Void OnLanguageSelected(SelectionGroupToggleSingleButton btn)
+    Void Refresh()
+    Void Start()
+
+type MapSelectionWindow : MonoBehaviour
+    GameObject mapEntryPrefab
+    SelectionGroupToggleSingle selectionGroup
+    Void InitButtons()
+
+type MapStatsWindow : MonoBehaviour
+    MyButton btnChallenges
+    SelectionGroupToggleSingle challengeSelection
+    MapSelectionUi mapSelectionUi
+    GameObject newChallengesIndicator
+    TextMeshProUGUI t_mapSpecs
+    Il2CppReferenceArray<SelectionGroupToggleSingleButtonTier> tierButtons
+    SelectionGroupToggleSingle tierSelection
+    Dictionary<Int32, Single> tierSilverMultipliers
+    Void Awake()
+    Void OnDestroy()
+    Void OnInfoChanged(SelectionGroupToggleSingleButton btn)
+    Void OnMapSelected(SelectionGroupToggleSingleButton mapButton, MapData mapData)
+    Void OnRunConfigChanged(RunConfig runConfig)
+    Void Refresh()
+    Void RefreshTiers()
+    Void Start()
+
+type MyButtonToggle : MyButton
+    Action<Boolean> A_Toggled
+    GameObject toggleIcon
+    Boolean IsOn()
+    Void OnClick()
+    Void Set(Boolean on)
+    Void StartHover()
+    Void StopHover()
+
+type MyButtonUnlock : MyButtonNormal
+    Action<UnlockContainer> A_Clicked
+    UnlockContainer unlockContainer
+    Void OnClick()
+    Void StartHover()
+    Void StopHover()
+    Void Update()
+
+type ProjectileWhirlwind : ProjectileBase
+    Dictionary<Collider, Single> enemyHitCooldowns
+    Single hitCooldown
+    Single maxSpeed
+    Single nextCheckDamageTime
+    Rigidbody rb
+    Single speed
+    Vector3 startDirection
+    Boolean CheckCollision(Collider collider, Vector3 normal)
+    Boolean HitEnemy(Collider collider)
+    Boolean TryInit(Int32 projectileIndex)
+    Vector3 GetMovementDirection()
+    Vector3 GetRaycastPosition()
+    Void CheckRadiusDamage()
+    Void FindMovementDirection()
+    Void MyFixedUpdate()
+    Void MyUpdate()
+    Void StepMovement()
+
+type QuestsCompletedEntry : MonoBehaviour
+    RawImage icon
+    MyButton myButton
+    TextMeshProUGUI t_description
+    TextMeshProUGUI t_name
+    TextMeshProUGUI t_unlock
+    UiAnimation uiAnimation
+    Void Set(MyAchievement achievement)
+
+type QuestsCompletedUi : MonoBehaviour
+    Transform contentParent
+    Single delay
+    GameObject prefab
+    ScrollRect scrollRect
+    AudioSource source
+    IEnumerator AnimateQuests(List<MyAchievement> achievements)
+    Void Start()
+    Void TestAddItem(MyAchievement ach)
+
+type QuestsWindowNew : Window
+    EAchievementType achievementTab
+    Button backBtn
+    LocalizedString localizedChallenges
+    LocalizedString localizedCharacters
+    LocalizedString localizedGeneral
+    LocalizedString localizedHats
+    LocalizedString localizedItems
+    LocalizedString localizedSkins
+    LocalizedString localizedTomes
+    LocalizedString localizedWeapons
+    RawImage progressBar
+    List<MyButtonQuest> questButtons
+    GameObject questPrefab
+    TextMeshProUGUI t_totalProgress
+    ButtonNavigationSelectionOnly tabNavigation
+    GameObject tabPrefab
+    List<EAchievementType> tabsEnums
+    TabVerticalNavigation tabVertNavigation
+    MyButtonToggle toggleHideCompleted
+    Boolean _Refresh_b__23_0(MyAchievement a)
+    Int32 _CreateTabs_b__25_0(EAchievementType a, EAchievementType b)
+    Int32 _Refresh_b__23_1(MyAchievement a, MyAchievement b)
+    Int32 GetAchievementTypeIndex(Int32 index)
+    LocalizedString GetTabLocalizedString(EAchievementType achType)
+    Void Awake()
+    Void CreateTabs()
+    Void OnDestroy()
+    Void OnEnable()
+    Void OnQuestButtonHover(MyButtonQuest btn)
+    Void OnTabSelected(Int32 index)
+    Void OnToggle(Boolean on)
+    Void Refresh()
+    Void Start()
+
+type QuickQuestsWindow : MonoBehaviour
+    GameObject allQuestsCompletedText
+    List<QuickQuestContainer> containers
+    Int32 numMaxQuests
+    GameObject prefab
+    List<MyAchievement> quests
+    Dictionary<MyAchievement, Int32> randomTieBreaker
+    Boolean _GetAllAchievements_b__11_0(MyAchievement a)
+    Int32 _GetAllAchievements_b__11_1(MyAchievement a, MyAchievement b)
+    Int32 GetTie(MyAchievement a)
+    List<MyAchievement> GetAllAchievements()
+    Void OnDestroy()
+    Void OnEnable()
+    Void Refresh()
+    Void Start()
+    Void TryInit()
+
+type ResolutionWindow : Window
+    GameObject resolutionButtonPrefab
+    List<MyButtonResolution> resolutionButtons
+    Void OnEnable()
+    Void Refresh()
+
+type Rewired.Data.UserDataStore_KeyValue : UserDataStore
+    List<Int32> __allActionIds
+    String __allActionIdsString
+    ActionMappingSaveMode _actionMappingSaveMode
+    Boolean _allowImpreciseJoystickAssignmentMatching
+    Boolean _deferredJoystickAssignmentLoadPending
+    Boolean _isEnabled
+    Boolean _loadDataOnStart
+    Boolean _loadJoystickAssignments
+    Boolean _loadKeyboardAssignments
+    Boolean _loadMouseAssignments
+    StringBuilder _sb
+    Dictionary<String, ControllerElementByRoleMap> _tempElementByRoleMaps
+    Dictionary<String, Boolean> _tempElementByRoleMapsEnabled
+    Boolean _wasJoystickEverDetected
+    ActionMappingSaveMode actionMappingSaveMode
+    List<Int32> allActionIds
+    String allActionIdsString
+    Int32 controllerElementByRoleMapKeyVersion
+    Int32 controllerMapKeyVersion
+    IDataStore dataStore
+    Boolean isEnabled
+    String key_controllerAssignments
+    Boolean loadControllerAssignments
+    Boolean loadDataOnStart
+    Boolean loadJoystickAssignments
+    Boolean loadKeyboardAssignments
+    Boolean loadMouseAssignments
+    String logPrefix
+    String thisScriptName
+    Boolean AddControllerElementByRoleMapEntry(Player player, Controller controller, ActionElementMap elementMap, Dictionary`2& maps)
+    Boolean LoadControllerAssignmentsNow()
+    Boolean LoadControllerElementMapByRole(Player player, Controller controller, String role, Int32 mapCategoryId, Int32 layoutId, Dictionary<String, ControllerElementByRoleMap> elementByRoleMaps)
+    Boolean LoadJoystickAssignmentsNow(ControllerAssignmentSaveInfo data)
+    Boolean LoadKeyboardAndMouseAssignmentsNow(ControllerAssignmentSaveInfo data)
+    Boolean SaveControllerAssignments()
+    Boolean TryFindJoysticksImprecise(JoystickInfo joystickInfo, List`1& matches)
+    ControllerAssignmentSaveInfo LoadControllerAssignmentData()
+    ControllerMap LoadControllerMap(Int32 playerId, ControllerIdentifier controllerIdentifier, Int32 categoryId, Int32 layoutId)
+    ControllerMap LoadControllerMap(Player player, ControllerIdentifier controllerIdentifier, Int32 categoryId, Int32 layoutId)
+    IEnumerator LoadJoystickAssignmentsDeferred()
+    Int32 LoadAll()
+    Int32 LoadAllJoystickCalibrationData()
+    Int32 LoadControllerDataNow(ControllerType controllerType, Int32 controllerId)
+    Int32 LoadControllerDataNow(Int32 playerId, ControllerType controllerType, Int32 controllerId)
+    Int32 LoadControllerMaps(Int32 playerId, ControllerType controllerType, Int32 controllerId)
+    Int32 LoadInputBehaviorNow(Int32 playerId, Int32 behaviorId)
+    Int32 LoadInputBehaviorNow(Player player, InputBehavior inputBehavior)
+    Int32 LoadInputBehaviors(Int32 playerId)
+    Int32 LoadJoystickCalibrationData(Int32 joystickId)
+    Int32 LoadJoystickCalibrationData(Joystick joystick)
+    Int32 LoadJoystickData(Int32 joystickId)
+    Int32 LoadPlayerDataNow(Int32 playerId)
+    Int32 LoadPlayerDataNow(Player player)
+    Joystick FindJoystickPrecise(JoystickInfo joystickInfo)
+    List<Int32> GetControllerMapKnownActionIds(Player player, ControllerIdentifier controllerIdentifier, Int32 categoryId, Int32 layoutId)
+    static Boolean TryGetString(IDataStore store, String key, String& result)
+    static Int32 GetDuplicateIndex(Player player, ControllerIdentifier controllerIdentifier)
+    static Int32 SortOldestToNewest(ControllerMapSaveData a, ControllerMapSaveData b)
+    static Void AppendControllerElementByRoleMapKey(StringBuilder sb, String elementRole, Int32 categoryId, Int32 layoutId, Int32 keyVersion)
+    static Void AppendControllerMapKeyCommonSuffix(StringBuilder sb, Player player, ControllerIdentifier controllerIdentifier, Int32 categoryId, Int32 layoutId, Int32 keyVersion)
+    static Void AppendPlayerKey(StringBuilder sb, Player player)
+    String GetControllerMapJson(Player player, ControllerIdentifier controllerIdentifier, Int32 categoryId, Int32 layoutId)
+    String GetControllerMapKey(Player player, ControllerIdentifier controllerIdentifier, Int32 categoryId, Int32 layoutId, Int32 ppKeyVersion)
+    String GetControllerMapKnownActionIdsKey(Player player, ControllerIdentifier controllerIdentifier, Int32 categoryId, Int32 layoutId, Int32 ppKeyVersion)
+    String GetInputBehaviorJson(Player player, Int32 id)
+    String GetInputBehaviorKey(Player player, Int32 inputBehaviorId)
+    String GetJoystickCalibrationMapJson(Joystick joystick)
+    String GetJoystickCalibrationMapKey(Joystick joystick)
+    Void AddDefaultMappingsForNewActions(ControllerIdentifier controllerIdentifier, ControllerMap controllerMap, List<Int32> knownActionIds)
+    ...
+
+type SelectionGroupToggleSingle : MonoBehaviour
+    List<SelectionGroupToggleSingleButton> _selectedButtons_k__BackingField
+    Action<SelectionGroupToggleSingleButton> A_ButtonSelected
+    List<SelectionGroupToggleSingleButton> buttons
+    Boolean canSelectMultiple
+    Boolean canSelectNothing
+    SelectionGroupToggleSingleButton lastButton
+    HashSet<SelectionGroupToggleSingleButton> registeredButtons
+    Boolean selectDefaultOnAwake
+    List<SelectionGroupToggleSingleButton> selectedButtons
+    Int32 startIndex
+    Int32 GetSelectedIndex()
+    SelectionGroupToggleSingleButton GetButton(Int32 index)
+    Void Awake()
+    Void DeselectButton(SelectionGroupToggleSingleButton btn)
+    Void FindButtons()
+    Void ForceSelect(Int32 index)
+    Void OnButtonSelect(SelectionGroupToggleSingleButton newBtn)
+    Void OnTransformChildrenChanged()
+    Void SelectButton(SelectionGroupToggleSingleButton btn)
+    Void SetNone()
+
+type SelectionGroupToggleSingleButton : MyButton
+    Boolean _canSelect_k__BackingField
+    Boolean _isSelected_k__BackingField
+    Boolean canSelect
+    Il2CppReferenceArray<GameObject> enableOnSelect
+    Boolean isSelected
+    GameObject unselectableOverlay
+    Void CanSelect(Boolean b)
+    Void Deselect()
+    Void OnClick()
+    Void Select()
+    Void StartHover()
+    Void StopHover()
+
+type SelectionGroupToggleSingleButtonChallenge : SelectionGroupToggleSingleButton
+    ChallengeData _challengeData_k__BackingField
+    Boolean _isShowing_k__BackingField
+    Action<SelectionGroupToggleSingleButtonChallenge> A_ChallengeHovered
+    ChallengeData challengeData
+    GameObject completedIcon
+    GameObject completedOverlay
+    Boolean isShowing
+    TextMeshProUGUI t_name
+    TextMeshProUGUI t_silver
+    Void Set(ChallengeData challengeData)
+    Void SetHidden()
+    Void SetVisible()
+    Void StartHover()
+    Void StopHover()
+
+type SelectionGroupToggleSingleButtonTier : SelectionGroupToggleSingleButton
+    GameObject alert
+    GameObject completedIcon
+    RunConfig runConfig
+    Void OnClick()
+    Void SetCompleted(Boolean completed, RunConfig runConfig)
+    Void Start()
+
+type ShopWindow : MonoBehaviour
+    ShopContainer _currentContainer_k__BackingField
+    Action<ShopContainer> A_LevelChanged
+    Button btnBack
+    MyButtonNormal btnBuy
+    MyButtonNormal btnRefund
+    Transform contentParent
+    ShopContainer currentContainer
+    TabGridNavigation navigation
+    GameObject shopContainerPrefab
+    List<ShopContainer> shopContainers
+    ShopFooter shopFooter
+    TextMeshProUGUI t_buy
+    TextMeshProUGUI t_refund
+    Void Awake()
+    Void Buy()
+    Void OnDestroy()
+    Void OnShopClicked(ShopContainer shopContainerClicked)
+    Void OnShopSelect(ShopContainer shopContainerClicked)
+    Void RefreshPrices()
+    Void Refund()
+    Void Start()
+
+type SimpleEncryptor : Object
+    Il2CppStructArray<Byte> IV
+    Il2CppStructArray<Byte> Key
+    static String Decrypt(String encryptedText)
+    static String Encrypt(String plainText)
+
+type UnlockContainer : MonoBehaviour
+    Action<UnlockContainer> A_Clicked
+    Action A_RemovedAlert
+    Action<UnlockContainer> A_Selected
+    GameObject activationToggle
+    GameObject activationToggleCheckmark
+    GameObject alert
+    RawImage backgroundLocked
+    RawImage backgroundUnlocked
+    Button button
+    Color defaultBackgroundColor
+    Boolean fullGameOnly
+    RawImage fullReleaseOnly
+    RawImage icon
+    Boolean isPurchased
+    Boolean isUnlocked
+    GameObject notPurchasedOverlay
+    String requirementsString
+    TextMeshProUGUI t_price
+    Texture t_unknown
+    GameObject unactivatedOverlay
+    UnlockableBase unlockable
+    Boolean visualsOnlyNoButton
+    Color GetBackgroundColor(UnlockableBase unlockable)
+    Void Awake()
+    Void OnDestroy()
+    Void OnEnable()
+    Void OnPurchased(UnlockableBase unlockable)
+    Void OnSelect(BaseEventData eventData)
+    Void Set(UnlockableBase unlockable)
+    Void SetAchievement(MyAchievement ach)
+    Void SetEmpty()
+    Void SetUnlocked(Boolean isUnlocked)
+    Void ToggleActivation()
+
+type UnlocksExtraInformation : MonoBehaviour
+    PlayerInventory dummyInventory
+    TextMeshProUGUI t_info
+    TextMeshProUGUI t_infoNumbers
+    TextMeshProUGUI t_title
+    LocalizedString titleStringCharacters
+    LocalizedString titleStringWeapons
+    Void OnDestroy()
+    Void SetCharacterInformation(CharacterData characterData)
+    Void SetInfoWeapon(WeaponData weaponData)
+    Void TrySetInfo(UnlockableBase unlockable)
+
+type UnlocksFooter : MonoBehaviour
+    Action<UnlockableBase> A_Purchased
+    MyButton buyButton
+    GameObject buyContainer
+    UnlocksExtraInformation extraInformation
+    UnlockContainer lastSelected
+    Window parentWindow
+    Vector2 reqContainerPosDefault
+    Vector2 reqContainerPosSmall
+    Il2CppReferenceArray<RequirementPrefab> reqContainers
+    Vector2 reqContainerScaleDefault
+    Vector2 reqContainerScaleSmall
+    RequirementsContainer requirementsContainer
+    TextMeshProUGUI t_buyPrice
+    TextMeshProUGUI t_suggestedBy
+    TextMeshProUGUI t_unlockDescription
+    TextMeshProUGUI t_unlockName
+    ButtonNavigationSelectionOnly tabNavigation
+    UnlockContainer unlockContainer
+    Void Awake()
+    Void OnDestroy()
+    Void OnTabChanged(Int32 index)
+    Void OnUnlockClicked(UnlockContainer container)
+    Void OnUnlockSelected(UnlockContainer container)
+    Void Refresh(UnlockContainer container)
+    Void SetEmpty()
+    Void TryBuyUnlockable()
+
+type UnlocksUi : MonoBehaviour
+    Transform contentParent
+    Il2CppReferenceArray<GameObject> exclamationMarks
+    GameObject exclChar
+    GameObject exclHats
+    GameObject exclItem
+    GameObject exclTome
+    GameObject exclWeapon
+    ButtonNavigationSelectionOnly tabButtons
+    TabGridNavigation tabGridNavigation
+    GameObject unlockContainerPrefab
+    List<UnlockContainer> unlockContainers
+    Void Awake()
+    Void FocusCharacterPurchase(CharacterData character)
+    Void OnDestroy()
+    Void OnEnable()
+    Void OnTabSelected(Int32 index)
+    Void Refresh(List<UnlockableBase> unlockables)
+    Void UpdateExclamationMarks()
+
+type VictoryScreen : MonoBehaviour
+    Single animatorSpeed
+    Single animatorTime
+    RawImage background
+    GameObject btnContinue
+    UiAnimation buttonAnimation
+    Single cardDesiredScale
+    GameObject coinFx
+    GameObject content
+    Single desiredAlpha
+    TextMeshProUGUI extraText
+    Single fadeInTime
+    Single fadeOutTime
+    RawImage itemDisplay
+    TextMeshProUGUI itemNameText
+    Int32 maxSilver
+    ParticleSystem ps
+    AudioSource sfx
+    Single silverAnimateTime
+    AudioSource silverSfx
+    AudioSource silverSfxFinish
+    Boolean silverStarted
+    Single silverTimer
+    TextMeshProUGUI t_score
+    Single textDesiredScale
+    Single yRotation
+    Color GetBackgroundColor()
+    IEnumerator ShowNewItem()
+    Void Animate()
+    Void FinishSilverCounter()
+    Void ShowButton()
+    Void Start()
+    Void Update()
+
+type Window : MonoBehaviour
+    Action A_WindowOpenedFirstTime
+    List<MyButton> allButtons
+    HashSet<GameObject> allButtonsHashed
+    Boolean alwaysUseStartBtn
+    Boolean isFocused
+    Single lastHadButtonTime
+    Single openDelay
+    MyButton savedBtn
+    MyButton startBtn
+    Void Awake()
+    Void Close()
+    Void DelayedButtonFocus()
+    Void FindAllButtonsInWindow()
+    Void FocusWindow()
+    Void OnButtonHover(MyButton btn)
+    Void OnDestroy()
+    Void OnDisable()
+    Void OnEnable()
+    Void Start()
+    Void UnfocusWindow()
+    Void Update()
+
+type WindowManager : Object
+    Action<Window> A_WindowOpened
+    Window activeWindow
+    List<Window> openWindows
+    static Boolean HasOpenWindow()
+    static Int32 GetNumOpenWindows()
+    static Void CloseAll()
+    static Void OnGUI()
+    static Void RefreshCursor()
+    static Void Update()
+    static Void WindowClosed(Window closedWindow)
+    static Void WindowOpened(Window newWindow)
+

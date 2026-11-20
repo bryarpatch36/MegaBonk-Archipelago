@@ -357,17 +357,6 @@
         "Forest - Complete Tier 2 (Chadbark)",
         "Forest - Complete Tier 3 (Bark Vader)"
       ],
-      "bosses": {
-        "Chunkham the Terrible": "Forest - Defeat Chunkham the Terrible",
-        "Stone Golem": "Forest - Defeat Stone Golem",
-        "Suspicious Bush": "Forest - Defeat the Suspicious Bush"
-      },
-      "boss_words": {
-        "golem": "Stone Golem",
-        "pig": "Chunkham the Terrible",
-        "chunkham": "Chunkham the Terrible",
-        "bush": "Suspicious Bush"
-      },
       "challenges": {
         "Fragile": "Forest Challenge - Fragile",
         "Turbo Mode": "Forest Challenge - Turbo Mode",
@@ -391,16 +380,6 @@
         "Desert - Complete Tier 2 (Anubruh)",
         "Desert - Complete Tier 3 (Juge Anubis)"
       ],
-      "bosses": {
-        "Bandit": "Desert - Defeat the Bandit",
-        "Sand Golem": "Desert - Defeat Sand Golem",
-        "Scorpionussy": "Desert - Defeat Scorpionussy"
-      },
-      "boss_words": {
-        "golem": "Sand Golem",
-        "scorp": "Scorpionussy",
-        "bandit": "Bandit"
-      },
       "challenges": {
         "Hyper": "Desert Challenge - Hyper",
         "The Floor is Lava": "Desert Challenge - The Floor is Lava",
@@ -416,18 +395,38 @@
     "Graveyard": {
       "item": "Graveyard Access",
       "tiers": [],
-      "bosses": {
-        "Big Bob": "Graveyard - Defeat Big Bob",
-        "Spooky Steve": "Graveyard - Defeat Spooky Steve"
-      },
-      "boss_words": {
-        "bob": "Big Bob",
-        "steve": "Spooky Steve",
-        "spooky": "Spooky Steve"
-      },
       "challenges": {},
       "keys": "Graveyard - Collect the 4 Crypt Keys"
     }
+  },
+  "enemies": {
+    "MinibossPig": "Forest - Defeat Chunkham the Terrible",
+    "MinibossGolem": "Forest - Defeat Stone Golem",
+    "Bush": "Forest - Defeat the Suspicious Bush",
+    "MinibossGolemSand": "Desert - Defeat Sand Golem",
+    "MinibossScorpion": "Desert - Defeat Scorpionussy",
+    "Bandit": "Desert - Defeat the Bandit"
+  },
+  "bosses": {
+    "Big Bob": "Graveyard - Defeat Big Bob",
+    "Spooky Steve": "Graveyard - Defeat Spooky Steve"
+  },
+  "ignored": {
+    "weapon": [
+      "Test",
+      "None"
+    ],
+    "tome": [
+      "Bounce",
+      "Balance",
+      "Gambler",
+      "Hoarder"
+    ],
+    "character": [],
+    "map": [
+      "None",
+      "Hell"
+    ]
   },
   "goals": [
     "Tier 1 Bosses",
@@ -443,15 +442,10 @@
       "BluetoothDagger": "Wireless Dagger"
     },
     "tome": {
-      "Hp": "Health",
-      "Gold": "Golden",
-      "Curse": "Cursed",
-      "Blood": "Bloody",
-      "Crit": "Precision"
+      "Regeneration": "Regen",
+      "Blood": "Bloody"
     },
-    "character": {
-      "Clank": "CL4NK"
-    },
+    "character": {},
     "map": {}
   }
 }

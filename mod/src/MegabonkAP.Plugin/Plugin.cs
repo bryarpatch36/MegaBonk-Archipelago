@@ -22,7 +22,7 @@ namespace MegabonkAP.Plugin
     {
         public const string Id = "bbush.megabonk.archipelago";
         public const string Name = "MegabonkAP";
-        public const string Version = "0.1.0";
+        public const string Version = "0.2.0";
 
         private ArchipelagoLink? _link;
         private Tracker? _tracker;
@@ -61,7 +61,10 @@ namespace MegabonkAP.Plugin
                 DeathLinkAllowed = deathLink.Value,
             };
             _tracker.KillRequested += (who, why) =>
-                log.Warn($"DeathLink: {who} died, so you should too. Ending your run is not built yet: do it yourself.");
+            {
+                log.Info($"DeathLink: {who} died, so you do too.");
+                Hooks.RequestKill();
+            };
 
             Assembly? game = LoadGame(log);
             var finder = new TypeFinder();

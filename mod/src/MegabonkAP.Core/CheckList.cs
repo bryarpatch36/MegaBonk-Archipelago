@@ -21,8 +21,6 @@ namespace MegabonkAP.Core
             public string Name = "";
             public string Item = "";
             public List<string> TierChecks = new();
-            public Dictionary<string, string> BossChecks = new();        // boss name -> check
-            public Dictionary<string, string> BossWords = new();         // word in the game's name -> boss name
             public Dictionary<string, string> ChallengeChecks = new();   // challenge name -> check
             public string? KeysCheck;
         }
@@ -37,11 +35,17 @@ namespace MegabonkAP.Core
         public IReadOnlyDictionary<string, Map> Maps => _maps;
         public IReadOnlyList<string> Goals => _goals;
 
+        /// <summary>Bosses the mod recognises by what happens ("Big Bob"), each with its check.</summary>
+        public IReadOnlyDictionary<string, string> BossChecks => _bossChecks;
+
         private readonly Dictionary<string, Character> _characters = new();
         private readonly Dictionary<string, Leveled> _weapons = new();
         private readonly Dictionary<string, Leveled> _tomes = new();
         private readonly Dictionary<string, Map> _maps = new();
         private readonly List<string> _goals = new();
+        private readonly Dictionary<string, string> _bossChecks = new();
+        private readonly Dictionary<string, string> _enemyChecks = new();     // the game's enemy name, squeezed -> check
+        private readonly Dictionary<string, HashSet<string>> _ignored = new();
         // kind -> (name as the game writes it, squeezed) -> the world's name
         private readonly Dictionary<string, Dictionary<string, string>> _lookup = new();
 
@@ -76,14 +80,17 @@ namespace MegabonkAP.Core
             {
                 var map = new Map { Name = p.Name, Item = Text(p.Value, "item") };
                 map.TierChecks.AddRange(p.Value.GetProperty("tiers").EnumerateArray().Select(e => e.GetString()!));
-                map.BossChecks = Pairs(p.Value.GetProperty("bosses"));
-                map.BossWords = Pairs(p.Value.GetProperty("boss_words"));
                 map.ChallengeChecks = Pairs(p.Value.GetProperty("challenges"));
                 if (p.Value.TryGetProperty("keys", out JsonElement keys)) map.KeysCheck = keys.GetString();
                 list._maps[p.Name] = map;
             }
 
             list._goals.AddRange(root.GetProperty("goals").EnumerateArray().Select(e => e.GetString()!));
+            foreach (KeyValuePair<string, string> boss in Pairs(root.GetProperty("bosses"))) list._bossChecks[boss.Key] = boss.Value;
+            foreach (KeyValuePair<string, string> enemy in Pairs(root.GetProperty("enemies")))
+                list._enemyChecks[Squeeze(enemy.Key)] = enemy.Value;
+            foreach (JsonProperty kind in root.GetProperty("ignored").EnumerateObject())
+                list._ignored[kind.Name] = kind.Value.EnumerateArray().Select(e => Squeeze(e.GetString()!)).ToHashSet();
 
             list.Index("character", list._characters.Keys, root);
             list.Index("weapon", list._weapons.Keys, root);
@@ -101,10 +108,11 @@ namespace MegabonkAP.Core
             foreach (Map m in _maps.Values)
             {
                 foreach (string check in m.TierChecks) yield return check;
-                foreach (string check in m.BossChecks.Values) yield return check;
                 foreach (string check in m.ChallengeChecks.Values) yield return check;
                 if (m.KeysCheck != null) yield return m.KeysCheck;
             }
+            foreach (string check in _enemyChecks.Values) yield return check;
+            foreach (string check in _bossChecks.Values) yield return check;
         }
 
         /// <summary>Every item the mod reads permissions from.</summary>
@@ -124,14 +132,16 @@ namespace MegabonkAP.Core
             return _lookup[kind].TryGetValue(Squeeze(gameName), out string? name) ? name : null;
         }
 
-        /// <summary>The boss a killed enemy is, from a word inside the game's name for it, or null.</summary>
-        public string? ResolveBoss(string map, string? gameName)
+        /// <summary>True for a name the game has and the world deliberately does not ("Test", a tome not in the world).</summary>
+        public bool IsIgnored(string kind, string? gameName) =>
+            !string.IsNullOrWhiteSpace(gameName) && _ignored.TryGetValue(kind, out HashSet<string>? names)
+            && names.Contains(Squeeze(gameName));
+
+        /// <summary>The check a killed enemy earns, by the game's exact name for it ("MinibossPig"), or null.</summary>
+        public string? EnemyCheck(string? gameName)
         {
-            if (string.IsNullOrWhiteSpace(gameName) || !_maps.TryGetValue(map, out Map? where)) return null;
-            string squeezed = Squeeze(gameName);
-            foreach (KeyValuePair<string, string> word in where.BossWords.OrderByDescending(w => w.Key.Length))
-                if (squeezed.Contains(word.Key, StringComparison.Ordinal)) return word.Value;
-            return null;
+            if (string.IsNullOrWhiteSpace(gameName)) return null;
+            return _enemyChecks.TryGetValue(Squeeze(gameName), out string? check) ? check : null;
         }
 
         /// <summary>The challenge check for a challenge the game names in its own way, or null.</summary>

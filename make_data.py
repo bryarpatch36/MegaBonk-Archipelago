@@ -208,7 +208,7 @@ game = {
 
 # What the game calls things in its own code, where that differs from the name players see.
 # Names are compared without case, spaces or punctuation, so only real differences are listed.
-# Sources: the EWeapon list in lukeod/megabonk_research; the rest are guesses to confirm in the game.
+# Source: the enums of game version 1.0.69 (mod/docs/probes/probe-1.0.69.txt).
 ALIASES = {
     "weapon": {
         "Sniper": "Sniper Rifle",
@@ -217,18 +217,32 @@ ALIASES = {
         "CorruptSword": "Corrupted Sword",
         "BluetoothDagger": "Wireless Dagger",
     },
-    "tome": {"Hp": "Health", "Gold": "Golden", "Curse": "Cursed", "Blood": "Bloody", "Crit": "Precision"},
-    "character": {"Clank": "CL4NK"},
+    "tome": {"Regeneration": "Regen", "Blood": "Bloody"},
+    "character": {},
     "map": {},
 }
 
-# A boss is recognised by a word inside the game's own name for it, per map.
-BOSS_WORDS = {
-    "Forest": {"golem": "Stone Golem", "pig": "Chunkham the Terrible", "chunkham": "Chunkham the Terrible",
-               "bush": "Suspicious Bush"},
-    "Desert": {"golem": "Sand Golem", "scorp": "Scorpionussy", "bandit": "Bandit"},
-    "Graveyard": {"bob": "Big Bob", "steve": "Spooky Steve", "spooky": "Spooky Steve"},
+# Names the game has that the world does not: the mod passes over them without a word.
+# The four tomes are in the game's code (1.0.69) but not in the world yet.
+IGNORED = {
+    "weapon": ["Test", "None"],
+    "tome": ["Bounce", "Balance", "Gambler", "Hoarder"],
+    "character": [],
+    "map": ["None", "Hell"],
 }
+
+# The game's own name of an enemy (EEnemy) -> the map and boss whose check its death earns.
+# Exact names: "Golem" and "Scorpion" are ordinary enemies, only the Miniboss ones count.
+BOSS_ENEMIES = {
+    "MinibossPig": ("Forest", "Chunkham the Terrible"),
+    "MinibossGolem": ("Forest", "Stone Golem"),
+    "Bush": ("Forest", "Suspicious Bush"),
+    "MinibossGolemSand": ("Desert", "Sand Golem"),
+    "MinibossScorpion": ("Desert", "Scorpionussy"),
+    "Bandit": ("Desert", "Bandit"),
+}
+# Bosses the mod recognises by what happens rather than by an enemy name.
+NAMED_BOSSES = {"Big Bob": "Graveyard", "Spooky Steve": "Graveyard"}
 
 
 def boss_check(map_name: str, boss: str) -> str:
@@ -241,15 +255,11 @@ for map_name, bosses in TIER_BOSSES.items():
     mod_maps[map_name] = {
         "item": f"Progressive {map_name} Tier",
         "tiers": [f"{map_name} - Complete Tier {n} ({boss})" for n, boss in enumerate(bosses, start=1)],
-        "bosses": {boss: boss_check(map_name, boss) for boss in sorted(set(BOSS_WORDS[map_name].values()))},
-        "boss_words": BOSS_WORDS[map_name],
         "challenges": {name: f"{map_name} Challenge - {name}" for name in CHALLENGES[map_name]},
     }
 mod_maps["Graveyard"] = {
     "item": "Graveyard Access",
     "tiers": [],
-    "bosses": {boss: boss_check("Graveyard", boss) for boss in sorted(set(BOSS_WORDS["Graveyard"].values()))},
-    "boss_words": BOSS_WORDS["Graveyard"],
     "challenges": {},
     "keys": "Graveyard - Collect the 4 Crypt Keys",
 }
@@ -271,6 +281,9 @@ mod_checks = {
         for name in TOMES
     },
     "maps": mod_maps,
+    "enemies": {enemy: boss_check(where, boss) for enemy, (where, boss) in BOSS_ENEMIES.items()},
+    "bosses": {boss: boss_check(where, boss) for boss, where in NAMED_BOSSES.items()},
+    "ignored": IGNORED,
     "goals": [f"Tier {n} Bosses" for n in (1, 2, 3)],   # in the order of the world's goal option
     "aliases": ALIASES,
 }

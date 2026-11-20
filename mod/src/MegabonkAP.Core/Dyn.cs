@@ -64,6 +64,41 @@ namespace MegabonkAP.Core
 
         public static bool Has(Type type, string member) => Reader(type, member) != null;
 
+        private static readonly ConcurrentDictionary<(Type, string, int), MethodInfo?> Methods = new();
+
+        /// <summary>A method by name and number of arguments, or null. Looked up once per type.</summary>
+        public static MethodInfo? Method(Type type, string name, int arguments)
+        {
+            return Methods.GetOrAdd((type, name, arguments), key =>
+            {
+                for (Type? t = key.Item1; t != null; t = t.BaseType)
+                {
+                    foreach (MethodInfo candidate in t.GetMethods(Any | BindingFlags.DeclaredOnly))
+                        if (candidate.Name == key.Item2 && candidate.GetParameters().Length == key.Item3
+                            && !candidate.IsGenericMethodDefinition)
+                            return candidate;
+                }
+                return null;
+            });
+        }
+
+        /// <summary>Call a method with arguments: weapons.ContainsKey(weapon). Null when it is missing or fails.</summary>
+        public static object? Call(object? target, string name, params object?[] arguments)
+        {
+            if (target == null) return null;
+            MethodInfo? method = Method(target.GetType(), name, arguments.Length);
+            if (method == null) return null;
+            try { return method.Invoke(method.IsStatic ? null : target, arguments); }
+            catch (Exception) { return null; }
+        }
+
+        /// <summary>Every value of the enum a method takes as its first argument: all weapons, from GetWeaponLevel(EWeapon).</summary>
+        public static Array? EnumOfFirstArgument(Type type, string method)
+        {
+            Type? argument = Method(type, method, 1)?.GetParameters()[0].ParameterType;
+            return argument != null && argument.IsEnum ? Enum.GetValues(argument) : null;
+        }
+
         public static int? Int(object? value)
         {
             switch (value)

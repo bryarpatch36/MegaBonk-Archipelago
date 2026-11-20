@@ -58,15 +58,24 @@ namespace MegabonkAP.Tests
     }
 }
 
-// Stand-ins for the game's own classes. They carry the member names the mod reads (listed in
-// docs/hooks.md), and the collections are deliberately not .NET collections, like the game's.
+// Stand-ins for the game's own classes, shaped after game version 1.0.69 as the probe recorded it
+// (docs/probes/probe-1.0.69.txt): the same type names, member names, statics and enum values.
+// The collections are deliberately not .NET collections, like the game's.
 namespace MegabonkAP.Tests.FakeGame
 {
-    public enum EMap { None, Forest, Desert, Graveyard, Hell }
-    public enum ECharacter { Fox, SirOofie, Calcium }
-    public enum EWeapon { FireStaff, Sword, Sniper, Bone }
-    public enum ETome { Damage, Hp, Chaos }
-    public enum EEnemy { Goblin, MinibossPig, MinibossGolem, ForestBoss1, GraveyardBob }
+    public enum EMap { None = 0, Forest = 1, Desert = 2, Hell = 4, Graveyard = 8 }
+    public enum ECharacter { Fox = 0, Calcium = 1, SirOofie = 2, Cl4nk = 3 }
+    public enum EWeapon { None = -1, FireStaff = 0, Bone = 1, Sword = 2, Test = 8, Sniper = 15 }
+    public enum ETome { Damage = 0, Health = 6, Regeneration = 7, Blood = 18, Bounce = 20, Chaos = 24 }
+
+    public enum EEnemy
+    {
+        Skeleton = 0, MinibossPig = 7, Goblin = 12, MinibossGolem = 15, Ent1 = 19, Ent2 = 20, Golem = 23,
+        MinibossGolemSand = 25, Scorpion = 26, MinibossScorpion = 27, Bandit = 37, Bush = 38, GhostKing = 43,
+    }
+
+    [Flags]
+    public enum EEnemyFlag { None = 0, Elite = 1, Boss = 2, StageBoss = 4, Challenge = 8, SummonerMiniboss = 16, FinalBoss = 32 }
 
     /// <summary>A list that is not IEnumerable: only GetEnumerator, MoveNext and Current, like the game's.</summary>
     public sealed class GameList<T>
@@ -85,15 +94,18 @@ namespace MegabonkAP.Tests.FakeGame
         }
     }
 
-    public sealed class GameDict<TKey, TValue> where TKey : notnull
+    /// <summary>A dictionary that can be asked ContainsKey and walked, but is not a .NET dictionary.</summary>
+    public class GameDict<TKey, TValue> where TKey : notnull
     {
-        private readonly List<Entry> _entries = new();
+        protected readonly List<Entry> Entries = new();
         public void Set(TKey key, TValue value)
         {
-            _entries.RemoveAll(e => e.Key.Equals(key));
-            _entries.Add(new Entry { Key = key, Value = value });
+            Entries.RemoveAll(e => e.Key.Equals(key));
+            Entries.Add(new Entry { Key = key, Value = value });
         }
-        public Walker GetEnumerator() => new Walker(_entries);
+        public TValue? Find(TKey key) => Entries.Where(e => e.Key.Equals(key)).Select(e => e.Value).FirstOrDefault();
+        public bool ContainsKey(TKey key) => Entries.Any(e => e.Key.Equals(key));
+        public Walker GetEnumerator() => new Walker(Entries);
 
         public sealed class Entry { public TKey Key = default!; public TValue Value = default!; }
         public sealed class Walker
@@ -109,23 +121,58 @@ namespace MegabonkAP.Tests.FakeGame
     public sealed class StageData { public string name = ""; }
     public sealed class MapData { public EMap eMap; public GameList<StageData> stages = new(); }
     public sealed class CharacterData { public ECharacter eCharacter; }
-    public sealed class RunConfig { public MapData? mapData; public StageData? stageData; }
+
+    public sealed class ChallengeData
+    {
+        public string name = "";            // the asset's name
+        public string shown = "";           // what the menu shows
+        public string GetDisplayName() => shown;
+    }
+
+    public sealed class RunConfig
+    {
+        public ChallengeData? challenge;
+        public MapData? mapData;
+        public int mapTierIndex;
+        public StageData? stageData;
+    }
+
     public sealed class WeaponBase { public int level { get; set; } }
-    public sealed class WeaponInventory { public GameDict<EWeapon, WeaponBase> weapons = new(); }
-    public sealed class TomeInventory { public GameDict<ETome, int> tomeLevels = new(); }
+
+    public sealed class WeaponInventory
+    {
+        public GameDict<EWeapon, WeaponBase> weapons = new();
+        public int GetWeaponLevel(EWeapon eWeapon) => weapons.Find(eWeapon)!.level;     // fails for a weapon not held, like the game's
+    }
+
+    public sealed class TomeInventory
+    {
+        public GameDict<ETome, int> tomeLevels = new();
+        public bool HasTome(ETome eTome) => tomeLevels.ContainsKey(eTome);
+        public int GetTomeLevel(ETome tome) => tomeLevels.Find(tome);
+    }
+
     public sealed class PlayerXp { public int level; }
+
+    public sealed class PlayerHealth
+    {
+        public int Killed;
+        public void KillPlayer() => Killed++;
+    }
 
     public sealed class PlayerInventory
     {
+        public CharacterData characterData = new();
         public WeaponInventory weaponInventory = new();
         public TomeInventory tomeInventory = new();
         public PlayerXp playerXp = new();
+        public PlayerHealth playerHealth = new();
     }
 
     public sealed class MyPlayer
     {
+        public ECharacter character;
         public PlayerInventory inventory = new();
-        public CharacterData characterData = new();
     }
 
     public sealed class GameManager
@@ -134,17 +181,35 @@ namespace MegabonkAP.Tests.FakeGame
         public MyPlayer? player;
     }
 
+    public static class MapController
+    {
+        public static RunConfig? runConfig;
+        public static PlayerInventory? inventory;
+        public static bool TierFinal;
+        public static bool IsTierFinalStage() => TierFinal;
+    }
+
+    public static class ChallengesTracker
+    {
+        public static ChallengeData? Current;
+        public static ChallengeData? GetCurrentChallenge() => Current;
+    }
+
     public sealed class EnemyData { public EEnemy enemyName; }
 
     public sealed class Enemy
     {
         public EnemyData enemyData = new();
-        public int enemyFlag;
+        public EEnemyFlag enemyFlag;
         public IntPtr Pointer;
-        public bool IsStageBoss() => (enemyFlag & 4) != 0;
-        public bool IsFinalBoss() => (enemyFlag & 32) != 0;
     }
+
+    public sealed class GraveyardBossRoom { public Enemy? bossEnemy; }
 
     /// <summary>An enemy from a game version that renamed everything the mod reads.</summary>
     public sealed class RenamedEnemy { public string kind = "Goblin"; public int hp; }
+
+    /// <summary>Inventories from a game version without GetWeaponLevel, HasTome and GetTomeLevel.</summary>
+    public sealed class OlderWeaponInventory { public GameList<GameDict<EWeapon, WeaponBase>.Entry> weapons = new(); }
+    public sealed class OlderTomeInventory { public GameList<GameDict<ETome, int>.Entry> tomeLevels = new(); }
 }

@@ -1,0 +1,996 @@
+[
+  {
+    "name": "Fox - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Fox| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Fox - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Fox| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Sir Oofie - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Sir Oofie| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Sir Oofie - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Sir Oofie| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Amog - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Amog| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Amog - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Amog| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Athena - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Athena| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Athena - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Athena| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Bandit - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Bandit| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Bandit - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Bandit| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Birdo - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Birdo| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Birdo - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Birdo| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Bush - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Bush| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Bush - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Bush| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Calcium - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Calcium| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Calcium - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Calcium| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "CL4NK - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - CL4NK| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "CL4NK - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - CL4NK| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Dicehead - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Dicehead| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Dicehead - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Dicehead| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Megachad - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Megachad| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Megachad - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Megachad| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Monke - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Monke| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Monke - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Monke| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Ninja - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Ninja| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Ninja - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Ninja| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Noelle - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Noelle| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Noelle - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Noelle| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Ogre - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Ogre| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Ogre - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Ogre| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Roberto - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Roberto| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Roberto - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Roberto| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Robinette - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Robinette| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Robinette - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Robinette| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Sir Chadwell - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Sir Chadwell| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Sir Chadwell - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Sir Chadwell| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Spaceman - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Spaceman| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Spaceman - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Spaceman| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Tony McZoom - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Tony McZoom| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Tony McZoom - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Tony McZoom| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Vlad - Complete a Run",
+    "category": [
+      "Characters"
+    ],
+    "requires": "|Character - Vlad| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Vlad - Reach Level 30",
+    "category": [
+      "Characters",
+      "Character Levels"
+    ],
+    "requires": "|Character - Vlad| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Aegis - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Aegis| or |Character - Athena|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Aura - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Aura| or |Character - Megachad|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Axe - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Axe| or |Character - Ogre|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Bananarang - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Bananarang| or |Character - Monke|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Black Hole - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Black Hole| or |Character - Spaceman|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Blood Magic - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Blood Magic| or |Character - Vlad|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Bone - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Bone| or |Character - Calcium|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Bow - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Bow| or |Character - Robinette|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Chunkers - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "|Weapon - Chunkers| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Corrupted Sword - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Corrupted Sword| or |Character - Sir Chadwell|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Dexecutioner - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Dexecutioner| or |Character - Bandit|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Dice - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Dice| or |Character - Dicehead|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Dragon's Breath - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "|Weapon - Dragon's Breath| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Firestaff - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Firestaff| or |Character - Fox|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Flamewalker - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "|Weapon - Flamewalker| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Frostwalker - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Frostwalker| or |Character - Noelle|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Hero Sword - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "|Weapon - Hero Sword| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Katana - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Katana| or |Character - Ninja|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Lightning Staff - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "|Weapon - Lightning Staff| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Mines - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "|Weapon - Mines| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Poison Flask - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Poison Flask| or |Character - Amog|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Revolver - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Revolver| or |Character - CL4NK|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Scythe - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Scythe| or |Character - Roberto|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Shotgun - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "|Weapon - Shotgun| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Slutty Rocket - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "|Weapon - Slutty Rocket| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Sniper Rifle - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Sniper Rifle| or |Character - Bush|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Space Noodle - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "|Weapon - Space Noodle| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Sword - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Sword| or |Character - Sir Oofie|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Tornado - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Tornado| or |Character - Birdo|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Wireless Dagger - Reach Level 10",
+    "category": [
+      "Weapons"
+    ],
+    "requires": "(|Weapon - Wireless Dagger| or |Character - Tony McZoom|) and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Agility Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Agility Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Armor Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Armor Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Attraction Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Attraction Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Bloody Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Bloody Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Chaos Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Chaos Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Cooldown Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Cooldown Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Cursed Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Cursed Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Damage Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Damage Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Duration Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Duration Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Evasion Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Evasion Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Golden Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Golden Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Health Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Health Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Knockback Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Knockback Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Luck Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Luck Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Precision Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Precision Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Projectile Speed Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Projectile Speed Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Quantity Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Quantity Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Regen Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Regen Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Shield Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Shield Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Silver Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Silver Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Size Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Size Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Thorns Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|Thorns Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "XP Tome - Reach Level 8",
+    "category": [
+      "Tomes"
+    ],
+    "requires": "|XP Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Forest - Complete Tier 1 (Lil Bark)",
+    "category": [
+      "Forest"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Forest - Complete Tier 2 (Chadbark)",
+    "category": [
+      "Forest"
+    ],
+    "requires": "|Progressive Forest Tier:2| and |@Weapons:3| and |@Tomes:5|"
+  },
+  {
+    "name": "Forest - Complete Tier 3 (Bark Vader)",
+    "category": [
+      "Forest"
+    ],
+    "requires": "|Progressive Forest Tier:3| and |@Weapons:6| and |@Tomes:9|"
+  },
+  {
+    "name": "Forest - Defeat Stone Golem",
+    "category": [
+      "Forest"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Forest - Defeat Chunkham the Terrible",
+    "category": [
+      "Forest"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Forest - Defeat the Suspicious Bush",
+    "category": [
+      "Forest",
+      "Hidden Bosses"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Forest Challenge - Fragile",
+    "category": [
+      "Forest",
+      "Challenges"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Forest Challenge - Turbo Mode",
+    "category": [
+      "Forest",
+      "Challenges"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Forest Challenge - Smol Boi",
+    "category": [
+      "Forest",
+      "Challenges"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Forest Challenge - AFK Gaming",
+    "category": [
+      "Forest",
+      "Challenges"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Forest Challenge - Blind",
+    "category": [
+      "Forest",
+      "Challenges"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Forest Challenge - Sticks and stones",
+    "category": [
+      "Forest",
+      "Challenges"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Forest Challenge - Weird Controls",
+    "category": [
+      "Forest",
+      "Challenges"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Forest Challenge - Speedrunner",
+    "category": [
+      "Forest",
+      "Challenges"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Forest Challenge - Speedrunner+",
+    "category": [
+      "Forest",
+      "Challenges"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Forest Challenge - Pacifist",
+    "category": [
+      "Forest",
+      "Challenges"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Forest Challenge - Oh no",
+    "category": [
+      "Forest",
+      "Challenges"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Forest Challenge - Oh shit",
+    "category": [
+      "Forest",
+      "Challenges"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Forest Challenge - What the fuck",
+    "category": [
+      "Forest",
+      "Challenges"
+    ],
+    "requires": "|Progressive Forest Tier:1|"
+  },
+  {
+    "name": "Desert - Complete Tier 1 (Lil Anubis)",
+    "category": [
+      "Desert"
+    ],
+    "requires": "|Progressive Desert Tier:1|"
+  },
+  {
+    "name": "Desert - Complete Tier 2 (Anubruh)",
+    "category": [
+      "Desert"
+    ],
+    "requires": "|Progressive Desert Tier:2| and |@Weapons:3| and |@Tomes:5|"
+  },
+  {
+    "name": "Desert - Complete Tier 3 (Juge Anubis)",
+    "category": [
+      "Desert"
+    ],
+    "requires": "|Progressive Desert Tier:3| and |@Weapons:6| and |@Tomes:9|"
+  },
+  {
+    "name": "Desert - Defeat Sand Golem",
+    "category": [
+      "Desert"
+    ],
+    "requires": "|Progressive Desert Tier:1|"
+  },
+  {
+    "name": "Desert - Defeat Scorpionussy",
+    "category": [
+      "Desert"
+    ],
+    "requires": "|Progressive Desert Tier:1|"
+  },
+  {
+    "name": "Desert - Defeat the Bandit",
+    "category": [
+      "Desert",
+      "Hidden Bosses"
+    ],
+    "requires": "|Progressive Desert Tier:1|"
+  },
+  {
+    "name": "Desert Challenge - Hyper",
+    "category": [
+      "Desert",
+      "Challenges"
+    ],
+    "requires": "|Progressive Desert Tier:1|"
+  },
+  {
+    "name": "Desert Challenge - The Floor is Lava",
+    "category": [
+      "Desert",
+      "Challenges"
+    ],
+    "requires": "|Progressive Desert Tier:1|"
+  },
+  {
+    "name": "Desert Challenge - Swarm",
+    "category": [
+      "Desert",
+      "Challenges"
+    ],
+    "requires": "|Progressive Desert Tier:1|"
+  },
+  {
+    "name": "Desert Challenge - Chonk Mode",
+    "category": [
+      "Desert",
+      "Challenges"
+    ],
+    "requires": "|Progressive Desert Tier:1|"
+  },
+  {
+    "name": "Desert Challenge - Speedrunner",
+    "category": [
+      "Desert",
+      "Challenges"
+    ],
+    "requires": "|Progressive Desert Tier:1|"
+  },
+  {
+    "name": "Desert Challenge - Speedrunner+",
+    "category": [
+      "Desert",
+      "Challenges"
+    ],
+    "requires": "|Progressive Desert Tier:1|"
+  },
+  {
+    "name": "Desert Challenge - Oh no",
+    "category": [
+      "Desert",
+      "Challenges"
+    ],
+    "requires": "|Progressive Desert Tier:1|"
+  },
+  {
+    "name": "Desert Challenge - Oh shit",
+    "category": [
+      "Desert",
+      "Challenges"
+    ],
+    "requires": "|Progressive Desert Tier:1|"
+  },
+  {
+    "name": "Desert Challenge - What the fuck",
+    "category": [
+      "Desert",
+      "Challenges"
+    ],
+    "requires": "|Progressive Desert Tier:1|"
+  },
+  {
+    "name": "Graveyard - Collect the 4 Crypt Keys",
+    "category": [
+      "Graveyard"
+    ],
+    "requires": "|Graveyard Access|"
+  },
+  {
+    "name": "Graveyard - Defeat Big Bob",
+    "category": [
+      "Graveyard"
+    ],
+    "requires": "|Graveyard Access| and |@Weapons:3| and |@Tomes:5|"
+  },
+  {
+    "name": "Graveyard - Defeat Spooky Steve",
+    "category": [
+      "Graveyard",
+      "Hidden Bosses"
+    ],
+    "requires": "|Graveyard Access| and |@Weapons:6| and |@Tomes:9|"
+  },
+  {
+    "name": "Tier 1 Bosses",
+    "category": [
+      "Goal"
+    ],
+    "requires": "|Progressive Forest Tier:1| and |Progressive Desert Tier:1|",
+    "victory": true
+  },
+  {
+    "name": "Tier 2 Bosses",
+    "category": [
+      "Goal"
+    ],
+    "requires": "|Progressive Forest Tier:2| and |Progressive Desert Tier:2| and |@Weapons:3| and |@Tomes:5|",
+    "victory": true
+  },
+  {
+    "name": "Tier 3 Bosses",
+    "category": [
+      "Goal"
+    ],
+    "requires": "|Progressive Forest Tier:3| and |Progressive Desert Tier:3| and |@Weapons:6| and |@Tomes:9|",
+    "victory": true
+  }
+]

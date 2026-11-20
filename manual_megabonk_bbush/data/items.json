@@ -1,0 +1,619 @@
+[
+  {
+    "name": "Character - Fox",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Sir Oofie",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Amog",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Athena",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Bandit",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Birdo",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Bush",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Calcium",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - CL4NK",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Dicehead",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Megachad",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Monke",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Ninja",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Noelle",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Ogre",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Roberto",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Robinette",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Sir Chadwell",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Spaceman",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Tony McZoom",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Character - Vlad",
+    "category": [
+      "Characters"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Aegis",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Aura",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Axe",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Bananarang",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Black Hole",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Blood Magic",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Bone",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Bow",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Chunkers",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Corrupted Sword",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Dexecutioner",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Dice",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Dragon's Breath",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Firestaff",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Flamewalker",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Frostwalker",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Hero Sword",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Katana",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Lightning Staff",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Mines",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Poison Flask",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Revolver",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Scythe",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Shotgun",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Slutty Rocket",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Sniper Rifle",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Space Noodle",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Sword",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Tornado",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Weapon - Wireless Dagger",
+    "category": [
+      "Weapons"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Agility Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Armor Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Attraction Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Bloody Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Chaos Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Cooldown Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Cursed Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Damage Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Duration Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Evasion Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Golden Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Health Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Knockback Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Luck Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Precision Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Projectile Speed Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Quantity Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Regen Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Shield Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Silver Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Size Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Thorns Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "XP Tome",
+    "category": [
+      "Tomes"
+    ],
+    "count": 1,
+    "progression": true
+  },
+  {
+    "name": "Progressive Forest Tier",
+    "category": [
+      "Maps"
+    ],
+    "count": 3,
+    "progression": true
+  },
+  {
+    "name": "Progressive Desert Tier",
+    "category": [
+      "Maps"
+    ],
+    "count": 3,
+    "progression": true
+  },
+  {
+    "name": "Graveyard Access",
+    "category": [
+      "Maps",
+      "Graveyard"
+    ],
+    "count": 1,
+    "progression": true
+  }
+]

@@ -1,0 +1,36 @@
+{
+  "user": {
+    "include_character_levels": {
+      "type": "Toggle",
+      "display_name": "Character level checks",
+      "description": [
+        "Adds a check for reaching Level 30 in a run with each character."
+      ],
+      "default": true
+    },
+    "include_hidden_bosses": {
+      "type": "Toggle",
+      "display_name": "Hidden boss checks",
+      "description": [
+        "Adds a check for each optional boss: the Suspicious Bush (Forest), the Bandit (Desert) and Spooky Steve (Graveyard)."
+      ],
+      "default": true
+    },
+    "include_challenges": {
+      "type": "Toggle",
+      "display_name": "Challenge checks",
+      "description": [
+        "Adds a check for each of the Forest and Desert challenges (22 checks)."
+      ],
+      "default": false
+    },
+    "include_graveyard": {
+      "type": "Toggle",
+      "display_name": "Graveyard",
+      "description": [
+        "Adds the Graveyard map: the Graveyard Access item and its checks."
+      ],
+      "default": true
+    }
+  }
+}

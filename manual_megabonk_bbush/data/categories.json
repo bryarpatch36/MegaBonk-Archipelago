@@ -1,0 +1,22 @@
+{
+  "Character Levels": {
+    "yaml_option": [
+      "include_character_levels"
+    ]
+  },
+  "Hidden Bosses": {
+    "yaml_option": [
+      "include_hidden_bosses"
+    ]
+  },
+  "Challenges": {
+    "yaml_option": [
+      "include_challenges"
+    ]
+  },
+  "Graveyard": {
+    "yaml_option": [
+      "include_graveyard"
+    ]
+  }
+}

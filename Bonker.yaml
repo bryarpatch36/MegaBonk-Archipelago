@@ -1,0 +1,14 @@
+# Player file for the Megabonk Manual world.
+# Copy it into the Players folder of your Archipelago install, one file per player.
+
+name: Bonker                       # your slot name: what you type when the client asks who you are
+description: Megabonk, hand-checked
+game: Manual_Megabonk_bbush
+
+Manual_Megabonk_bbush:
+  goal: tier 2 bosses              # tier 1 bosses, tier 2 bosses or tier 3 bosses: finish that tier on Forest and on Desert
+  include_character_levels: true   # a check for reaching Level 30 with each character
+  include_hidden_bosses: true      # checks for the Suspicious Bush, the Bandit and Spooky Steve
+  include_challenges: false        # a check for each Forest and Desert challenge (22 checks)
+  include_graveyard: true          # the Graveyard map: its access item and its checks
+  death_link: false                # when you die the others die, and the other way round (button in the Manual Client)

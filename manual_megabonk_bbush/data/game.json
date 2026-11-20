@@ -1,0 +1,26 @@
+{
+  "game": "Megabonk",
+  "creator": "bbush",
+  "filler_item_name": "Bonk",
+  "death_link": true,
+  "starting_items": [
+    {
+      "items": [
+        "Progressive Forest Tier"
+      ],
+      "random": 1
+    },
+    {
+      "item_categories": [
+        "Characters"
+      ],
+      "random": 1
+    },
+    {
+      "item_categories": [
+        "Tomes"
+      ],
+      "random": 2
+    }
+  ]
+}

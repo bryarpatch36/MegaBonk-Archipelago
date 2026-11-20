@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The BepInEx (IL2CPP) plugin. It holds no game types: every hook is found by name when the
+       game starts, so this builds without the game installed.
+
+       dotnet build -c Release                          -> dist/MegabonkAP/
+       dotnet build -c Release -p:MegabonkPath="<game>" -> also copied into <game>/BepInEx/plugins/MegabonkAP/ -->
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>MegabonkAP</AssemblyName>
+    <RootNamespace>MegabonkAP.Plugin</RootNamespace>
+    <Product>Megabonk Archipelago</Product>
+    <Version>0.1.0</Version>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <NoWarn>$(NoWarn);NU1902;NU1903;NU5104;NU1603</NoWarn>
+    <DistFolder>$(MSBuildProjectDirectory)\..\..\dist\MegabonkAP</DistFolder>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />
+    <ProjectReference Include="..\MegabonkAP.Core\MegabonkAP.Core.csproj" />
+  </ItemGroup>
+
+  <!-- What the game needs next to the plugin: the plugin, the core, and the Archipelago client library. -->
+  <Target Name="CollectPlugin" AfterTargets="Build">
+    <ItemGroup>
+      <PluginFile Include="$(OutDir)MegabonkAP.dll;$(OutDir)MegabonkAP.Core.dll;$(OutDir)Archipelago.MultiClient.Net.dll" />
+      <PluginFile Include="$(OutDir)Newtonsoft.Json.dll" Condition="Exists('$(OutDir)Newtonsoft.Json.dll')" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PluginFile)" DestinationFolder="$(DistFolder)" />
+    <Copy SourceFiles="@(PluginFile)" DestinationFolder="$(MegabonkPath)\BepInEx\plugins\MegabonkAP"
+          Condition="'$(MegabonkPath)' != '' And Exists('$(MegabonkPath)\BepInEx')" />
+    <Message Importance="high" Text="Plugin files are in $(DistFolder)" />
+  </Target>
+
+</Project>

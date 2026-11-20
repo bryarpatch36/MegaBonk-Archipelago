@@ -1,0 +1,179 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+
+namespace MegabonkAP.Core
+{
+    /// <summary>
+    /// The world's names, read from checks.json (written by make_data.py): which item permits
+    /// which thing, and which check belongs to which event in the game.
+    /// </summary>
+    public sealed class CheckList
+    {
+        public sealed record Character(string Name, string Item, string Weapon, string RunCheck, string LevelCheck);
+        public sealed record Leveled(string Name, string Item, string LevelCheck);
+
+        public sealed class Map
+        {
+            public string Name = "";
+            public string Item = "";
+            public List<string> TierChecks = new();
+            public Dictionary<string, string> BossChecks = new();        // boss name -> check
+            public Dictionary<string, string> BossWords = new();         // word in the game's name -> boss name
+            public Dictionary<string, string> ChallengeChecks = new();   // challenge name -> check
+            public string? KeysCheck;
+        }
+
+        public string Game { get; private set; } = "";
+        public int CharacterLevel { get; private set; }
+        public int WeaponLevel { get; private set; }
+        public int TomeLevel { get; private set; }
+        public IReadOnlyDictionary<string, Character> Characters => _characters;
+        public IReadOnlyDictionary<string, Leveled> Weapons => _weapons;
+        public IReadOnlyDictionary<string, Leveled> Tomes => _tomes;
+        public IReadOnlyDictionary<string, Map> Maps => _maps;
+        public IReadOnlyList<string> Goals => _goals;
+
+        private readonly Dictionary<string, Character> _characters = new();
+        private readonly Dictionary<string, Leveled> _weapons = new();
+        private readonly Dictionary<string, Leveled> _tomes = new();
+        private readonly Dictionary<string, Map> _maps = new();
+        private readonly List<string> _goals = new();
+        // kind -> (name as the game writes it, squeezed) -> the world's name
+        private readonly Dictionary<string, Dictionary<string, string>> _lookup = new();
+
+        public static CheckList Load()
+        {
+            using Stream stream = typeof(CheckList).Assembly.GetManifestResourceStream("checks.json")
+                ?? throw new InvalidOperationException("checks.json is not embedded in MegabonkAP.Core");
+            using var reader = new StreamReader(stream, Encoding.UTF8);
+            return Parse(reader.ReadToEnd());
+        }
+
+        public static CheckList Parse(string json)
+        {
+            using JsonDocument document = JsonDocument.Parse(json);
+            JsonElement root = document.RootElement;
+            var list = new CheckList { Game = root.GetProperty("game").GetString()! };
+
+            JsonElement levels = root.GetProperty("levels");
+            list.CharacterLevel = levels.GetProperty("character").GetInt32();
+            list.WeaponLevel = levels.GetProperty("weapon").GetInt32();
+            list.TomeLevel = levels.GetProperty("tome").GetInt32();
+
+            foreach (JsonProperty p in root.GetProperty("characters").EnumerateObject())
+                list._characters[p.Name] = new Character(p.Name, Text(p.Value, "item"), Text(p.Value, "weapon"),
+                    Text(p.Value, "run"), Text(p.Value, "level"));
+            foreach (JsonProperty p in root.GetProperty("weapons").EnumerateObject())
+                list._weapons[p.Name] = new Leveled(p.Name, Text(p.Value, "item"), Text(p.Value, "level"));
+            foreach (JsonProperty p in root.GetProperty("tomes").EnumerateObject())
+                list._tomes[p.Name] = new Leveled(p.Name, Text(p.Value, "item"), Text(p.Value, "level"));
+
+            foreach (JsonProperty p in root.GetProperty("maps").EnumerateObject())
+            {
+                var map = new Map { Name = p.Name, Item = Text(p.Value, "item") };
+                map.TierChecks.AddRange(p.Value.GetProperty("tiers").EnumerateArray().Select(e => e.GetString()!));
+                map.BossChecks = Pairs(p.Value.GetProperty("bosses"));
+                map.BossWords = Pairs(p.Value.GetProperty("boss_words"));
+                map.ChallengeChecks = Pairs(p.Value.GetProperty("challenges"));
+                if (p.Value.TryGetProperty("keys", out JsonElement keys)) map.KeysCheck = keys.GetString();
+                list._maps[p.Name] = map;
+            }
+
+            list._goals.AddRange(root.GetProperty("goals").EnumerateArray().Select(e => e.GetString()!));
+
+            list.Index("character", list._characters.Keys, root);
+            list.Index("weapon", list._weapons.Keys, root);
+            list.Index("tome", list._tomes.Keys, root);
+            list.Index("map", list._maps.Keys, root);
+            return list;
+        }
+
+        /// <summary>Every check the mod can send.</summary>
+        public IEnumerable<string> AllChecks()
+        {
+            foreach (Character c in _characters.Values) { yield return c.RunCheck; yield return c.LevelCheck; }
+            foreach (Leveled w in _weapons.Values) yield return w.LevelCheck;
+            foreach (Leveled t in _tomes.Values) yield return t.LevelCheck;
+            foreach (Map m in _maps.Values)
+            {
+                foreach (string check in m.TierChecks) yield return check;
+                foreach (string check in m.BossChecks.Values) yield return check;
+                foreach (string check in m.ChallengeChecks.Values) yield return check;
+                if (m.KeysCheck != null) yield return m.KeysCheck;
+            }
+        }
+
+        /// <summary>Every item the mod reads permissions from.</summary>
+        public IEnumerable<string> AllItems() =>
+            _characters.Values.Select(c => c.Item)
+                .Concat(_weapons.Values.Select(w => w.Item))
+                .Concat(_tomes.Values.Select(t => t.Item))
+                .Concat(_maps.Values.Select(m => m.Item));
+
+        /// <summary>
+        /// The world's name for something the game names in its own way ("FireStaff", "Sniper",
+        /// "SirOofie"), or null when nothing matches. kind is character, weapon, tome or map.
+        /// </summary>
+        public string? Resolve(string kind, string? gameName)
+        {
+            if (string.IsNullOrWhiteSpace(gameName)) return null;
+            return _lookup[kind].TryGetValue(Squeeze(gameName), out string? name) ? name : null;
+        }
+
+        /// <summary>The boss a killed enemy is, from a word inside the game's name for it, or null.</summary>
+        public string? ResolveBoss(string map, string? gameName)
+        {
+            if (string.IsNullOrWhiteSpace(gameName) || !_maps.TryGetValue(map, out Map? where)) return null;
+            string squeezed = Squeeze(gameName);
+            foreach (KeyValuePair<string, string> word in where.BossWords.OrderByDescending(w => w.Key.Length))
+                if (squeezed.Contains(word.Key, StringComparison.Ordinal)) return word.Value;
+            return null;
+        }
+
+        /// <summary>The challenge check for a challenge the game names in its own way, or null.</summary>
+        public string? ResolveChallenge(string map, string? gameName)
+        {
+            if (string.IsNullOrWhiteSpace(gameName) || !_maps.TryGetValue(map, out Map? where)) return null;
+            string squeezed = Squeeze(gameName);
+            foreach (KeyValuePair<string, string> challenge in where.ChallengeChecks)
+                if (Squeeze(challenge.Key) == squeezed) return challenge.Value;
+            return null;
+        }
+
+        /// <summary>Lower case, letters and digits only: "Dragon's Breath" and "DragonsBreath" are the same.</summary>
+        public static string Squeeze(string text)
+        {
+            var builder = new StringBuilder(text.Length);
+            foreach (char c in text)
+            {
+                if (char.IsLetterOrDigit(c)) builder.Append(char.ToLowerInvariant(c));
+                else if (c == '+') builder.Append("plus");     // Speedrunner and Speedrunner+ differ
+            }
+            return builder.ToString();
+        }
+
+        private void Index(string kind, IEnumerable<string> names, JsonElement root)
+        {
+            var table = new Dictionary<string, string>();
+            foreach (string name in names) table[Squeeze(name)] = name;
+            if (kind == "tome")
+                foreach (string name in names) table[Squeeze(name + " Tome")] = name;
+            if (root.GetProperty("aliases").TryGetProperty(kind, out JsonElement aliases))
+                foreach (JsonProperty alias in aliases.EnumerateObject())
+                {
+                    table[Squeeze(alias.Name)] = alias.Value.GetString()!;
+                    if (kind == "tome") table[Squeeze(alias.Name + " Tome")] = alias.Value.GetString()!;
+                }
+            _lookup[kind] = table;
+        }
+
+        private static string Text(JsonElement element, string name) => element.GetProperty(name).GetString()!;
+
+        private static Dictionary<string, string> Pairs(JsonElement element) =>
+            element.EnumerateObject().ToDictionary(p => p.Name, p => p.Value.GetString()!);
+    }
+}

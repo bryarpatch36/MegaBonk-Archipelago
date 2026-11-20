@@ -1,6 +1,9 @@
 # Megabonk for Archipelago
 
-Megabonk as a game in an [Archipelago](https://archipelago.gg) multiworld, built as a **Manual world**: nothing is installed into the game. You play Megabonk normally, the items you are sent decide which characters, weapons, tomes and maps you may use, and you tick off what you have done in Archipelago's Manual Client.
+Megabonk as a game in an [Archipelago](https://archipelago.gg) multiworld. It has two parts:
+
+- **A Manual world.** Nothing is installed into the game. You play Megabonk normally, the items you are sent decide which characters, weapons, tomes and maps you may use, and you tick off what you have done in Archipelago's Manual Client.
+- **MegabonkAP, a mod (in progress).** A BepInEx plugin that sends the checks for you as you play. It is built but has not been loaded into the game yet: see [mod/README.md](mod/README.md).
 
 This is an unofficial fan project. It is not affiliated with or endorsed by vedinad or the Archipelago project.
 
@@ -11,7 +14,8 @@ This is an unofficial fan project. It is not affiliated with or endorsed by vedi
 | Generating a multiworld with every option combination | Works (automated test) |
 | Hosting a seed, connecting as the slot, sending checks, receiving items, reaching the goal | Works against a local Archipelago 0.6.8 server (automated test, no game involved) |
 | Playing it with the Manual Client and the real game | Not yet tried |
-| Checks sent by themselves, rules enforced by the game | Not built: that needs a mod inside Megabonk (see "What this does not do") |
+| Checks sent by themselves (the mod) | Its rules and its Archipelago connection pass their tests without the game; the plugin has never been loaded into Megabonk ([mod/README.md](mod/README.md)) |
+| Rules enforced by the game | Not built |
 
 The lists of characters, weapons and tomes come from a public Megabonk database as of November 2026. Megabonk was not available on the PC this was built on, so three things were taken from guides rather than seen in the game and may need a correction after a first session: the challenge names, the Graveyard checks, and the level numbers the checks ask for (see "Building and changing it").
 
@@ -74,13 +78,14 @@ So that nobody is asked for a long run with nothing in hand, the generator only 
 
 ## What this does not do
 
-- **No automatic checks.** You tick every check yourself. Sending them from the game would take a mod inside Megabonk (a BepInEx or MelonLoader plugin that talks to the Archipelago server). No finished one exists publicly as of November 2026; the one repository that turns up for it holds empty files.
+- **No automatic checks yet.** You tick every check yourself until the mod in [mod/](mod/README.md) has been tried in the game. Two other attempts at a Megabonk Archipelago mod are public, both unfinished as of November 2026: one repository of empty files, and Bonkipelago, a two-day prototype without a release or a world.
 - **No enforcement.** The game does not know what you hold. The Toggler covers weapons and tomes; characters and tiers are on your honour.
 - **In-run items are not part of it.** The game's 85 pickup items are not in the item pool.
 
 ## Building and changing it
 
 - `make_data.py` holds every list (characters and their starting weapons, weapons, tomes, bosses, challenges) and the level numbers (`CHARACTER_LEVEL`, `WEAPON_LEVEL`, `TOME_LEVEL`), and writes the world's `data/*.json` from them. Change a name or a number there, never in the JSON.
+- `make_data.py` also writes `mod/src/MegabonkAP.Core/checks.json`, the same names for the mod, so the two cannot disagree.
 - `build_apworld.py` packs `manual_megabonk_bbush/` into `manual_megabonk_bbush.apworld`.
 - Bump `world_version` in `manual_megabonk_bbush/archipelago.json` on every change, and give the new `.apworld` to every player before generating: all players need the same one.
 
@@ -96,7 +101,7 @@ python tests/test_generate.py <archipelago source folder>
 python tests/e2e_local_server.py <archipelago source folder> <seed zip> Bonker
 ```
 
-`test_generate.py` generates a seed for every option combination and checks the number of checks, the goal and the starting items. `e2e_local_server.py` hosts a seed on a local server and plays the slot without the game.
+`test_generate.py` generates a seed for every option combination and checks the number of checks, the goal and the starting items. `e2e_local_server.py` hosts a seed on a local server and plays the slot without the game. The mod has its own tests: see [mod/README.md](mod/README.md).
 
 ## Credits
 

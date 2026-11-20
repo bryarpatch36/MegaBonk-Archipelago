@@ -1,0 +1,457 @@
+{
+  "game": "Manual_Megabonk_bbush",
+  "levels": {
+    "character": 30,
+    "weapon": 10,
+    "tome": 8
+  },
+  "characters": {
+    "Fox": {
+      "item": "Character - Fox",
+      "weapon": "Firestaff",
+      "run": "Fox - Complete a Run",
+      "level": "Fox - Reach Level 30"
+    },
+    "Sir Oofie": {
+      "item": "Character - Sir Oofie",
+      "weapon": "Sword",
+      "run": "Sir Oofie - Complete a Run",
+      "level": "Sir Oofie - Reach Level 30"
+    },
+    "Amog": {
+      "item": "Character - Amog",
+      "weapon": "Poison Flask",
+      "run": "Amog - Complete a Run",
+      "level": "Amog - Reach Level 30"
+    },
+    "Athena": {
+      "item": "Character - Athena",
+      "weapon": "Aegis",
+      "run": "Athena - Complete a Run",
+      "level": "Athena - Reach Level 30"
+    },
+    "Bandit": {
+      "item": "Character - Bandit",
+      "weapon": "Dexecutioner",
+      "run": "Bandit - Complete a Run",
+      "level": "Bandit - Reach Level 30"
+    },
+    "Birdo": {
+      "item": "Character - Birdo",
+      "weapon": "Tornado",
+      "run": "Birdo - Complete a Run",
+      "level": "Birdo - Reach Level 30"
+    },
+    "Bush": {
+      "item": "Character - Bush",
+      "weapon": "Sniper Rifle",
+      "run": "Bush - Complete a Run",
+      "level": "Bush - Reach Level 30"
+    },
+    "Calcium": {
+      "item": "Character - Calcium",
+      "weapon": "Bone",
+      "run": "Calcium - Complete a Run",
+      "level": "Calcium - Reach Level 30"
+    },
+    "CL4NK": {
+      "item": "Character - CL4NK",
+      "weapon": "Revolver",
+      "run": "CL4NK - Complete a Run",
+      "level": "CL4NK - Reach Level 30"
+    },
+    "Dicehead": {
+      "item": "Character - Dicehead",
+      "weapon": "Dice",
+      "run": "Dicehead - Complete a Run",
+      "level": "Dicehead - Reach Level 30"
+    },
+    "Megachad": {
+      "item": "Character - Megachad",
+      "weapon": "Aura",
+      "run": "Megachad - Complete a Run",
+      "level": "Megachad - Reach Level 30"
+    },
+    "Monke": {
+      "item": "Character - Monke",
+      "weapon": "Bananarang",
+      "run": "Monke - Complete a Run",
+      "level": "Monke - Reach Level 30"
+    },
+    "Ninja": {
+      "item": "Character - Ninja",
+      "weapon": "Katana",
+      "run": "Ninja - Complete a Run",
+      "level": "Ninja - Reach Level 30"
+    },
+    "Noelle": {
+      "item": "Character - Noelle",
+      "weapon": "Frostwalker",
+      "run": "Noelle - Complete a Run",
+      "level": "Noelle - Reach Level 30"
+    },
+    "Ogre": {
+      "item": "Character - Ogre",
+      "weapon": "Axe",
+      "run": "Ogre - Complete a Run",
+      "level": "Ogre - Reach Level 30"
+    },
+    "Roberto": {
+      "item": "Character - Roberto",
+      "weapon": "Scythe",
+      "run": "Roberto - Complete a Run",
+      "level": "Roberto - Reach Level 30"
+    },
+    "Robinette": {
+      "item": "Character - Robinette",
+      "weapon": "Bow",
+      "run": "Robinette - Complete a Run",
+      "level": "Robinette - Reach Level 30"
+    },
+    "Sir Chadwell": {
+      "item": "Character - Sir Chadwell",
+      "weapon": "Corrupted Sword",
+      "run": "Sir Chadwell - Complete a Run",
+      "level": "Sir Chadwell - Reach Level 30"
+    },
+    "Spaceman": {
+      "item": "Character - Spaceman",
+      "weapon": "Black Hole",
+      "run": "Spaceman - Complete a Run",
+      "level": "Spaceman - Reach Level 30"
+    },
+    "Tony McZoom": {
+      "item": "Character - Tony McZoom",
+      "weapon": "Wireless Dagger",
+      "run": "Tony McZoom - Complete a Run",
+      "level": "Tony McZoom - Reach Level 30"
+    },
+    "Vlad": {
+      "item": "Character - Vlad",
+      "weapon": "Blood Magic",
+      "run": "Vlad - Complete a Run",
+      "level": "Vlad - Reach Level 30"
+    }
+  },
+  "weapons": {
+    "Aegis": {
+      "item": "Weapon - Aegis",
+      "level": "Aegis - Reach Level 10"
+    },
+    "Aura": {
+      "item": "Weapon - Aura",
+      "level": "Aura - Reach Level 10"
+    },
+    "Axe": {
+      "item": "Weapon - Axe",
+      "level": "Axe - Reach Level 10"
+    },
+    "Bananarang": {
+      "item": "Weapon - Bananarang",
+      "level": "Bananarang - Reach Level 10"
+    },
+    "Black Hole": {
+      "item": "Weapon - Black Hole",
+      "level": "Black Hole - Reach Level 10"
+    },
+    "Blood Magic": {
+      "item": "Weapon - Blood Magic",
+      "level": "Blood Magic - Reach Level 10"
+    },
+    "Bone": {
+      "item": "Weapon - Bone",
+      "level": "Bone - Reach Level 10"
+    },
+    "Bow": {
+      "item": "Weapon - Bow",
+      "level": "Bow - Reach Level 10"
+    },
+    "Chunkers": {
+      "item": "Weapon - Chunkers",
+      "level": "Chunkers - Reach Level 10"
+    },
+    "Corrupted Sword": {
+      "item": "Weapon - Corrupted Sword",
+      "level": "Corrupted Sword - Reach Level 10"
+    },
+    "Dexecutioner": {
+      "item": "Weapon - Dexecutioner",
+      "level": "Dexecutioner - Reach Level 10"
+    },
+    "Dice": {
+      "item": "Weapon - Dice",
+      "level": "Dice - Reach Level 10"
+    },
+    "Dragon's Breath": {
+      "item": "Weapon - Dragon's Breath",
+      "level": "Dragon's Breath - Reach Level 10"
+    },
+    "Firestaff": {
+      "item": "Weapon - Firestaff",
+      "level": "Firestaff - Reach Level 10"
+    },
+    "Flamewalker": {
+      "item": "Weapon - Flamewalker",
+      "level": "Flamewalker - Reach Level 10"
+    },
+    "Frostwalker": {
+      "item": "Weapon - Frostwalker",
+      "level": "Frostwalker - Reach Level 10"
+    },
+    "Hero Sword": {
+      "item": "Weapon - Hero Sword",
+      "level": "Hero Sword - Reach Level 10"
+    },
+    "Katana": {
+      "item": "Weapon - Katana",
+      "level": "Katana - Reach Level 10"
+    },
+    "Lightning Staff": {
+      "item": "Weapon - Lightning Staff",
+      "level": "Lightning Staff - Reach Level 10"
+    },
+    "Mines": {
+      "item": "Weapon - Mines",
+      "level": "Mines - Reach Level 10"
+    },
+    "Poison Flask": {
+      "item": "Weapon - Poison Flask",
+      "level": "Poison Flask - Reach Level 10"
+    },
+    "Revolver": {
+      "item": "Weapon - Revolver",
+      "level": "Revolver - Reach Level 10"
+    },
+    "Scythe": {
+      "item": "Weapon - Scythe",
+      "level": "Scythe - Reach Level 10"
+    },
+    "Shotgun": {
+      "item": "Weapon - Shotgun",
+      "level": "Shotgun - Reach Level 10"
+    },
+    "Slutty Rocket": {
+      "item": "Weapon - Slutty Rocket",
+      "level": "Slutty Rocket - Reach Level 10"
+    },
+    "Sniper Rifle": {
+      "item": "Weapon - Sniper Rifle",
+      "level": "Sniper Rifle - Reach Level 10"
+    },
+    "Space Noodle": {
+      "item": "Weapon - Space Noodle",
+      "level": "Space Noodle - Reach Level 10"
+    },
+    "Sword": {
+      "item": "Weapon - Sword",
+      "level": "Sword - Reach Level 10"
+    },
+    "Tornado": {
+      "item": "Weapon - Tornado",
+      "level": "Tornado - Reach Level 10"
+    },
+    "Wireless Dagger": {
+      "item": "Weapon - Wireless Dagger",
+      "level": "Wireless Dagger - Reach Level 10"
+    }
+  },
+  "tomes": {
+    "Agility": {
+      "item": "Agility Tome",
+      "level": "Agility Tome - Reach Level 8"
+    },
+    "Armor": {
+      "item": "Armor Tome",
+      "level": "Armor Tome - Reach Level 8"
+    },
+    "Attraction": {
+      "item": "Attraction Tome",
+      "level": "Attraction Tome - Reach Level 8"
+    },
+    "Bloody": {
+      "item": "Bloody Tome",
+      "level": "Bloody Tome - Reach Level 8"
+    },
+    "Chaos": {
+      "item": "Chaos Tome",
+      "level": "Chaos Tome - Reach Level 8"
+    },
+    "Cooldown": {
+      "item": "Cooldown Tome",
+      "level": "Cooldown Tome - Reach Level 8"
+    },
+    "Cursed": {
+      "item": "Cursed Tome",
+      "level": "Cursed Tome - Reach Level 8"
+    },
+    "Damage": {
+      "item": "Damage Tome",
+      "level": "Damage Tome - Reach Level 8"
+    },
+    "Duration": {
+      "item": "Duration Tome",
+      "level": "Duration Tome - Reach Level 8"
+    },
+    "Evasion": {
+      "item": "Evasion Tome",
+      "level": "Evasion Tome - Reach Level 8"
+    },
+    "Golden": {
+      "item": "Golden Tome",
+      "level": "Golden Tome - Reach Level 8"
+    },
+    "Health": {
+      "item": "Health Tome",
+      "level": "Health Tome - Reach Level 8"
+    },
+    "Knockback": {
+      "item": "Knockback Tome",
+      "level": "Knockback Tome - Reach Level 8"
+    },
+    "Luck": {
+      "item": "Luck Tome",
+      "level": "Luck Tome - Reach Level 8"
+    },
+    "Precision": {
+      "item": "Precision Tome",
+      "level": "Precision Tome - Reach Level 8"
+    },
+    "Projectile Speed": {
+      "item": "Projectile Speed Tome",
+      "level": "Projectile Speed Tome - Reach Level 8"
+    },
+    "Quantity": {
+      "item": "Quantity Tome",
+      "level": "Quantity Tome - Reach Level 8"
+    },
+    "Regen": {
+      "item": "Regen Tome",
+      "level": "Regen Tome - Reach Level 8"
+    },
+    "Shield": {
+      "item": "Shield Tome",
+      "level": "Shield Tome - Reach Level 8"
+    },
+    "Silver": {
+      "item": "Silver Tome",
+      "level": "Silver Tome - Reach Level 8"
+    },
+    "Size": {
+      "item": "Size Tome",
+      "level": "Size Tome - Reach Level 8"
+    },
+    "Thorns": {
+      "item": "Thorns Tome",
+      "level": "Thorns Tome - Reach Level 8"
+    },
+    "XP": {
+      "item": "XP Tome",
+      "level": "XP Tome - Reach Level 8"
+    }
+  },
+  "maps": {
+    "Forest": {
+      "item": "Progressive Forest Tier",
+      "tiers": [
+        "Forest - Complete Tier 1 (Lil Bark)",
+        "Forest - Complete Tier 2 (Chadbark)",
+        "Forest - Complete Tier 3 (Bark Vader)"
+      ],
+      "bosses": {
+        "Chunkham the Terrible": "Forest - Defeat Chunkham the Terrible",
+        "Stone Golem": "Forest - Defeat Stone Golem",
+        "Suspicious Bush": "Forest - Defeat the Suspicious Bush"
+      },
+      "boss_words": {
+        "golem": "Stone Golem",
+        "pig": "Chunkham the Terrible",
+        "chunkham": "Chunkham the Terrible",
+        "bush": "Suspicious Bush"
+      },
+      "challenges": {
+        "Fragile": "Forest Challenge - Fragile",
+        "Turbo Mode": "Forest Challenge - Turbo Mode",
+        "Smol Boi": "Forest Challenge - Smol Boi",
+        "AFK Gaming": "Forest Challenge - AFK Gaming",
+        "Blind": "Forest Challenge - Blind",
+        "Sticks and stones": "Forest Challenge - Sticks and stones",
+        "Weird Controls": "Forest Challenge - Weird Controls",
+        "Speedrunner": "Forest Challenge - Speedrunner",
+        "Speedrunner+": "Forest Challenge - Speedrunner+",
+        "Pacifist": "Forest Challenge - Pacifist",
+        "Oh no": "Forest Challenge - Oh no",
+        "Oh shit": "Forest Challenge - Oh shit",
+        "What the fuck": "Forest Challenge - What the fuck"
+      }
+    },
+    "Desert": {
+      "item": "Progressive Desert Tier",
+      "tiers": [
+        "Desert - Complete Tier 1 (Lil Anubis)",
+        "Desert - Complete Tier 2 (Anubruh)",
+        "Desert - Complete Tier 3 (Juge Anubis)"
+      ],
+      "bosses": {
+        "Bandit": "Desert - Defeat the Bandit",
+        "Sand Golem": "Desert - Defeat Sand Golem",
+        "Scorpionussy": "Desert - Defeat Scorpionussy"
+      },
+      "boss_words": {
+        "golem": "Sand Golem",
+        "scorp": "Scorpionussy",
+        "bandit": "Bandit"
+      },
+      "challenges": {
+        "Hyper": "Desert Challenge - Hyper",
+        "The Floor is Lava": "Desert Challenge - The Floor is Lava",
+        "Swarm": "Desert Challenge - Swarm",
+        "Chonk Mode": "Desert Challenge - Chonk Mode",
+        "Speedrunner": "Desert Challenge - Speedrunner",
+        "Speedrunner+": "Desert Challenge - Speedrunner+",
+        "Oh no": "Desert Challenge - Oh no",
+        "Oh shit": "Desert Challenge - Oh shit",
+        "What the fuck": "Desert Challenge - What the fuck"
+      }
+    },
+    "Graveyard": {
+      "item": "Graveyard Access",
+      "tiers": [],
+      "bosses": {
+        "Big Bob": "Graveyard - Defeat Big Bob",
+        "Spooky Steve": "Graveyard - Defeat Spooky Steve"
+      },
+      "boss_words": {
+        "bob": "Big Bob",
+        "steve": "Spooky Steve",
+        "spooky": "Spooky Steve"
+      },
+      "challenges": {},
+      "keys": "Graveyard - Collect the 4 Crypt Keys"
+    }
+  },
+  "goals": [
+    "Tier 1 Bosses",
+    "Tier 2 Bosses",
+    "Tier 3 Bosses"
+  ],
+  "aliases": {
+    "weapon": {
+      "Sniper": "Sniper Rifle",
+      "Rockets": "Slutty Rocket",
+      "Mine": "Mines",
+      "CorruptSword": "Corrupted Sword",
+      "BluetoothDagger": "Wireless Dagger"
+    },
+    "tome": {
+      "Hp": "Health",
+      "Gold": "Golden",
+      "Curse": "Cursed",
+      "Blood": "Bloody",
+      "Crit": "Precision"
+    },
+    "character": {
+      "Clank": "CL4NK"
+    },
+    "map": {}
+  }
+}

@@ -201,9 +201,89 @@ game = {
 }
 
 
+# ---------------------------------------------------------------------------------------------
+# The same lists, shaped for the mod (mod/src/MegabonkAP.Core/checks.json): which check belongs
+# to which thing in the game, so the mod and the world can never disagree on a name.
+# ---------------------------------------------------------------------------------------------
+
+# What the game calls things in its own code, where that differs from the name players see.
+# Names are compared without case, spaces or punctuation, so only real differences are listed.
+# Sources: the EWeapon list in lukeod/megabonk_research; the rest are guesses to confirm in the game.
+ALIASES = {
+    "weapon": {
+        "Sniper": "Sniper Rifle",
+        "Rockets": "Slutty Rocket",
+        "Mine": "Mines",
+        "CorruptSword": "Corrupted Sword",
+        "BluetoothDagger": "Wireless Dagger",
+    },
+    "tome": {"Hp": "Health", "Gold": "Golden", "Curse": "Cursed", "Blood": "Bloody", "Crit": "Precision"},
+    "character": {"Clank": "CL4NK"},
+    "map": {},
+}
+
+# A boss is recognised by a word inside the game's own name for it, per map.
+BOSS_WORDS = {
+    "Forest": {"golem": "Stone Golem", "pig": "Chunkham the Terrible", "chunkham": "Chunkham the Terrible",
+               "bush": "Suspicious Bush"},
+    "Desert": {"golem": "Sand Golem", "scorp": "Scorpionussy", "bandit": "Bandit"},
+    "Graveyard": {"bob": "Big Bob", "steve": "Spooky Steve", "spooky": "Spooky Steve"},
+}
+
+
+def boss_check(map_name: str, boss: str) -> str:
+    return next(loc["name"] for loc in locations
+                if loc["name"] in (f"{map_name} - Defeat {boss}", f"{map_name} - Defeat the {boss}"))
+
+
+mod_maps = {}
+for map_name, bosses in TIER_BOSSES.items():
+    mod_maps[map_name] = {
+        "item": f"Progressive {map_name} Tier",
+        "tiers": [f"{map_name} - Complete Tier {n} ({boss})" for n, boss in enumerate(bosses, start=1)],
+        "bosses": {boss: boss_check(map_name, boss) for boss in sorted(set(BOSS_WORDS[map_name].values()))},
+        "boss_words": BOSS_WORDS[map_name],
+        "challenges": {name: f"{map_name} Challenge - {name}" for name in CHALLENGES[map_name]},
+    }
+mod_maps["Graveyard"] = {
+    "item": "Graveyard Access",
+    "tiers": [],
+    "bosses": {boss: boss_check("Graveyard", boss) for boss in sorted(set(BOSS_WORDS["Graveyard"].values()))},
+    "boss_words": BOSS_WORDS["Graveyard"],
+    "challenges": {},
+    "keys": "Graveyard - Collect the 4 Crypt Keys",
+}
+
+mod_checks = {
+    "game": "Manual_Megabonk_bbush",
+    "levels": {"character": CHARACTER_LEVEL, "weapon": WEAPON_LEVEL, "tome": TOME_LEVEL},
+    "characters": {
+        name: {"item": f"Character - {name}", "weapon": weapon,
+               "run": f"{name} - Complete a Run", "level": f"{name} - Reach Level {CHARACTER_LEVEL}"}
+        for name, weapon in CHARACTERS.items()
+    },
+    "weapons": {
+        name: {"item": f"Weapon - {name}", "level": f"{name} - Reach Level {WEAPON_LEVEL}"}
+        for name in sorted(list(CHARACTERS.values()) + OTHER_WEAPONS)
+    },
+    "tomes": {
+        name: {"item": f"{name} Tome", "level": f"{name} Tome - Reach Level {TOME_LEVEL}"}
+        for name in TOMES
+    },
+    "maps": mod_maps,
+    "goals": [f"Tier {n} Bosses" for n in (1, 2, 3)],   # in the order of the world's goal option
+    "aliases": ALIASES,
+}
+
 def write(name: str, content) -> None:
     text = json.dumps(content, indent=2, ensure_ascii=False) + "\n"
     (data / name).write_text(text, encoding="utf-8", newline="\n")
+
+
+mod_core = Path(__file__).resolve().parent / "mod" / "src" / "MegabonkAP.Core"
+mod_core.mkdir(parents=True, exist_ok=True)
+(mod_core / "checks.json").write_text(
+    json.dumps(mod_checks, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
 
 
 write("items.json", items)

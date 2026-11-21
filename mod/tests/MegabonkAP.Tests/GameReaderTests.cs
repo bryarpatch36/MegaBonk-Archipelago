@@ -72,7 +72,7 @@ namespace MegabonkAP.Tests
             TomeInventory tomes = _player.inventory.tomeInventory;
             tomes.tomeLevels.Set(ETome.Damage, 8);
             tomes.tomeLevels.Set(ETome.Health, 9);
-            tomes.tomeLevels.Set(ETome.Bounce, 9);          // a tome not held: it does not count
+            tomes.tomeLevels.Set(ETome.Bounce, 9);          // a tome the world does not have
             _reader.TomesChanged(tomes);
 
             _reader.XpChanged(new PlayerXp { level = 30 });
@@ -97,7 +97,7 @@ namespace MegabonkAP.Tests
                 "Fox - Complete a Run",
                 "Fox - Reach Level 30",
             }, _link.Sent.OrderBy(s => s));
-            Assert.False(_log.Has("matches nothing"));     // every name the game used is known
+            Assert.False(_log.Has("matches nothing"));     // Bounce is known and passed over
             Assert.True(_log.Has("Boss killed on Forest: the game calls it 'Ent1'."));
             Assert.True(_log.Has("Seen this run: 5 enemy deaths (3 bosses), player level 30"));
         }

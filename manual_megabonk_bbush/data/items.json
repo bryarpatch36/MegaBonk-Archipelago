@@ -432,23 +432,7 @@
     "progression": true
   },
   {
-    "name": "Balance Tome",
-    "category": [
-      "Tomes"
-    ],
-    "count": 1,
-    "progression": true
-  },
-  {
     "name": "Bloody Tome",
-    "category": [
-      "Tomes"
-    ],
-    "count": 1,
-    "progression": true
-  },
-  {
-    "name": "Bounce Tome",
     "category": [
       "Tomes"
     ],
@@ -504,14 +488,6 @@
     "progression": true
   },
   {
-    "name": "Gambler Tome",
-    "category": [
-      "Tomes"
-    ],
-    "count": 1,
-    "progression": true
-  },
-  {
     "name": "Golden Tome",
     "category": [
       "Tomes"
@@ -521,14 +497,6 @@
   },
   {
     "name": "Health Tome",
-    "category": [
-      "Tomes"
-    ],
-    "count": 1,
-    "progression": true
-  },
-  {
-    "name": "Hoarder Tome",
     "category": [
       "Tomes"
     ],

@@ -546,25 +546,11 @@
     "requires": "|Attraction Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
   },
   {
-    "name": "Balance Tome - Reach Level 8",
-    "category": [
-      "Tomes"
-    ],
-    "requires": "|Balance Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
-  },
-  {
     "name": "Bloody Tome - Reach Level 8",
     "category": [
       "Tomes"
     ],
     "requires": "|Bloody Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
-  },
-  {
-    "name": "Bounce Tome - Reach Level 8",
-    "category": [
-      "Tomes"
-    ],
-    "requires": "|Bounce Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
   },
   {
     "name": "Chaos Tome - Reach Level 8",
@@ -609,13 +595,6 @@
     "requires": "|Evasion Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
   },
   {
-    "name": "Gambler Tome - Reach Level 8",
-    "category": [
-      "Tomes"
-    ],
-    "requires": "|Gambler Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
-  },
-  {
     "name": "Golden Tome - Reach Level 8",
     "category": [
       "Tomes"
@@ -628,13 +607,6 @@
       "Tomes"
     ],
     "requires": "|Health Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
-  },
-  {
-    "name": "Hoarder Tome - Reach Level 8",
-    "category": [
-      "Tomes"
-    ],
-    "requires": "|Hoarder Tome| and (|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
   },
   {
     "name": "Knockback Tome - Reach Level 8",

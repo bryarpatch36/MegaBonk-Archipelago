@@ -43,10 +43,9 @@ OTHER_WEAPONS = [
 ]
 
 TOMES = [
-    "Agility", "Armor", "Attraction", "Balance", "Bloody", "Bounce", "Chaos", "Cooldown",
-    "Cursed", "Damage", "Duration", "Evasion", "Gambler", "Golden", "Health", "Hoarder",
-    "Knockback", "Luck", "Precision", "Projectile Speed", "Quantity", "Regen", "Shield",
-    "Silver", "Size", "Thorns", "XP",
+    "Agility", "Armor", "Attraction", "Bloody", "Chaos", "Cooldown", "Cursed", "Damage",
+    "Duration", "Evasion", "Golden", "Health", "Knockback", "Luck", "Precision",
+    "Projectile Speed", "Quantity", "Regen", "Shield", "Silver", "Size", "Thorns", "XP",
 ]
 
 # map -> the boss that ends a run of tier 1, 2, 3
@@ -224,9 +223,10 @@ ALIASES = {
 }
 
 # Names the game has that the world does not: the mod passes over them without a word.
+# The four tomes are in the game's code (1.0.69) but cannot be picked in a run, so the world leaves them out.
 IGNORED = {
     "weapon": ["Test", "None"],
-    "tome": [],
+    "tome": ["Bounce", "Balance", "Gambler", "Hoarder"],
     "character": [],
     "map": ["None", "Hell"],
 }

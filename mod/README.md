@@ -24,7 +24,17 @@ Version 0.2.0. Version 0.1.0 was run once on the real game (Megabonk 1.0.69, Bep
 - Because nothing is compiled against the game, a game update that renames a method costs one feature and a line in the log, not a mod that fails to load. The log names the missing member and lists what the object has instead.
 - [docs/hooks.md](docs/hooks.md) lists every game name the mod relies on and what has been seen working. [docs/probes/](docs/probes/) keeps the probe of each game version looked at.
 
-## Installing it on the PC that has the game
+## Installing it with a mod manager
+
+`MegabonkAP-<version>.zip` in the folder above is the whole mod in one file, in the layout mod managers read.
+
+1. In r2modman, select Megabonk and a profile, then **Settings → Import local mod** and pick the zip. Gale has the same under **File → Import local mod**. BepInEx (`BepInExPack_IL2CPP`) is named as a dependency; install it from the Online tab if the manager does not add it.
+2. If you installed an earlier build by hand, delete `BepInEx/plugins/MegabonkAP` in the profile folder first, or the mod loads twice.
+3. Start the game once and close it, then set `Server` and `Slot` in the manager's config editor (`bbush.megabonk.archipelago.cfg`).
+
+`python mod/make_package.py` builds the plugin and writes the zip again; run it after changing the mod.
+
+## Building it on the PC that has the game
 
 What you need there: Megabonk (Steam, Windows), the [.NET SDK](https://dotnet.microsoft.com/download) 8 or newer, and this folder.
 

@@ -128,7 +128,7 @@ namespace MegabonkAP.Tests
             Assert.Null(List.Resolve("weapon", null));
             Assert.Null(List.Resolve("map", "Hell"));
             Assert.False(List.IsIgnored("weapon", "Banhammer"));
-            Assert.True(List.IsIgnored("tome", "Gambler"));
+            Assert.False(List.IsIgnored("tome", "Gambler"));
             Assert.True(List.IsIgnored("weapon", "Test"));
         }
 
@@ -299,11 +299,10 @@ namespace MegabonkAP.Tests
         }
 
         [Fact]
-        public void ATomeTheWorldDoesNotHaveIsPassedOverWithoutAWord()
+        public void AWeaponTheWorldDoesNotHaveIsPassedOverWithoutAWord()
         {
             Tracker tracker = Start("Character - Fox", "Progressive Forest Tier");
             tracker.RunStarted("Fox", "Forest", 1);
-            tracker.TomeLevel("Gambler", 12);
             tracker.WeaponLevel("Test", 12);
             Assert.Empty(_link.Sent);
             Assert.False(_log.Has("matches nothing"));

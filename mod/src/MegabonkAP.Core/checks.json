@@ -268,9 +268,17 @@
       "item": "Attraction Tome",
       "level": "Attraction Tome - Reach Level 8"
     },
+    "Balance": {
+      "item": "Balance Tome",
+      "level": "Balance Tome - Reach Level 8"
+    },
     "Bloody": {
       "item": "Bloody Tome",
       "level": "Bloody Tome - Reach Level 8"
+    },
+    "Bounce": {
+      "item": "Bounce Tome",
+      "level": "Bounce Tome - Reach Level 8"
     },
     "Chaos": {
       "item": "Chaos Tome",
@@ -296,6 +304,10 @@
       "item": "Evasion Tome",
       "level": "Evasion Tome - Reach Level 8"
     },
+    "Gambler": {
+      "item": "Gambler Tome",
+      "level": "Gambler Tome - Reach Level 8"
+    },
     "Golden": {
       "item": "Golden Tome",
       "level": "Golden Tome - Reach Level 8"
@@ -303,6 +315,10 @@
     "Health": {
       "item": "Health Tome",
       "level": "Health Tome - Reach Level 8"
+    },
+    "Hoarder": {
+      "item": "Hoarder Tome",
+      "level": "Hoarder Tome - Reach Level 8"
     },
     "Knockback": {
       "item": "Knockback Tome",
@@ -416,12 +432,7 @@
       "Test",
       "None"
     ],
-    "tome": [
-      "Bounce",
-      "Balance",
-      "Gambler",
-      "Hoarder"
-    ],
+    "tome": [],
     "character": [],
     "map": [
       "None",

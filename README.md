@@ -17,7 +17,7 @@ This is an unofficial fan project. It is not affiliated with or endorsed by vedi
 | Checks sent by themselves (the mod) | Loads in Megabonk 1.0.69, attaches its hooks and connects. No check has been sent from the game yet ([mod/README.md](mod/README.md)) |
 | Rules enforced by the game | Not built |
 
-The lists of characters, weapons and tomes come from a public Megabonk database as of November 2026, and all match the game's own code (version 1.0.69). The game's code also names four tomes the world does not have (Bounce, Balance, Gambler, Hoarder); whether they can be obtained has not been checked. Megabonk was not available on the PC this was built on, so three things were taken from guides rather than seen in the game and may need a correction after a first session: the challenge names, the Graveyard checks, and the level numbers the checks ask for (see "Building and changing it").
+The lists of characters, weapons and tomes come from a public Megabonk database as of November 2026, and all match the game's own code (version 1.0.69). Four of the tomes (Bounce, Balance, Gambler, Hoarder) were taken from the game's code rather than the database; whether they can be obtained in a run has not been checked. Megabonk was not available on the PC this was built on, so three things were taken from guides rather than seen in the game and may need a correction after a first session: the challenge names, the Graveyard checks, and the level numbers the checks ask for (see "Building and changing it").
 
 ## What you need
 
@@ -64,7 +64,7 @@ If you are sent a character, weapon, tome or map tier that your save has not unl
 | Complete a run with each character (any map, any tier) | 21 | always on |
 | Reach Level 30 in a run with each character | 21 | `include_character_levels` (default on) |
 | Get each weapon to Level 10 in a run | 30 | always on |
-| Get each tome to Level 8 in a run | 23 | always on |
+| Get each tome to Level 8 in a run | 27 | always on |
 | Complete Forest Tier 1, 2, 3 (Lil Bark, Chadbark, Bark Vader) | 3 | always on |
 | Complete Desert Tier 1, 2, 3 (Lil Anubis, Anubruh, Juge Anubis) | 3 | always on |
 | Minibosses: Stone Golem, Chunkham the Terrible, Sand Golem, Scorpionussy | 4 | always on |
@@ -72,7 +72,7 @@ If you are sent a character, weapon, tome or map tier that your save has not unl
 | Graveyard: collect the 4 Crypt Keys, defeat Big Bob | 2 | `include_graveyard` (default on; also removes Spooky Steve and `Graveyard Access`) |
 | Forest challenges (13) and Desert challenges (9) | 22 | `include_challenges` (default off) |
 
-With the defaults that is 110 checks. The item pool is 21 characters, 30 weapons, 23 tomes, 3 Forest tiers, 3 Desert tiers and `Graveyard Access` (81 items, 4 of them given at the start); the remaining checks hold `Bonk`, a filler item that does nothing.
+With the defaults that is 114 checks. The item pool is 21 characters, 30 weapons, 27 tomes, 3 Forest tiers, 3 Desert tiers and `Graveyard Access` (85 items, 4 of them given at the start); the remaining checks hold `Bonk`, a filler item that does nothing.
 
 So that nobody is asked for a long run with nothing in hand, the generator only expects a Tier 2 completion (and Big Bob) once you hold 3 weapons and 5 tomes, and a Tier 3 completion (and Spooky Steve) once you hold 6 weapons and 9 tomes.
 

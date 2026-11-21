@@ -50,7 +50,7 @@ A test reads the enums out of the probe and fails if any value is neither known 
 
 - **`EWeapon`**: all 30 real weapons match; `Test` and `None` are passed over.
 - **`ECharacter`**: all 21 match (`Cl4nk`, `SirOofie`, `TonyMcZoom`, `SirChadwell` by ignoring case and spaces).
-- **`ETome`**: 23 match (`Regeneration` is Regen, `Blood` is Bloody). **Four tomes are in the game's code and not in the world: `Bounce`, `Balance`, `Gambler`, `Hoarder`.** The mod passes over them. Whether they are obtainable in the game has not been checked.
+- **`ETome`**: all 27 match (`Regeneration` is Regen, `Blood` is Bloody). Four of them (`Bounce`, `Balance`, `Gambler`, `Hoarder`) were added to the world from the game's code; whether they are obtainable in the game has not been checked.
 - **`EEnemy`**: bosses are matched by exact name, because `Golem` and `Scorpion` are ordinary enemies: `MinibossPig` (Chunkham the Terrible), `MinibossGolem` (Stone Golem), `Bush`, `MinibossGolemSand` (Sand Golem), `MinibossScorpion` (Scorpionussy), `Bandit`. That the pig is Chunkham is assumed.
 - **Spooky Steve** has no way to be recognised yet. Candidates in `EEnemy`: `GhostInvincible`, `Ghostham`. The mod logs every boss it does not know (`Boss killed on Graveyard: the game calls it '...'`), which will name him.
 - **Tier bosses** need no names: `Ent1`–`Ent3` and `Pharaoh1`–`Pharaoh3` are presumably them, but the tier check comes from the stage-boss event.

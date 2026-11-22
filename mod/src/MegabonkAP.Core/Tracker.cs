@@ -42,11 +42,29 @@ namespace MegabonkAP.Core
         private bool _refusalSaid;
         private DateTime _deathReceived = DateTime.MinValue;
 
+        // what the overlay shows, and what locking goes by
+        private bool _itemsKnown;                                // the server has said what is held, this start
+        private bool _connected;
+        private HashSet<string> _done = new();                   // checks the server counts as done
+        private int _total;
+        private string? _picked;                                 // the character last confirmed in the menu
+        private readonly List<Note> _notes = new();
+
+        /// <summary>A line for the player: an item arrived, a check went out, something was refused.</summary>
+        public sealed record Note(DateTime At, string Text, bool Bad);
+
         /// <summary>
         /// On: a check only counts when the run and the thing are permitted by held items, as the
         /// world's rules say. Off: everything that happens counts.
         /// </summary>
         public bool Strict { get; set; } = true;
+
+        /// <summary>
+        /// On, together with Strict: what is not held cannot be used. A locked character or map tier
+        /// cannot be started, and locked weapons and tomes are not offered. Nothing is locked before
+        /// the server has said what is held.
+        /// </summary>
+        public bool Lock { get; set; } = true;
 
         /// <summary>Off: deaths are neither sent nor acted on, whatever the slot says.</summary>
         public bool DeathLinkAllowed { get; set; } = true;
@@ -97,6 +115,7 @@ namespace MegabonkAP.Core
                 string? name = Known("character", character);
                 if (name == null || name == _character) return;
                 _character = name;
+                _picked = name;
                 _refusalSaid = false;
                 _log.Info($"Playing as {_character}.");
                 if (_inRun) RunCounts();        // say at once when this run will not count
@@ -258,8 +277,10 @@ namespace MegabonkAP.Core
         {
             lock (_gate)
             {
-                if (!_link.Connected) return;
+                if (!_link.Connected) { _connected = false; return; }
+                _connected = true;
                 AdoptSession();
+                ReadProgress();
                 if (_owed.Count > 0)
                 {
                     foreach (string gone in _owed.Where(c => !_link.Exists(c)).ToList())
@@ -279,6 +300,7 @@ namespace MegabonkAP.Core
                             _owed.Remove(check);
                             _sent.Add(check);
                             _log.Info($"Check sent: {check}");
+                            Tell($"Check sent: {check}");
                         }
                     }
                     SaveState();
@@ -310,6 +332,131 @@ namespace MegabonkAP.Core
             }
         }
 
+        // ------------------------------------------------------------------ what may be used
+
+        /// <summary>Whether anything is locked at all right now.</summary>
+        public bool Locking
+        {
+            get { lock (_gate) return Strict && Lock && _itemsKnown; }
+        }
+
+        /// <summary>
+        /// The player confirmed a character in the menu, under the game's name for it. Null: go
+        /// ahead. Otherwise the reason it is refused, already written to the log and the overlay.
+        /// </summary>
+        public string? CharacterRefusal(string? gameName)
+        {
+            lock (_gate)
+            {
+                string? name = _list.Resolve("character", gameName);
+                if (name == null) return null;                      // not a character of the world: not ours to refuse
+                if (Locking && !Holds(_list.Characters[name].Item))
+                    return Refuse($"{name} is locked: you do not hold {_list.Characters[name].Item}.");
+                _picked = name;
+                return null;
+            }
+        }
+
+        /// <summary>A run is about to start on this map and tier. Null: go ahead. Otherwise the reason it is refused.</summary>
+        public string? RunRefusal(string? gameMap, int tier)
+        {
+            lock (_gate)
+            {
+                string? name = _list.Resolve("map", gameMap);
+                if (name == null || !Locking) return null;
+                CheckList.Map map = _list.Maps[name];
+                if (map.TierChecks.Count == 0)
+                    return Holds(map.Item) ? null : Refuse($"{name} is locked: you do not hold {map.Item}.");
+                int needed = Math.Max(tier, 1);
+                if (Copies(map.Item) >= needed) return null;
+                return Refuse($"{name} Tier {needed} is locked: it needs {needed} {map.Item}, you hold {Copies(map.Item)}.");
+            }
+        }
+
+        /// <summary>Whether the game may offer this weapon or tome ("weapon" / "tome", the game's name) at a level-up.</summary>
+        public bool OfferAllowed(string kind, string? gameName)
+        {
+            lock (_gate)
+            {
+                if (!Locking) return true;
+                string? name = _list.Resolve(kind, gameName);
+                if (name == null) return true;                      // not in the world: left alone
+                if (kind == "tome") return Holds(_list.Tomes[name].Item);
+                if (Holds(_list.Weapons[name].Item)) return true;
+                string? character = _character ?? _picked;          // a character's own weapon comes with the character
+                return character != null && _list.Characters[character].Weapon == name
+                    && Holds(_list.Characters[character].Item);
+            }
+        }
+
+        /// <summary>The plugin learned whether the server can be reached. Call it after every try.</summary>
+        public void ConnectionSeen(bool connected)
+        {
+            lock (_gate) _connected = connected;
+        }
+
+        /// <summary>Everything the overlay shows, as of now.</summary>
+        public Snapshot Look()
+        {
+            lock (_gate)
+            {
+                return new Snapshot
+                {
+                    Connected = _connected,
+                    ItemsKnown = _itemsKnown,
+                    Locking = Locking,
+                    Done = _done.Count,
+                    Total = _total,
+                    DoneChecks = new HashSet<string>(_done.Concat(_sent)),
+                    Owed = _owed.Count,
+                    Held = new Dictionary<string, int>(_held),
+                    InRun = _inRun,
+                    Character = _character,
+                    Map = _map,
+                    Tier = _tier,
+                    RunProblem = _inRun ? RunProblem() : null,
+                    Notes = _notes.ToList(),
+                };
+            }
+        }
+
+        public sealed class Snapshot
+        {
+            public bool Connected, ItemsKnown, Locking, InRun;
+            public int Done, Total, Owed, Tier;
+            public string? Character, Map, RunProblem;
+            public IReadOnlyCollection<string> DoneChecks = Array.Empty<string>();
+            public IReadOnlyDictionary<string, int> Held = new Dictionary<string, int>();
+            public IReadOnlyList<Note> Notes = Array.Empty<Note>();
+        }
+
+        private string Refuse(string reason)
+        {
+            _log.Warn(reason);
+            Tell(reason, bad: true);
+            return reason;
+        }
+
+        /// <summary>Keep a line for the overlay. The same line again within a few seconds is one line.</summary>
+        private void Tell(string text, bool bad = false)
+        {
+            DateTime now = _now();
+            if (_notes.Count > 0 && _notes[^1].Text == text && (now - _notes[^1].At).TotalSeconds < 5)
+            {
+                _notes[^1] = new Note(now, text, bad);
+                return;
+            }
+            _notes.Add(new Note(now, text, bad));
+            if (_notes.Count > 12) _notes.RemoveAt(0);
+        }
+
+        private void ReadProgress()
+        {
+            if (!_link.Connected) return;
+            _done = new HashSet<string>(_link.CheckedNames);
+            _total = _link.TotalChecks;
+        }
+
         /// <summary>Checks earned and not yet taken by the server.</summary>
         public IReadOnlyCollection<string> Owed
         {
@@ -321,7 +468,21 @@ namespace MegabonkAP.Core
         /// <summary>Whether this run counts at all: the character and the map tier must be held.</summary>
         private bool RunCounts()
         {
-            if (!Strict) return true;
+            string? reason = RunProblem();
+            if (reason == null) return true;
+            if (!_refusalSaid)
+            {
+                _refusalSaid = true;
+                _log.Warn($"This run does not count: {reason}.");
+                Tell($"This run does not count: {reason}.", bad: true);
+            }
+            return false;
+        }
+
+        /// <summary>Why the run being played does not count, or null when it does.</summary>
+        private string? RunProblem()
+        {
+            if (!Strict) return null;
             string? reason = null;
             if (_character == null) reason = "the game has not said which character this is";
             else if (!Holds(_list.Characters[_character].Item)) reason = $"you do not hold {_list.Characters[_character].Item}";
@@ -335,13 +496,7 @@ namespace MegabonkAP.Core
                         ? $"{_map} Tier {needed} needs {needed} {map.Item}, you hold {Copies(map.Item)}"
                         : $"you do not hold {map.Item}";
             }
-            if (reason == null) return true;
-            if (!_refusalSaid)
-            {
-                _refusalSaid = true;
-                _log.Warn($"This run does not count: {reason}.");
-            }
-            return false;
+            return reason;
         }
 
         private void Earn(string check)
@@ -349,6 +504,7 @@ namespace MegabonkAP.Core
             if (_sent.Contains(check) || !_owed.Add(check)) return;
             _earnedThisStart.Add(check);
             _log.Info($"Check earned: {check}");
+            if (!_link.Connected) Tell($"Check earned, kept until the server is back: {check}");
             SaveState();
             Flush();
         }
@@ -368,6 +524,7 @@ namespace MegabonkAP.Core
             }
             _goalSent = true;
             _log.Info($"Goal reached: {_list.Goals[goal.Value]}.");
+            Tell($"Goal reached: {_list.Goals[goal.Value]}!");
             _link.SendGoal();
         }
 
@@ -381,6 +538,7 @@ namespace MegabonkAP.Core
                 _deathReceived = _now();
             }
             _log.Info($"{who} died ({why}).");
+            lock (_gate) Tell($"DeathLink: {who} died ({why}).", bad: true);
             KillRequested?.Invoke(who, why);
         }
 
@@ -391,8 +549,20 @@ namespace MegabonkAP.Core
                 var held = new Dictionary<string, int>();
                 foreach (string item in _link.ReceivedItems)
                     held[item] = held.TryGetValue(item, out int copies) ? copies + 1 : 1;
+                if (_itemsKnown)
+                {
+                    foreach (KeyValuePair<string, int> now in held.OrderBy(h => h.Key))
+                        if (now.Value > (_held.TryGetValue(now.Key, out int before) ? before : 0)) Tell($"Received: {now.Key}");
+                }
+                else if (_link.Connected)
+                {
+                    _itemsKnown = true;
+                    Tell($"Connected: you hold {held.Values.Sum()} items.");
+                }
                 _held = held;
+                _connected = _link.Connected;
                 _refusalSaid = false;       // a new item may have made the run count
+                ReadProgress();
             }
             Flush();
         }

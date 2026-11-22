@@ -68,6 +68,21 @@ internal static class Program
         string character = characterItem.Substring("Character - ".Length);
         CheckList.Character who = list.Characters[character];
 
+        // 0. locks go by what the server says is held: the starting character, Forest Tier 1, two tomes
+        string other = list.Characters.Keys.First(c => c != character);
+        string heldTome = list.Tomes.Values.First(t => start.Contains(t.Item)).Name;
+        string lockedTome = list.Tomes.Values.First(t => !start.Contains(t.Item)).Name;
+        Expect(tracker.Locking && tracker.CharacterRefusal(character) == null && tracker.CharacterRefusal(other) != null,
+            $"{character} may be played, {other} is locked");
+        Expect(tracker.RunRefusal("Forest", 1) == null && tracker.RunRefusal("Forest", 2) != null && tracker.RunRefusal("Desert", 1) != null,
+            "Forest Tier 1 may be started; Forest Tier 2 and Desert are locked");
+        Expect(tracker.OfferAllowed("tome", heldTome) && !tracker.OfferAllowed("tome", lockedTome)
+            && tracker.OfferAllowed("weapon", who.Weapon) && !tracker.OfferAllowed("weapon", list.Characters[other].Weapon),
+            $"offers: {heldTome} Tome and {who.Weapon} yes, {lockedTome} Tome and {list.Characters[other].Weapon} no");
+        string before0 = Overlay.Render(tracker.Look(), list, Overlay.Compact, DateTime.UtcNow);
+        Expect(before0.Contains($"0/{link.TotalChecks} checks") && link.TotalChecks > 50 && before0.Contains("Forest Tier 1"),
+            $"the overlay shows 0 of {link.TotalChecks} checks and Forest Tier 1");
+
         // 1. strict rules, a run the starting items permit
         tracker.RunStarted(character, "Forest", 1);
         tracker.PlayerLevel(30);
@@ -75,6 +90,15 @@ internal static class Program
         string tier1 = list.Maps["Forest"].TierChecks[0];
         Expect(Wait(() => link.IsChecked(tier1) && link.IsChecked(who.RunCheck) && link.IsChecked(who.LevelCheck)),
             $"the server took: {tier1}; {who.RunCheck}; {who.LevelCheck}");
+
+        tracker.Flush();
+        string after1 = Overlay.Render(tracker.Look(), list, Overlay.Full, DateTime.UtcNow);
+        Expect(after1.Contains($"3/{link.TotalChecks} checks") && link.CheckedNames.Contains(tier1)
+            && after1.Contains($"<color=#9be29b>{character}</color>"),
+            $"the overlay shows 3 checks done and {character} in green");
+        Console.WriteLine("      --- the overlay, full view ---");
+        foreach (string line in System.Text.RegularExpressions.Regex.Replace(after1, "<[^>]+>", "").Split('\n'))
+            Console.WriteLine("      | " + line);
 
         // 2. strict rules, a run they do not permit (Desert without a Desert tier)
         tracker.RunStarted(character, "Desert", 1);

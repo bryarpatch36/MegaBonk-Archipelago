@@ -26,6 +26,10 @@ namespace MegabonkAP.Core
         private int _deaths;
         private int _bossDeaths;
 
+        // the list of weapons or tomes last limited, and what was taken out of it
+        private sealed class Offers { public long List; public readonly List<object> Removed = new(); public string? Said; }
+        private readonly Dictionary<string, Offers> _offers = new();
+
         /// <summary>
         /// Set by the plugin when the game's own "stage boss died" method is hooked. When it is
         /// not, stage bosses are recognised among the enemy deaths instead.
@@ -249,6 +253,111 @@ namespace MegabonkAP.Core
                 return;
             }
             Dyn.Call(playerHealth, "KillPlayer");
+        }
+
+        // ------------------------------------------------------------------ what may be used
+
+        /// <summary>
+        /// CharacterMenu.OnConfirmCharacter(MyButtonCharacter), before the game acts on it. False:
+        /// the character is locked and the game must not go on.
+        /// </summary>
+        public bool MayConfirmCharacter(object? menu, object? button)
+        {
+            object? character = Dyn.First(button, "characterData.eCharacter", "character.eCharacter", "data.eCharacter", "eCharacter")
+                ?? Dyn.OfEnum(button, "ECharacter");
+            if (character == null)
+            {
+                if (button != null) Missing(button, "the character on the button; the menu's selectedCharacter is used instead");
+                character = Dyn.Get(menu, "selectedCharacter");
+            }
+            if (character == null)
+            {
+                if (menu != null) Missing(menu, "the chosen character (selectedCharacter)");
+                return true;
+            }
+            return _tracker.CharacterRefusal(Dyn.Name(character)) == null;
+        }
+
+        /// <summary>MapController.StartNewMap(RunConfig), before the game acts on it. False: the map or tier is locked.</summary>
+        public bool MayStartRun(object? runConfig)
+        {
+            if (runConfig == null) return true;
+            string? map = Dyn.Name(Dyn.Get(runConfig, "mapData.eMap"));
+            int? tierIndex = Dyn.Int(Dyn.Get(runConfig, "mapTierIndex"));
+            if (map == null) return true;
+            return _tracker.RunRefusal(map, tierIndex == null ? 0 : tierIndex.Value + 1) == null;
+        }
+
+        /// <summary>SelectionGroupToggleSingleButtonTier.OnClick(), before the game acts on it. False: that tier is locked.</summary>
+        public bool MayPickTier(object? tierButton) => MayStartRun(Dyn.Get(tierButton, "runConfig"));
+
+        /// <summary>
+        /// UnlockUtility.GetAvailableWeapons() / GetAvailableTomes() returned this collection: the
+        /// things the game may offer. Take out what is not held. kind: "weapon" or "tome".
+        /// </summary>
+        public void LimitOffers(string kind, object? collection)
+        {
+            if (collection == null) return;
+            lock (_gate)
+            {
+                if (!_offers.TryGetValue(kind, out Offers? offers)) _offers[kind] = offers = new Offers();
+
+                // the game may hand out the same list again: put back what was taken out of it, then judge afresh
+                long id = Identity(collection);
+                if (offers.List == id)
+                {
+                    foreach (object item in offers.Removed)
+                        if (!Dyn.Bool(Dyn.Call(collection, "Contains", item))) Dyn.Call(collection, "Add", item);
+                }
+                offers.Removed.Clear();
+                offers.List = id;
+                if (!_tracker.Locking) return;
+
+                string enumName = kind == "weapon" ? "EWeapon" : "ETome";
+                List<object> all = Dyn.Items(collection).Where(i => i != null).Select(i => i!).ToList();
+                if (all.Count == 0)
+                {
+                    if ((Dyn.Int(Dyn.First(collection, "Count", "count")) ?? 0) > 0)
+                        Missing(collection, $"the {kind}s the game may offer (the list could not be walked)");
+                    return;
+                }
+
+                var kept = new List<string>();
+                var locked = new List<object>();
+                foreach (object item in all)
+                {
+                    object? named = Dyn.First(item, kind == "weapon" ? "eWeapon" : "eTome") ?? Dyn.OfEnum(item, enumName);
+                    if (named == null) { Missing(item, $"which {kind} this is ({enumName})"); return; }
+                    string name = Dyn.Name(named) ?? "";
+                    if (_tracker.OfferAllowed(kind, name)) kept.Add(name);
+                    else locked.Add(item);
+                }
+
+                if (kept.Count == 0)
+                {
+                    SayOffers(offers, $"You hold none of the {all.Count} {kind}s the game can offer, so its {kind} offers are left as they are.");
+                    return;
+                }
+                if (locked.Count > 0 && Dyn.Method(collection.GetType(), "Remove", 1) == null)
+                {
+                    Missing(collection, $"a way to take locked {kind}s out of the offers (Remove)");
+                    return;
+                }
+                foreach (object item in locked)
+                {
+                    Dyn.Call(collection, "Remove", item);
+                    offers.Removed.Add(item);
+                }
+                kept.Sort(StringComparer.OrdinalIgnoreCase);
+                SayOffers(offers, $"Level-up {kind}s limited to the {kept.Count} of {all.Count} you hold: {string.Join(", ", kept)}.");
+            }
+        }
+
+        private void SayOffers(Offers offers, string message)
+        {
+            if (offers.Said == message) return;
+            offers.Said = message;
+            _log.Info(message);
         }
 
         // ------------------------------------------------------------------ inside

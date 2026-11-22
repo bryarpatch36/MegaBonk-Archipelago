@@ -24,6 +24,12 @@ namespace MegabonkAP.Core
         /// <summary>True when the server already counts this check as done.</summary>
         bool IsChecked(string check);
 
+        /// <summary>Names of every check the server counts as done.</summary>
+        IReadOnlyCollection<string> CheckedNames { get; }
+
+        /// <summary>How many checks this seed has.</summary>
+        int TotalChecks { get; }
+
         /// <summary>True when this seed has the check at all (an option may have switched it off).</summary>
         bool Exists(string check);
 

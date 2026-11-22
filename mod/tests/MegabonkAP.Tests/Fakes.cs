@@ -31,6 +31,8 @@ namespace MegabonkAP.Tests
         public IReadOnlyList<string> ReceivedItems => Items;
         public bool IsChecked(string check) => CheckedAlready.Contains(check) || Sent.Contains(check);
         public bool Exists(string check) => !NotInSeed.Contains(check);
+        public IReadOnlyCollection<string> CheckedNames => CheckedAlready.Concat(Sent).Distinct().ToList();
+        public int TotalChecks { get; set; } = 110;
 
         public IReadOnlyCollection<string> Send(IEnumerable<string> checks)
         {
@@ -82,6 +84,9 @@ namespace MegabonkAP.Tests.FakeGame
     {
         private readonly List<T> _items = new();
         public void Add(T item) => _items.Add(item);
+        public bool Remove(T item) => _items.Remove(item);
+        public bool Contains(T item) => _items.Contains(item);
+        public int Count => _items.Count;
         public Walker GetEnumerator() => new Walker(_items);
 
         public sealed class Walker
@@ -121,6 +126,13 @@ namespace MegabonkAP.Tests.FakeGame
     public sealed class StageData { public string name = ""; }
     public sealed class MapData { public EMap eMap; public GameList<StageData> stages = new(); }
     public sealed class CharacterData { public ECharacter eCharacter; }
+    public sealed class WeaponData { public EWeapon eWeapon; }
+    public sealed class TomeData { public ETome eTome; }
+    public sealed class RenamedTomeData { public string title = ""; public ETome which; }      // a game update renamed the member
+    public sealed class MyButtonCharacter { public CharacterData characterData = new(); }
+    public sealed class PlainButton { public string label = ""; }
+    public sealed class CharacterMenu { public ECharacter selectedCharacter; }
+    public sealed class SelectionGroupToggleSingleButtonTier { public RunConfig? runConfig; }
 
     public sealed class ChallengeData
     {

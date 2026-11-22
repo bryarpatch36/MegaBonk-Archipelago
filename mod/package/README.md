@@ -1,6 +1,6 @@
 # Megabonk Archipelago
 
-Connects Megabonk to an [Archipelago](https://archipelago.gg) multiworld: the mod watches the game and sends your checks by itself. It goes with the `manual_megabonk_bbush` world.
+Connects Megabonk to an [Archipelago](https://archipelago.gg) multiworld: the mod watches the game and sends your checks by itself, locks what you do not hold yet, and shows a tracker on screen (`F8` changes its view). It goes with the `manual_megabonk_bbush` world.
 
 ## Setting it up
 
@@ -16,7 +16,12 @@ Connects Megabonk to an [Archipelago](https://archipelago.gg) multiworld: the mo
 | `Slot` | empty | Your slot name |
 | `Password` | empty | The room's password, if any |
 | `Strict` | on | A check only counts when you hold what the world's rules ask for |
+| `Lock` | on | With `Strict` on: a character, map or tier you do not hold cannot be started, and weapons and tomes you do not hold are not offered |
 | `DeathLink` | on | Follows the `death_link` option of your YAML. Off: never |
+| `Mode` | `Compact` | The on-screen tracker: `Compact`, `Full` or `Hidden` |
+| `Key` | `F8` | Steps through the tracker's views. `None`: no key |
+| `Position` | `MiddleLeft` | `TopLeft`, `MiddleLeft`, `BottomLeft`, `TopRight`, `MiddleRight` or `BottomRight` |
+| `FontSize`, `Width` | 20, 520 | Size of the tracker, as on a 1080p screen |
 | `Probe` | on | Writes `BepInEx/MegabonkAP-probe.txt` at every start: the names in the game's code |
 
 Megabonk has online leaderboards, and modded play can get scores flagged. Check the game's setting for uploading scores before playing modded.

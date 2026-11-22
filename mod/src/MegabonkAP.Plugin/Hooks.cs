@@ -10,18 +10,23 @@ namespace MegabonkAP.Plugin
     /// <summary>
     /// Attaches to the game's methods by name, after each has run, and hands what it sees to the
     /// GameReader. A method that is not found costs the feature named next to it and a line in the
-    /// log; the others still attach. Only one hook ever changes the game: a received DeathLink
-    /// calls the game's own KillPlayer.
+    /// log; the others still attach.
+    ///
+    /// Most hooks only watch. The ones that change the game: a received DeathLink calls the game's
+    /// own KillPlayer; the three "Before" hooks stop a locked character, map or tier from being
+    /// started; and the two offer hooks take locked weapons and tomes out of what the game may
+    /// offer. When one of those fails it lets the game go on as if the mod were not there.
     ///
     /// The names are those of game version 1.0.69. docs/hooks.md says which were seen working.
     /// </summary>
     internal static class Hooks
     {
-        private sealed record Hook(string Type, string Method, int? Parameters, string After, string Feature);
+        /// <summary>After: runs after the game's method. Before: runs first, and false stops the game's method.</summary>
+        private sealed record Hook(string Type, string Method, int? Parameters, string? After, string Feature, string? Before = null);
 
         private static readonly Hook[] All =
         {
-            new("MapController", "StartNewMap", 1, nameof(AfterStartNewMap), "knowing which map and tier a run is"),
+            new("MapController", "StartNewMap", 1, nameof(AfterStartNewMap), "knowing which map and tier a run is, and locking maps", nameof(BeforeStartNewMap)),
             new("MapController", "RestartRun", 0, nameof(AfterRestartRun), "noticing a restarted run"),
             new("MyPlayer", "StartPlayer", 2, nameof(AfterStartPlayer), "knowing which character is played"),
             new("TrackStats", "OnEnemyDied", 2, nameof(AfterEnemyDiedStatic), "miniboss and hidden boss checks"),
@@ -35,6 +40,18 @@ namespace MegabonkAP.Plugin
             new("GraveyardBossRoom", "Activate", 0, nameof(AfterCrypt), "the Crypt Keys check"),
             new("GraveyardBossRoom", "OnEnemyDied", 2, nameof(AfterGraveyardEnemyDied), "the Big Bob check and Graveyard runs"),
             new("ChallengesTracker", "CompleteChallenge", 0, nameof(AfterChallenge), "challenge checks"),
+            new("CharacterMenu", "OnConfirmCharacter", 1, null, "locking characters you do not hold", nameof(BeforeConfirmCharacter)),
+            new("SelectionGroupToggleSingleButtonTier", "OnClick", 0, null, "locking tiers in the map menu", nameof(BeforeTierClick)),
+            new("UnlockUtility", "GetAvailableWeapons", 0, nameof(AfterAvailableWeapons), "offering only weapons you hold"),
+            new("UnlockUtility", "GetAvailableTomes", 0, nameof(AfterAvailableTomes), "offering only tomes you hold"),
+        };
+
+        // Any one of these gives the overlay its turn on the game's own thread, in menus and in a run.
+        private static readonly Hook[] Frames =
+        {
+            new("UnityEngine.EventSystems.EventSystem", "Update", 0, nameof(AfterFrame), "the overlay"),
+            new("UnityEngine.Canvas", "SendWillRenderCanvases", 0, nameof(AfterFrame), "the overlay"),
+            new("WindowManager", "Update", 0, nameof(AfterFrame), "the overlay"),
         };
 
         // only used when TrackStats.OnEnemyDied is not there
@@ -45,6 +62,8 @@ namespace MegabonkAP.Plugin
 
         private static GameReader? _reader;
         private static ILog? _log;
+        private static Screen? _screen;
+        private static bool _runRefused;        // StartNewMap was stopped: what runs after it must not count a run
         private static readonly HashSet<string> Failed = new();
         private static long _killBefore;        // a DeathLink waits here for the game's own thread: ticks, 0 = none
 
@@ -60,6 +79,21 @@ namespace MegabonkAP.Plugin
                 if (ok && hook.Method == "OnStageBossDied") reader.StageBossEvent = true;
                 if (ok) attached++;
             }
+            return attached;
+        }
+
+        /// <summary>Give the overlay its turn every frame. Returns how many of the game's per-frame methods were found.</summary>
+        public static int AttachFrames(Harmony harmony, Screen screen, TypeFinder finder, ILog log)
+        {
+            _screen = screen;
+            int attached = 0;
+            foreach (Hook hook in Frames)
+            {
+                if (finder.Find(hook.Type) == null) continue;       // only one is needed: no complaint for the others
+                if (Attach(harmony, finder, log, hook)) attached++;
+            }
+            if (attached == 0)
+                log.Warn("Overlay: none of the game's per-frame methods could be hooked, so it only updates during a run.");
             return attached;
         }
 
@@ -90,13 +124,17 @@ namespace MegabonkAP.Plugin
                 return false;
             }
 
-            MethodInfo after = typeof(Hooks).GetMethod(hook.After, BindingFlags.Static | BindingFlags.NonPublic)!;
+            const BindingFlags mine = BindingFlags.Static | BindingFlags.NonPublic;
+            MethodInfo? after = hook.After == null ? null : typeof(Hooks).GetMethod(hook.After, mine)!;
+            MethodInfo? before = hook.Before == null ? null : typeof(Hooks).GetMethod(hook.Before, mine)!;
             int done = 0;
             foreach (MethodInfo target in targets)
             {
                 try
                 {
-                    harmony.Patch(target, postfix: new HarmonyMethod(after));
+                    harmony.Patch(target,
+                        prefix: before == null ? null : new HarmonyMethod(before),
+                        postfix: after == null ? null : new HarmonyMethod(after));
                     done++;
                 }
                 catch (Exception problem)
@@ -111,8 +149,31 @@ namespace MegabonkAP.Plugin
 
         // ---- what runs after the game's methods. An error here must never reach the game. ----
 
-        private static void AfterStartNewMap(object[] __args) =>
+        private static bool BeforeStartNewMap(object[] __args)
+        {
+            _runRefused = !Allowed(nameof(BeforeStartNewMap), r => r.MayStartRun(__args.Length > 0 ? __args[0] : null));
+            return !_runRefused;
+        }
+
+        private static void AfterStartNewMap(object[] __args)
+        {
+            if (_runRefused) { _runRefused = false; return; }       // the game's method did not run: no run began
             Safely(nameof(AfterStartNewMap), r => r.RunStarted(__args.Length > 0 ? __args[0] : null));
+        }
+
+        private static bool BeforeConfirmCharacter(object __instance, object[] __args) =>
+            Allowed(nameof(BeforeConfirmCharacter), r => r.MayConfirmCharacter(__instance, __args.Length > 0 ? __args[0] : null));
+
+        private static bool BeforeTierClick(object __instance) =>
+            Allowed(nameof(BeforeTierClick), r => r.MayPickTier(__instance));
+
+        private static void AfterAvailableWeapons(object __result) =>
+            Safely(nameof(AfterAvailableWeapons), r => r.LimitOffers("weapon", __result));
+
+        private static void AfterAvailableTomes(object __result) =>
+            Safely(nameof(AfterAvailableTomes), r => r.LimitOffers("tome", __result));
+
+        private static void AfterFrame() => _screen?.Pump();
 
         private static void AfterRestartRun() =>
             Safely(nameof(AfterRestartRun), r => r.RunRestarted());
@@ -146,6 +207,7 @@ namespace MegabonkAP.Plugin
 
         private static void AfterHealthTick(object __instance)
         {
+            _screen?.Pump();
             if (_killBefore == 0) return;                   // every frame: nothing else may happen here
             long before = System.Threading.Interlocked.Exchange(ref _killBefore, 0);
             if (before == 0 || DateTime.UtcNow.Ticks > before) return;
@@ -160,6 +222,14 @@ namespace MegabonkAP.Plugin
 
         private static void AfterChallenge() =>
             Safely(nameof(AfterChallenge), r => r.ChallengeCompleted());
+
+        /// <summary>Ask whether the game may go on. Anything that goes wrong means yes.</summary>
+        private static bool Allowed(string where, Func<GameReader, bool> question)
+        {
+            bool allowed = true;
+            Safely(where, r => allowed = question(r));
+            return allowed;
+        }
 
         private static void Safely(string where, Action<GameReader> action)
         {

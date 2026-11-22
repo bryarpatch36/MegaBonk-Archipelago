@@ -99,6 +99,31 @@ namespace MegabonkAP.Core
             return argument != null && argument.IsEnum ? Enum.GetValues(argument) : null;
         }
 
+        /// <summary>
+        /// The value of the first field or property whose type is the enum of this name: a weapon's
+        /// EWeapon, whatever the member itself is called. Null when there is none.
+        /// </summary>
+        public static object? OfEnum(object? target, string enumName)
+        {
+            if (target == null) return null;
+            string? member = EnumMembers.GetOrAdd((target.GetType(), enumName), key =>
+            {
+                for (Type? t = key.Item1; t != null; t = t.BaseType)
+                {
+                    foreach (MemberInfo m in t.GetMembers(Any | BindingFlags.DeclaredOnly))
+                    {
+                        Type? type = m is FieldInfo f ? f.FieldType
+                            : m is PropertyInfo p && p.GetIndexParameters().Length == 0 && p.GetMethod != null ? p.PropertyType : null;
+                        if (type != null && type.IsEnum && type.Name == key.Item2) return m.Name;
+                    }
+                }
+                return null;
+            });
+            return member == null ? null : Get(target, member);
+        }
+
+        private static readonly ConcurrentDictionary<(Type, string), string?> EnumMembers = new();
+
         public static int? Int(object? value)
         {
             switch (value)

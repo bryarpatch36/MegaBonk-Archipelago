@@ -6,7 +6,7 @@ The first run on the real game (mod 0.1.0, one Forest Tier 1 run) showed: all ho
 
 ## Methods hooked (`Hooks.cs`)
 
-All run after the game's method. Only `PlayerHealth.Tick` ever changes anything, and only when a DeathLink has arrived.
+Most run after the game's method and only watch. Those that change the game are marked: `PlayerHealth.Tick` when a DeathLink has arrived, the three that run *before* the game's method and can stop it, and the two that edit a list the game returned. Each of them lets the game go on untouched when it fails or cannot read what it needs.
 
 | Method | Used for | Seen on the real game |
 |---|---|---|
@@ -25,6 +25,13 @@ All run after the game's method. Only `PlayerHealth.Tick` ever changes anything,
 | `GraveyardBossRoom.OnEnemyDied(Enemy, DamageContainer)` | Big Bob: the dead enemy is the room's own `bossEnemy` | New in 0.2.0 |
 | `ChallengesTracker.CompleteChallenge()` | Challenge checks | New in 0.2.0 |
 | `Enemy.EnemyDied()` | Only if `TrackStats.OnEnemyDied` is missing | Not used |
+| `MapController.StartNewMap(RunConfig)`, before | **Stops** a run on a map or tier that is locked | New in 0.3.0 |
+| `CharacterMenu.OnConfirmCharacter(MyButtonCharacter)`, before | **Stops** confirming a locked character | New in 0.3.0 |
+| `SelectionGroupToggleSingleButtonTier.OnClick()`, before | **Stops** picking a locked tier (the button's `runConfig`) | New in 0.3.0 |
+| `UnlockUtility.GetAvailableWeapons()` | **Removes** weapons not held from the returned `List<WeaponData>`. That the level-up offers are drawn from it is assumed from the name | New in 0.3.0 |
+| `UnlockUtility.GetAvailableTomes()` | **Removes** tomes not held from the returned `HashSet<TomeData>` | New in 0.3.0 |
+
+For the overlay, one of these gives the mod its turn every frame; whichever exist are hooked: `UnityEngine.EventSystems.EventSystem.Update()`, `UnityEngine.Canvas.SendWillRenderCanvases()`, `WindowManager.Update()`, and `PlayerHealth.Tick()` during a run.
 
 ## Members read (`GameReader.cs`)
 
@@ -43,6 +50,13 @@ All run after the game's method. Only `PlayerHealth.Tick` ever changes anything,
 | `ChallengesTracker` (static) | `GetCurrentChallenge()` | The challenge just completed |
 | `PlayerHealth` | `KillPlayer()` | DeathLink |
 | any game object | `Pointer` | Telling two wrappers of one object apart from two objects |
+| `MyButtonCharacter` | `characterData.eCharacter`, else any member of type `ECharacter`; else `CharacterMenu.selectedCharacter` | The character being confirmed. `MyButtonCharacter` is not in the probe, so its member is a guess with two fallbacks |
+| `WeaponData`, `TomeData` | `eWeapon` / `eTome`, else any member of type `EWeapon` / `ETome` | Which weapon or tome an offer is. Neither type is in the probe; the guess follows `CharacterData.eCharacter` and `MapData.eMap` |
+| the offer lists | `GetEnumerator()`, `Contains`, `Remove`, `Add` | Taking locked things out, and putting them back if the game hands out the same list again after an item arrived |
+
+## The overlay (`Screen.cs`)
+
+Unity and TextMeshPro members used, all by name: `GameObject(string)`, `AddComponent<T>()`, `SetActive`, `transform`; `Object.DontDestroyOnLoad`; `Canvas.renderMode`, `sortingOrder`; `CanvasScaler.uiScaleMode`, `referenceResolution`, `matchWidthOrHeight`; `Image.color`, `raycastTarget`, `rectTransform`; `RectTransform.SetParent`, `anchorMin`, `anchorMax`, `pivot`, `anchoredPosition`, `sizeDelta`, `offsetMin`, `offsetMax`; `TextMeshProUGUI.text`, `fontSize`, `alignment`, `enableWordWrapping`, `richText`, `font`, `GetPreferredValues(string, float, float)`; `Input.GetKeyDown(KeyCode)`. None has been seen working on the game. The game itself uses TextMeshPro and `OnGUI`, so the classes are there; whether every member survived the game's build is what the first run shows.
 
 ## Names matched (`make_data.py`)
 

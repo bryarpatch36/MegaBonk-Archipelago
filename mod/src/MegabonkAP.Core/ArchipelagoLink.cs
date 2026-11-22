@@ -123,6 +123,24 @@ namespace MegabonkAP.Core
             }
         }
 
+        public IReadOnlyCollection<string> CheckedNames
+        {
+            get
+            {
+                lock (_gate)
+                {
+                    if (_session == null) return Array.Empty<string>();
+                    return _session.Locations.AllLocationsChecked
+                        .Select(id => _session.Locations.GetLocationNameFromId(id, _game) ?? "").Where(n => n.Length > 0).ToList();
+                }
+            }
+        }
+
+        public int TotalChecks
+        {
+            get { lock (_gate) return _session?.Locations.AllLocations.Count ?? 0; }
+        }
+
         public bool Exists(string check)
         {
             lock (_gate)

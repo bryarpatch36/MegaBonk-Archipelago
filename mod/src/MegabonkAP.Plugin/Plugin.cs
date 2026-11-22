@@ -22,12 +22,14 @@ namespace MegabonkAP.Plugin
     {
         public const string Id = "bbush.megabonk.archipelago";
         public const string Name = "MegabonkAP";
-        public const string Version = "0.2.0";
+        public const string Version = "0.3.0";
 
         private ArchipelagoLink? _link;
         private Tracker? _tracker;
         private Timer? _timer;
+        private Timer? _overlayTimer;
         private int _busy;
+        private int _mode;
 
         public override void Load()
         {
@@ -44,6 +46,19 @@ namespace MegabonkAP.Plugin
                 + "the weapon or tome). Off: everything you do counts.");
             ConfigEntry<bool> deathLink = Config.Bind("Rules", "DeathLink", true,
                 "On: DeathLink follows the death_link option of your YAML. Off: never, whatever the YAML says.");
+            ConfigEntry<bool> locking = Config.Bind("Rules", "Lock", true,
+                "On, together with Strict: what you do not hold cannot be used. A locked character or map tier cannot be started, "
+                + "and locked weapons and tomes are not offered at a level-up. Off: you can use anything, it just does not count.");
+            ConfigEntry<string> mode = Config.Bind("Overlay", "Mode", "Compact",
+                "The on-screen tracker: Compact, Full (lists everything you hold) or Hidden. The key below steps through them.");
+            ConfigEntry<string> key = Config.Bind("Overlay", "Key", "F8",
+                "The key that changes the overlay's view, as a Unity key name (F8, Tab, BackQuote, ...). None: no key.");
+            ConfigEntry<string> corner = Config.Bind("Overlay", "Position", "MiddleLeft",
+                "Where the overlay sits: TopLeft, MiddleLeft, BottomLeft, TopRight, MiddleRight or BottomRight.");
+            ConfigEntry<int> fontSize = Config.Bind("Overlay", "FontSize", 20,
+                "Text size, as on a 1080p screen. The overlay grows with the screen.");
+            ConfigEntry<int> width = Config.Bind("Overlay", "Width", 520,
+                "Width of the overlay, as on a 1080p screen.");
             ConfigEntry<bool> probe = Config.Bind("Debug", "Probe", true,
                 "On: at every start, write what the game's code looks like to BepInEx/MegabonkAP-probe.txt. "
                 + "It reads names only and changes nothing. Send that file along when something does not work.");
@@ -58,6 +73,7 @@ namespace MegabonkAP.Plugin
             _tracker = new Tracker(list, _link, log, Path.Combine(Paths.ConfigPath, "MegabonkAP.state.json"))
             {
                 Strict = strict.Value,
+                Lock = locking.Value,
                 DeathLinkAllowed = deathLink.Value,
             };
             _tracker.KillRequested += (who, why) =>
@@ -70,9 +86,26 @@ namespace MegabonkAP.Plugin
             var finder = new TypeFinder();
             var reader = new GameReader(_tracker, log, finder.Find);
 
-            int hooked = Hooks.Attach(new Harmony(Id), reader, finder, log);
+            var harmony = new Harmony(Id);
+            int hooked = Hooks.Attach(harmony, reader, finder, log);
             log.Info($"{Name} {Version} loaded: {hooked} of {Hooks.Wanted} hooks attached, "
-                + (strict.Value ? "strict rules" : "everything counts") + ".");
+                + (!strict.Value ? "everything counts" : locking.Value ? "strict rules, locks on" : "strict rules, nothing locked") + ".");
+
+            _mode = Overlay.ParseMode(mode.Value);
+            Screen.LoadUnity(log, Path.Combine(Paths.BepInExRootPath, "interop"));
+            var screen = new Screen(log, finder, corner.Value, fontSize.Value, width.Value, key.Value, () =>
+            {
+                _mode = Overlay.Next(_mode);
+                mode.Value = Overlay.ModeName(_mode);       // remembered for the next start
+                RenderOverlay();
+            });
+            _screen = screen;
+            _list = list;
+            _slotSet = !string.IsNullOrWhiteSpace(slot.Value);
+            _keyName = key.Value.Trim();
+            Hooks.AttachFrames(harmony, screen, finder, log);
+            // the text is made away from the game's thread; the game's thread only puts it on screen
+            _overlayTimer = new Timer(_ => RenderOverlay(), null, TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(400));
 
             if (probe.Value && game != null) WriteProbe(game, log);
 
@@ -86,6 +119,7 @@ namespace MegabonkAP.Plugin
         public override bool Unload()
         {
             _timer?.Dispose();
+            _overlayTimer?.Dispose();
             _link?.Dispose();
             return true;
         }
@@ -95,7 +129,10 @@ namespace MegabonkAP.Plugin
             if (Interlocked.Exchange(ref _busy, 1) == 1) return;        // the last try is still running
             try
             {
-                if (_link != null && _link.EnsureConnected()) _tracker?.Flush();
+                if (_link == null) return;
+                bool connected = _link.EnsureConnected();
+                _tracker?.ConnectionSeen(connected);
+                if (connected) _tracker?.Flush();
             }
             catch (Exception problem)
             {
@@ -104,6 +141,27 @@ namespace MegabonkAP.Plugin
             finally
             {
                 Interlocked.Exchange(ref _busy, 0);
+            }
+        }
+
+        private Screen? _screen;
+        private CheckList? _list;
+        private bool _slotSet;
+        private string _keyName = "";
+
+        private void RenderOverlay()
+        {
+            Screen? screen = _screen;
+            if (screen == null || _tracker == null || _list == null) return;
+            try
+            {
+                // the hint names the key only once it is known to work; hidden stays hidden
+                string? hint = screen.KeyWorks ? _keyName : null;
+                screen.Text = Overlay.Render(_tracker.Look(), _list, _mode, DateTime.UtcNow, _slotSet, hint);
+            }
+            catch (Exception problem)
+            {
+                Log.LogWarning($"Overlay: the text could not be made: {problem.Message}");
             }
         }
 

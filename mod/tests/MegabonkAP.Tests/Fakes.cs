@@ -150,10 +150,23 @@ namespace MegabonkAP.Tests.FakeGame
         public UnityEngine.GameObject gameObject = new("UpgradeButton");
     }
 
+    public sealed class LevelupScreen
+    {
+        public UpgradePicker? picker;
+        public bool SkipWorks = true;
+        public int Skips, Closes, ButtonRefreshes;
+        public void Skip() { Skips++; if (SkipWorks) picker!.window.SetActive(false); }
+        public void CloseLevelupScreen() { Closes++; picker!.window.SetActive(false); }
+        public void RefreshUtilityButtons() => ButtonRefreshes++;
+    }
+
     public sealed class UpgradePicker
     {
         public GameList<UpgradeButton> buttons = new();
         public bool banishMode;
+        public UnityEngine.GameObject window = new("LevelupWindow");
+        public LevelupScreen levelupScreen = new();
+        public UpgradePicker() { levelupScreen.picker = this; }
     }
 
     public sealed class ChallengeData

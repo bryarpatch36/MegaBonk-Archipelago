@@ -464,20 +464,22 @@ namespace MegabonkAP.Core
                 {
                     if (Dyn.First(_picker, "window.activeInHierarchy", "gameObject.activeInHierarchy") is bool shown && !shown)
                     {
-                        _picker = null;                 // the level-up is over
+                        Forget();                       // the level-up is over
                         return;
                     }
                     DimLocked();
+                    SkipWhenAsked();
                 }
-                catch (Exception) { _picker = null; }
+                catch (Exception) { Forget(); }
             }
         }
 
         /// <summary>
         /// UpgradePicker.SelectUpgrade(IUpgradable, List, UpgradeButton, ERarity), before the game
-        /// acts on it. False: that weapon or tome is locked and something else can be picked. When
-        /// every offer is locked, or the other offers cannot be seen, the pick is let through:
-        /// a level-up must never be left without a way out.
+        /// acts on it. False: that weapon or tome is locked. When every offer on screen is locked
+        /// the pick is refused too, and the level-up is skipped for the player at no cost, so
+        /// there is always a way out. Only when the other offers cannot be seen is a locked pick
+        /// let through.
         /// </summary>
         public bool MayPickOffer(object? picker, object? upgradable)
         {
@@ -497,8 +499,10 @@ namespace MegabonkAP.Core
                 }
                 if (buttons.All(b => b.locked))
                 {
-                    _tracker.Say("Every offer here is locked, so pick any: it will not count.");
-                    return true;
+                    _picker = picker;
+                    _stuck = true;
+                    _skipWanted = true;                 // carried out at the next Frame, outside the game's own click
+                    return false;
                 }
                 return _tracker.OfferRefusal(what.Value.kind, what.Value.name) == null;
             }
@@ -528,9 +532,73 @@ namespace MegabonkAP.Core
         private void DimLocked()
         {
             List<(object button, bool locked)> buttons = Buttons(_picker);
-            bool dim = _tracker.Locking && buttons.Any(b => !b.locked);     // all locked: any may be picked, so none is dimmed
-            foreach ((object button, bool locked) in buttons) Dim(button, dim && locked);
+            bool locking = _tracker.Locking;
+            foreach ((object button, bool locked) in buttons) Dim(button, locking && locked);
+
+            bool stuck = locking && buttons.Count > 0 && buttons.All(b => b.locked);
+            if (stuck == _stuck) return;
+            _stuck = stuck;
+            if (!stuck) return;
+            // the tools' prices are now zero (ToolPrice): have the game look at its buttons again
+            Dyn.Call(Dyn.Get(_picker, "levelupScreen"), "RefreshUtilityButtons");
+            _tracker.Say("Every offer here is locked. Skip costs nothing, or pick any offer to skip.");
         }
+
+        /// <summary>
+        /// Whether the level-up on screen has nothing the player may pick. While it has, skipping,
+        /// refreshing and banishing cost nothing (see ToolPrice).
+        /// </summary>
+        public bool Stuck
+        {
+            get { lock (_gate) return _stuck; }
+        }
+
+        /// <summary>LevelupScreen.GetShopToolPrice(int) returned this price: what it should be instead.</summary>
+        public int ToolPrice(int price) => Stuck ? 0 : price;
+
+        /// <summary>
+        /// The player picked an offer on a level-up where everything is locked: skip it for them
+        /// through the game's own Skip, and if the offers are still there a moment later, close
+        /// the level-up.
+        /// </summary>
+        private void SkipWhenAsked()
+        {
+            object? screen = Dyn.Get(_picker, "levelupScreen");
+            DateTime now = Now();
+            if (_skipWanted)
+            {
+                _skipWanted = false;
+                if (screen == null || Dyn.Method(screen.GetType(), "Skip", 0) == null)
+                {
+                    Say("A level-up with only locked offers could not be skipped: the game's LevelupScreen.Skip was not found."
+                        + (_picker != null ? $" UpgradePicker has: {Dyn.Describe(_picker.GetType())}" : ""));
+                    return;
+                }
+                Dyn.Call(screen, "Skip");
+                _skipCheck = now.AddSeconds(1);
+                _tracker.Say("Every offer was locked, so the level-up was skipped at no cost.");
+                return;
+            }
+            if (_skipCheck != null && now >= _skipCheck)
+            {
+                _skipCheck = null;
+                if (!_stuck) return;                    // other offers are showing, or it closed
+                Dyn.Call(screen, "CloseLevelupScreen");
+                _log.Warn("The game's Skip left the locked offers on screen, so the level-up was closed (LevelupScreen.CloseLevelupScreen).");
+            }
+        }
+
+        private void Forget()
+        {
+            _picker = null;
+            _stuck = false;
+            _skipWanted = false;
+            _skipCheck = null;
+        }
+
+        private bool _stuck;                // every offer on screen is locked
+        private bool _skipWanted;           // the player picked one anyway: skip at the next Frame
+        private DateTime? _skipCheck;       // when to see whether the skip worked
 
         /// <summary>Fade a button the way a thing you cannot afford is faded, or bring it back.</summary>
         private void Dim(object button, bool dim)

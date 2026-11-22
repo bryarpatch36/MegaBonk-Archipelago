@@ -4,25 +4,25 @@ A BepInEx plugin for Megabonk that connects to the Manual world's slot and sends
 
 ## Status
 
-Version 0.3.3. Version 0.1.0 was run once on the real game (Megabonk 1.0.69, BepInEx 6.0.0-be.788 through r2modman, one Forest Tier 1 run): it loaded, every hook attached, it connected to the Archipelago server and read the map. It also showed three wrong guesses, which 0.2.0 corrects using the names the mod's own probe read from the game. 0.3.0 added locks (what you do not hold cannot be used) and an on-screen tracker; it was played on a ROG Ally: the tracker showed and the locks on characters and maps held, but level-ups still offered weapons and tomes that were not held. 0.3.1 dims those offers and refuses them, and lets a controller change the tracker's view. **0.3.1 has not been run on the game yet.**
+Version 0.3.4. Version 0.1.0 was run once on the real game (Megabonk 1.0.69, BepInEx 6.0.0-be.788 through r2modman, one Forest Tier 1 run): it loaded, every hook attached, it connected to the Archipelago server and read the map. It also showed three wrong guesses, which 0.2.0 corrects using the names the mod's own probe read from the game. 0.3.0 added locks (what you do not hold cannot be used) and an on-screen tracker; it was played on a ROG Ally: the tracker showed and the locks on characters and maps held, but level-ups still offered weapons and tomes that were not held. 0.3.1 dims those offers and refuses them, and lets a controller change the tracker's view. **0.3.1 has not been run on the game yet.**
 
 | Part | State |
 |---|---|
-| Which check belongs to which event, and whether it counts under the world's rules | Works: 149 automated tests |
+| Which check belongs to which event, and whether it counts under the world's rules | Works: 152 automated tests |
 | Connecting to Archipelago, sending checks, receiving items, the goal, keeping checks earned offline | Works against a local Archipelago 0.6.8 server (`tests/e2e_mod_core.py`), and connected from inside the game |
-| The plugin loading in the game and its hooks attaching | Works (0.1.0: 9 of 9). 0.3.1 has 20 hooks |
+| The plugin loading in the game and its hooks attaching | Works (0.1.0: 9 of 9). 0.3.4 has 21 hooks |
 | Reading the map of a run | Works on the real game |
 | Reading the character, the tier, levels, bosses, run completion | Rewritten in 0.2.0 against the game's real names; tested against stand-in classes shaped like the game's; not yet seen on the game |
 | DeathLink | Works both ways against a local Archipelago server. On the game (0.3.1, a seed with `death_link` on) neither direction worked; that run's log was not looked at. 0.3.3 no longer depends on the game calling `PlayerHealth.PlayerDied` and `PlayerHealth.Tick`: a few times a second it asks `PlayerHealth.IsDead()` and carries out a waiting kill, on the same per-frame turn the overlay uses. Not seen on the game. The overlay and the log say whether DeathLink is on, and why not |
 | Spooky Steve | Not recognised yet: the game's name for him is unknown |
 | Locks on characters, maps and tiers | Work on the real game (0.3.0) |
-| Locked weapons and tomes at a level-up | 0.3.0 tried to take them out of the offers and they were still offered; why is not known without that run's log. 0.3.1 leaves them on screen, dimmed, and refuses the pick. Tested against stand-ins; not seen on the game |
+| Locked weapons and tomes at a level-up | 0.3.0 tried to take them out of the offers and they were still offered; why is not known without that run's log. Since 0.3.1 they stay on screen, dimmed, and the pick is refused: this works on the real game. Until 0.3.4 a level-up whose offers were all locked let any be picked, which on the game happened with tomes once the held ones stopped being offered. 0.3.4 refuses those too: on such a level-up Skip, Refresh and Banish cost nothing, and picking any offer skips it. That part is tested against stand-ins, not seen on the game |
 | The on-screen tracker | Works on the real game (0.3.0). Changing its view from a controller is new in 0.3.1 and not seen on the game |
 
 ## How it is put together
 
 - `src/MegabonkAP.Core` holds everything that does not need the game: the Archipelago connection (`ArchipelagoLink`), the rules (`Tracker`), the names (`CheckList`, from `checks.json`, which `make_data.py` writes), and reading game objects by member name (`GameReader`, `Dyn`).
-- `src/MegabonkAP.Plugin` is the BepInEx plugin. It contains no game types. At start it finds twenty game methods by name (`Hooks.cs`) and runs a little code after each, or before the few it may stop; that code hands the game's object to `GameReader`. The overlay is drawn the same way: `Screen` finds Unity's and TextMeshPro's classes by name.
+- `src/MegabonkAP.Plugin` is the BepInEx plugin. It contains no game types. At start it finds twenty-one game methods by name (`Hooks.cs`) and runs a little code after each, or before the few it may stop; that code hands the game's object to `GameReader`. The overlay is drawn the same way: `Screen` finds Unity's and TextMeshPro's classes by name.
 - Because nothing is compiled against the game, a game update that renames a method costs one feature and a line in the log, not a mod that fails to load. The log names the missing member and lists what the object has instead.
 - [docs/hooks.md](docs/hooks.md) lists every game name the mod relies on and what has been seen working. [docs/probes/](docs/probes/) keeps the probe of each game version looked at.
 
@@ -62,7 +62,7 @@ What you need there: Megabonk (Steam, Windows), the [.NET SDK](https://dotnet.mi
 
 | Line | Meaning |
 |---|---|
-| `MegabonkAP 0.3.3 loaded: 20 of 20 hooks attached` | Every game method was found. Fewer: a `Hook missing:` line above it names each one and what the type has instead |
+| `MegabonkAP 0.3.4 loaded: 21 of 21 hooks attached` | Every game method was found. Fewer: a `Hook missing:` line above it names each one and what the type has instead |
 | `Connected to ... as ...: N of M checks done.` | The Archipelago side works |
 | `Run started: Forest Tier 1` | The run's map and tier were read |
 | `Playing as Fox.` | The character was read, a moment after the run started |
@@ -96,7 +96,7 @@ Still to do after that, each needing its own run: a Tier 2 run (the tier is not 
 7. **The overlay.** Expect `Overlay: on screen.` in the log and a dark panel at the left edge, in the menu and in a run. `F8` steps through compact, full and hidden.
 8. **A locked character.** In the character menu, confirm one you do not hold: nothing should happen, and the overlay should say why. Then confirm the one you hold.
 9. **A locked tier.** Try Forest Tier 2, or Desert, without the items. If the menu ends up stuck after a refusal, say where: the game is stopped at `MapController.StartNewMap`, and what the menu does then is not known.
-10. **Level-up offers.** A weapon or tome you do not hold should look faded and do nothing when picked, with the reason on the overlay. When every offer is locked, any can be picked (`Every offer here is locked, so pick any`). If a level-up ever leaves nothing to pick, set `Lock = false` and send the log.
+10. **Level-up offers.** A weapon or tome you do not hold should look faded and do nothing when picked, with the reason on the overlay. When every offer is locked the overlay says `Every offer here is locked. Skip costs nothing, or pick any offer to skip.`: check that the game's Skip button is free and usable there, and that picking an offer skips the level-up. If a level-up ever cannot be left, set `Lock = false` and send the log.
 11. **The controller.** Click both sticks at once: the overlay should step to its next view.
 
 Locks and overlay can each be switched off in the settings if one misbehaves; the checks work without them.
@@ -111,7 +111,7 @@ Locks and overlay can each be switched off in the settings if one misbehaves; th
 | `Slot` | empty | Your slot name. Nothing is sent while it is empty |
 | `Password` | empty | The room's password, if any |
 | `Strict` | on | A check only counts when you hold what the world's rules ask for: the character, the map tier, the weapon (or it is your character's own) or the tome. Off: everything counts |
-| `Lock` | on | With `Strict` on: what you do not hold cannot be used. A locked character, map or tier cannot be started, and locked weapons and tomes are not offered at a level-up. Nothing is locked until the server has said what you hold. Off: anything can be used, it just does not count |
+| `Lock` | on | With `Strict` on: what you do not hold cannot be used. A locked character, map or tier cannot be started, and locked weapons and tomes cannot be picked at a level-up; when a level-up offers nothing else, skipping it is free. Nothing is locked until the server has said what you hold. Off: anything can be used, it just does not count |
 | `DeathLink` | on | Follows the `death_link` option of your YAML. Off: never |
 | `Mode` | `Compact` | The on-screen tracker: `Compact`, `Full` (lists everything you hold, green when its checks are done) or `Hidden`. The key steps through them and the choice is remembered |
 | `Key` | `F8` | The key that changes the view, as a Unity key name. `None`: no key |

@@ -46,6 +46,7 @@ namespace MegabonkAP.Plugin
             new("UnlockUtility", "GetAvailableTomes", 0, nameof(AfterAvailableTomes), "offering only tomes you hold"),
             new("UpgradePicker", "ShuffleUpgrades", 1, nameof(AfterShuffleUpgrades), "dimming locked level-up offers"),
             new("UpgradePicker", "SelectUpgrade", 4, null, "refusing a locked level-up offer", nameof(BeforeSelectUpgrade)),
+            new("LevelupScreen", "GetShopToolPrice", 1, nameof(AfterToolPrice), "a free Skip when every level-up offer is locked"),
         };
 
         // Any one of these gives the overlay its turn on the game's own thread, in menus and in a run.
@@ -178,6 +179,14 @@ namespace MegabonkAP.Plugin
 
         private static bool BeforeSelectUpgrade(object __instance, object[] __args) =>
             Allowed(nameof(BeforeSelectUpgrade), r => r.MayPickOffer(__instance, __args.Length > 0 ? __args[0] : null));
+
+        private static void AfterToolPrice(ref int __result)
+        {
+            GameReader? reader = _reader;
+            if (reader == null) return;
+            try { __result = reader.ToolPrice(__result); }
+            catch (Exception) { /* the game's own price stands */ }
+        }
 
         private static long _nextOffersLook;
 

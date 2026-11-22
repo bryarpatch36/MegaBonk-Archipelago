@@ -16,7 +16,7 @@ Connects Megabonk to an [Archipelago](https://archipelago.gg) multiworld: the mo
 | `Slot` | empty | Your slot name |
 | `Password` | empty | The room's password, if any |
 | `Strict` | on | A check only counts when you hold what the world's rules ask for |
-| `Lock` | on | With `Strict` on: a character, map or tier you do not hold cannot be started, and weapons and tomes you do not hold are not offered |
+| `Lock` | on | With `Strict` on: a character, map or tier you do not hold cannot be started, and weapons and tomes you do not hold cannot be picked. A level-up with only locked offers can be skipped for free |
 | `DeathLink` | on | Follows the `death_link` option of your YAML. Off: never |
 | `Mode` | `Compact` | The on-screen tracker: `Compact`, `Full` or `Hidden` |
 | `Key` | `F8` | Steps through the tracker's views. `None`: no key |

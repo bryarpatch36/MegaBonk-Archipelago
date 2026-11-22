@@ -22,7 +22,7 @@ namespace MegabonkAP.Plugin
     {
         public const string Id = "bbush.megabonk.archipelago";
         public const string Name = "MegabonkAP";
-        public const string Version = "0.3.3";
+        public const string Version = "0.3.4";
 
         private ArchipelagoLink? _link;
         private Tracker? _tracker;

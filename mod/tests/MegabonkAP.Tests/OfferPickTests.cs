@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using MegabonkAP.Core;
 using MegabonkAP.Tests.FakeGame;
@@ -49,14 +50,67 @@ namespace MegabonkAP.Tests
         }
 
         [Fact]
-        public void WhenEveryOfferIsLockedAnyMayBePicked()
+        public void WhenEveryOfferIsLockedTheyAreAllRefusedAndSkippingIsFree()
         {
             _link.Give("Weapon - Sword");
             UpgradePicker picker = Picker(Weapon(EWeapon.Bone), Tome(ETome.Health), Tome(ETome.Damage));
-            Assert.True(_reader.MayPickOffer(picker, Weapon(EWeapon.Bone)));
-            Assert.True(_log.Has("Every offer here is locked, so pick any: it will not count."));
+            Assert.Equal(40, _reader.ToolPrice(40));
             _reader.OffersShown(picker);
-            Assert.Equal(new[] { 1f, 1f, 1f }, Alphas(picker));            // nothing is dimmed when nothing else can be picked
+            Assert.Equal(new[] { 0.3f, 0.3f, 0.3f }, Alphas(picker));
+            Assert.True(_reader.Stuck);
+            Assert.Equal(0, _reader.ToolPrice(40));
+            Assert.Equal(1, picker.levelupScreen.ButtonRefreshes);         // the game is told to look at its prices again
+            Assert.True(_log.Has("Every offer here is locked. Skip costs nothing, or pick any offer to skip."));
+            Assert.Equal(0, picker.levelupScreen.Skips);                   // nothing happens until the player acts
+        }
+
+        [Fact]
+        public void PickingOnALevelUpWithOnlyLockedOffersSkipsIt()
+        {
+            _link.Give("Weapon - Sword");
+            UpgradePicker picker = Picker(Weapon(EWeapon.Bone), Tome(ETome.Health));
+            _reader.OffersShown(picker);
+            Assert.False(_reader.MayPickOffer(picker, Weapon(EWeapon.Bone)));
+            Assert.Equal(0, picker.levelupScreen.Skips);                   // not inside the game's own click
+            _reader.Frame();
+            Assert.Equal(1, picker.levelupScreen.Skips);
+            Assert.True(_log.Has("Every offer was locked, so the level-up was skipped at no cost."));
+            _reader.Frame();                                                // the window is gone: all is forgotten
+            Assert.False(_reader.Stuck);
+            Assert.Equal(40, _reader.ToolPrice(40));
+            Assert.Equal(0, picker.levelupScreen.Closes);
+        }
+
+        [Fact]
+        public void WhenTheGamesSkipDoesNothingTheLevelUpIsClosed()
+        {
+            _link.Give("Weapon - Sword");
+            DateTime now = DateTime.UtcNow;
+            _reader.Now = () => now;
+            UpgradePicker picker = Picker(Weapon(EWeapon.Bone));
+            picker.levelupScreen.SkipWorks = false;
+            Assert.False(_reader.MayPickOffer(picker, Weapon(EWeapon.Bone)));      // also works when the offers were never announced
+            _reader.Frame();
+            Assert.Equal(1, picker.levelupScreen.Skips);
+            _reader.Frame();
+            Assert.Equal(0, picker.levelupScreen.Closes);                  // give the game a second
+            now = now.AddSeconds(2);
+            _reader.Frame();
+            Assert.Equal(1, picker.levelupScreen.Closes);
+            Assert.True(_log.Has("the level-up was closed"));
+        }
+
+        [Fact]
+        public void ARefreshThatBringsSomethingPickableEndsTheFreePrices()
+        {
+            _link.Give("Weapon - Sword");
+            UpgradePicker picker = Picker(Weapon(EWeapon.Bone));
+            _reader.OffersShown(picker);
+            Assert.True(_reader.Stuck);
+            Dyn.Items(picker.buttons).Cast<UpgradeButton>().First().upgradable = Weapon(EWeapon.Sword);
+            _reader.OffersShown(picker);
+            Assert.False(_reader.Stuck);
+            Assert.Equal(40, _reader.ToolPrice(40));
         }
 
         [Fact]
@@ -92,7 +146,8 @@ namespace MegabonkAP.Tests
             _link.Give("Weapon - Sword");
             UpgradePicker picker = Picker(Weapon(EWeapon.Bone), Weapon(EWeapon.Sword));
             Dyn.Items(picker.buttons).Cast<UpgradeButton>().Last().gameObject.SetActive(false);     // left over from an earlier level-up
-            Assert.True(_reader.MayPickOffer(picker, Weapon(EWeapon.Bone)));
+            Assert.False(_reader.MayPickOffer(picker, Weapon(EWeapon.Bone)));
+            Assert.True(_reader.Stuck);                 // the hidden Sword is no way out: this level-up has only locked offers
         }
 
         [Fact]

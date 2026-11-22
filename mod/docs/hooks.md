@@ -31,7 +31,8 @@ Most run after the game's method and only watch. Those that change the game are 
 | `UnlockUtility.GetAvailableWeapons()` | **Removes** weapons not held from the returned `List<WeaponData>`. That the level-up offers are drawn from it is assumed from the name | New in 0.3.0 |
 | `UnlockUtility.GetAvailableTomes()` | **Removes** tomes not held from the returned `HashSet<TomeData>` | New in 0.3.0 |
 | `UpgradePicker.ShuffleUpgrades(EEncounter)` | A level-up's offers are on screen: **dims** the locked ones (a `CanvasGroup` on the button, alpha 0.3). Looked at again a few times a second while the picker is shown | New in 0.3.1 |
-| `UpgradePicker.SelectUpgrade(IUpgradable, List<StatModifier>, UpgradeButton, ERarity)`, before | **Stops** picking a locked weapon or tome, unless every offer is locked, the picker is in banish mode, or the other offers cannot be read | New in 0.3.1 |
+| `UpgradePicker.SelectUpgrade(IUpgradable, List<StatModifier>, UpgradeButton, ERarity)`, before | **Stops** picking a locked weapon or tome, unless the picker is in banish mode or the other offers cannot be read. When every offer is locked, the pick is stopped and the mod calls `LevelupScreen.Skip()` at its next turn, then `CloseLevelupScreen()` if the offers are still there a second later | 0.3.1; works on the game. The skip is new in 0.3.4 |
+| `LevelupScreen.GetShopToolPrice(int)` | **Returns 0** while every offer on screen is locked, so Skip (and Refresh, Banish: the game has one price method for all three) is free there; `RefreshUtilityButtons()` is called when that begins. That this method prices the Skip button is assumed from its name | New in 0.3.4 |
 
 On the real game (0.3.0) the two `GetAvailable...` hooks did not keep locked weapons and tomes out of the offers. Whether they attached, fired, or edit a list the offers are not drawn from is in that run's log, which was not looked at; they are kept because they do no harm.
 

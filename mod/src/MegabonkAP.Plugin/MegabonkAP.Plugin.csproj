@@ -10,7 +10,7 @@
     <AssemblyName>MegabonkAP</AssemblyName>
     <RootNamespace>MegabonkAP.Plugin</RootNamespace>
     <Product>Megabonk Archipelago</Product>
-    <Version>0.3.2</Version>
+    <Version>0.3.3</Version>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>

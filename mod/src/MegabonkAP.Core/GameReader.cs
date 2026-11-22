@@ -237,12 +237,99 @@ namespace MegabonkAP.Core
             _tracker.ChallengeCompleted(challenge == null ? Array.Empty<string?>() : ChallengeNames(challenge).ToArray());
         }
 
-        /// <summary>PlayerHealth.PlayerDied().</summary>
+        /// <summary>
+        /// PlayerHealth.PlayerDied(), or WatchHealth seeing the player dead: whichever comes first
+        /// reports the death, the other is ignored until the player is alive again.
+        /// </summary>
         public void PlayerDied()
         {
-            lock (_gate) _log.Info("You died. " + Summary());
+            lock (_gate)
+            {
+                if (_dead) return;
+                _dead = true;
+                _log.Info("You died. " + Summary());
+            }
             _tracker.PlayerDied();
         }
+
+        /// <summary>Another player died (DeathLink): end this player at the next look at their health, if one comes within ten seconds.</summary>
+        public void RequestKill()
+        {
+            lock (_gate) _killBefore = Now().AddSeconds(10);
+        }
+
+        /// <summary>
+        /// Call a few times a second from the game's own thread. It looks at the player's health:
+        /// a death is reported even if the game's PlayerDied was never seen, and a waiting
+        /// DeathLink is carried out. Then it looks at the level-up offers on screen.
+        /// </summary>
+        public void Frame()
+        {
+            WatchHealth();
+            RefreshOffers();
+        }
+
+        private void WatchHealth()
+        {
+            bool died = false;
+            lock (_gate)
+            {
+                // the player's health, by each way the game is known to keep it
+                object? health = Dyn.Get(Player(), "inventory.playerHealth")
+                    ?? Dyn.GetStatic(_findType("MyPlayer"), "Instance.inventory.playerHealth")
+                    ?? Dyn.GetStatic(_findType("MapController"), "inventory.playerHealth");
+                if (health == null)                                                   // between runs
+                {
+                    if (_killBefore != null && Now() > _killBefore)
+                    {
+                        _killBefore = null;
+                        _log.Info("DeathLink: no player was found within ten seconds, so nothing happened.");
+                    }
+                    _dead = false;
+                    _killCheck = null;
+                    return;
+                }
+                bool? dead = Dyn.Get(health, "IsDead()") as bool?;
+                if (dead == null) Say($"Could not ask the game whether the player is dead (PlayerHealth.IsDead). It has: {Dyn.Describe(health.GetType())}");
+
+                DateTime now = Now();
+                if (_killBefore != null)
+                {
+                    bool inTime = now <= _killBefore;
+                    _killBefore = null;
+                    if (inTime && dead != true)
+                    {
+                        Kill(health);
+                        _killCheck = now.AddSeconds(1.5);
+                        return;
+                    }
+                }
+                if (_killCheck != null && now >= _killCheck)
+                {
+                    _killCheck = null;
+                    if (dead == false)
+                    {
+                        // KillPlayer did not do it: empty the health and let the game notice
+                        bool emptied = Dyn.Set(health, "hp", 0);
+                        Dyn.Set(health, "shield", 0f);
+                        Dyn.Set(health, "overheal", 0f);
+                        Dyn.Call(health, "CheckDead");
+                        _log.Warn("DeathLink: KillPlayer left the player alive, so their health was " + (emptied ? "set to zero." : "left alone: it could not be set."));
+                    }
+                }
+
+                if (dead == true && !_dead) died = true;
+                else if (dead != true) _dead = false;
+            }
+            if (died) PlayerDied();
+        }
+
+        private bool _dead;                 // this death has been reported
+        private DateTime? _killBefore;      // a DeathLink waits until then
+        private DateTime? _killCheck;       // when to see whether the kill worked
+
+        /// <summary>The clock, replaceable in tests.</summary>
+        public Func<DateTime> Now { get; set; } = () => DateTime.UtcNow;
 
         /// <summary>DeathLink: end the player through the game's own PlayerHealth.KillPlayer().</summary>
         public void Kill(object? playerHealth)
@@ -253,6 +340,7 @@ namespace MegabonkAP.Core
                 return;
             }
             Dyn.Call(playerHealth, "KillPlayer");
+            _log.Info("DeathLink: the game's KillPlayer was called.");
         }
 
         // ------------------------------------------------------------------ what may be used

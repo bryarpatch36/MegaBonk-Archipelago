@@ -191,7 +191,13 @@ namespace MegabonkAP.Tests.FakeGame
     public sealed class PlayerHealth
     {
         public int Killed;
-        public void KillPlayer() => Killed++;
+        public int hp = 100;
+        public float shield = 5f;
+        public bool KillWorks = true;
+        public int Checked;
+        public void KillPlayer() { Killed++; if (KillWorks) hp = 0; }
+        public bool IsDead() => hp <= 0;
+        public void CheckDead() => Checked++;
     }
 
     public sealed class PlayerInventory

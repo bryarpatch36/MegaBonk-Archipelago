@@ -4,16 +4,16 @@ A BepInEx plugin for Megabonk that connects to the Manual world's slot and sends
 
 ## Status
 
-Version 0.3.2. Version 0.1.0 was run once on the real game (Megabonk 1.0.69, BepInEx 6.0.0-be.788 through r2modman, one Forest Tier 1 run): it loaded, every hook attached, it connected to the Archipelago server and read the map. It also showed three wrong guesses, which 0.2.0 corrects using the names the mod's own probe read from the game. 0.3.0 added locks (what you do not hold cannot be used) and an on-screen tracker; it was played on a ROG Ally: the tracker showed and the locks on characters and maps held, but level-ups still offered weapons and tomes that were not held. 0.3.1 dims those offers and refuses them, and lets a controller change the tracker's view. **0.3.1 has not been run on the game yet.**
+Version 0.3.3. Version 0.1.0 was run once on the real game (Megabonk 1.0.69, BepInEx 6.0.0-be.788 through r2modman, one Forest Tier 1 run): it loaded, every hook attached, it connected to the Archipelago server and read the map. It also showed three wrong guesses, which 0.2.0 corrects using the names the mod's own probe read from the game. 0.3.0 added locks (what you do not hold cannot be used) and an on-screen tracker; it was played on a ROG Ally: the tracker showed and the locks on characters and maps held, but level-ups still offered weapons and tomes that were not held. 0.3.1 dims those offers and refuses them, and lets a controller change the tracker's view. **0.3.1 has not been run on the game yet.**
 
 | Part | State |
 |---|---|
-| Which check belongs to which event, and whether it counts under the world's rules | Works: 144 automated tests |
+| Which check belongs to which event, and whether it counts under the world's rules | Works: 149 automated tests |
 | Connecting to Archipelago, sending checks, receiving items, the goal, keeping checks earned offline | Works against a local Archipelago 0.6.8 server (`tests/e2e_mod_core.py`), and connected from inside the game |
 | The plugin loading in the game and its hooks attaching | Works (0.1.0: 9 of 9). 0.3.1 has 20 hooks |
 | Reading the map of a run | Works on the real game |
 | Reading the character, the tier, levels, bosses, run completion | Rewritten in 0.2.0 against the game's real names; tested against stand-in classes shaped like the game's; not yet seen on the game |
-| DeathLink | Works both ways against a local Archipelago server. On the game, one session reported neither direction working; whether the seed had `death_link` on is not known. Since 0.3.2 the overlay and the log say whether DeathLink is on, and why not |
+| DeathLink | Works both ways against a local Archipelago server. On the game (0.3.1, a seed with `death_link` on) neither direction worked; that run's log was not looked at. 0.3.3 no longer depends on the game calling `PlayerHealth.PlayerDied` and `PlayerHealth.Tick`: a few times a second it asks `PlayerHealth.IsDead()` and carries out a waiting kill, on the same per-frame turn the overlay uses. Not seen on the game. The overlay and the log say whether DeathLink is on, and why not |
 | Spooky Steve | Not recognised yet: the game's name for him is unknown |
 | Locks on characters, maps and tiers | Work on the real game (0.3.0) |
 | Locked weapons and tomes at a level-up | 0.3.0 tried to take them out of the offers and they were still offered; why is not known without that run's log. 0.3.1 leaves them on screen, dimmed, and refuses the pick. Tested against stand-ins; not seen on the game |
@@ -62,7 +62,7 @@ What you need there: Megabonk (Steam, Windows), the [.NET SDK](https://dotnet.mi
 
 | Line | Meaning |
 |---|---|
-| `MegabonkAP 0.3.2 loaded: 20 of 20 hooks attached` | Every game method was found. Fewer: a `Hook missing:` line above it names each one and what the type has instead |
+| `MegabonkAP 0.3.3 loaded: 20 of 20 hooks attached` | Every game method was found. Fewer: a `Hook missing:` line above it names each one and what the type has instead |
 | `Connected to ... as ...: N of M checks done.` | The Archipelago side works |
 | `Run started: Forest Tier 1` | The run's map and tier were read |
 | `Playing as Fox.` | The character was read, a moment after the run started |
@@ -70,6 +70,7 @@ What you need there: Megabonk (Steam, Windows), the [.NET SDK](https://dotnet.mi
 | `Stage boss dead. Seen this run: 812 enemy deaths (3 bosses), player level 34, weapons and tomes: ...` | Written at every stage boss; `You died. Seen this run: ...` at every death. It shows which hooks are alive: zero deaths, an unknown level or no weapons mean that hook is not firing |
 | `Boss killed on Forest: the game calls it '...'` | A boss the mod has no check for. For the tier bosses that is expected |
 | `DeathLink is on.` / `DeathLink is off: this seed was generated with death_link off.` | Written after connecting. The overlay's first line says the same. DeathLink needs `death_link: true` in the YAML before the seed is generated |
+| `You died. Telling the others.` / `DeathLink: the game's KillPlayer was called.` | DeathLink going out, and coming in. `KillPlayer left the player alive, so their health was set to zero` means the game's own method did not kill and the fallback was used |
 | `This run does not count: ...` | The rules refused the run (see `Strict` below); not an error |
 | `Overlay: on screen.` | The tracker was drawn. `Overlay: ...` followed by a reason means it was not; after three failures it switches itself off and the game goes on |
 | `Calcium is locked: you do not hold Character - Calcium.` | A lock refused a character, map or tier. The same line shows on the overlay |

@@ -280,6 +280,92 @@ namespace MegabonkAP.Tests
             Assert.True(_log.Has("DeathLink: the game's KillPlayer could not be found"));
         }
 
+        private PlayerHealth DeathLinkRun()
+        {
+            _link.Slot["death_link"] = 1L;
+            _link.Give("Character - Fox", "Progressive Forest Tier");
+            Begin(Forest(1), ECharacter.Fox);
+            return _player.inventory.playerHealth;
+        }
+
+        [Fact]
+        public void ADeathIsNoticedByLookingAtTheHealthAndToldOnce()
+        {
+            PlayerHealth health = DeathLinkRun();
+            _reader.Frame();
+            Assert.Empty(_link.Deaths);
+
+            health.hp = 0;
+            _reader.Frame();
+            _reader.Frame();
+            _reader.PlayerDied();                       // the game's own PlayerDied, should it come as well
+            Assert.Single(_link.Deaths);
+
+            health.hp = 100;                            // a new life: the next death counts again
+            _reader.Frame();
+            health.hp = 0;
+            _reader.Frame();
+            Assert.Equal(2, _link.Deaths.Count);
+        }
+
+        [Fact]
+        public void TheGamesOwnPlayerDiedComingFirstIsNotToldTwice()
+        {
+            PlayerHealth health = DeathLinkRun();
+            health.hp = 0;
+            _reader.PlayerDied();
+            _reader.Frame();
+            Assert.Single(_link.Deaths);
+        }
+
+        [Fact]
+        public void AReceivedDeathKillsAtTheNextLookAndIsNotSentBack()
+        {
+            PlayerHealth health = DeathLinkRun();
+            _tracker.KillRequested += (_, _) => _reader.RequestKill();
+            _link.Die("Chief", "fell");
+            _reader.Frame();
+            Assert.Equal(1, health.Killed);
+            Assert.True(_log.Has("DeathLink: the game's KillPlayer was called."));
+            _reader.Frame();                            // now dead: seen, but it is Chief's death
+            _reader.Frame();
+            Assert.Equal(1, health.Killed);
+            Assert.Empty(_link.Deaths);
+        }
+
+        [Fact]
+        public void WhenKillPlayerDoesNothingTheHealthIsEmptied()
+        {
+            PlayerHealth health = DeathLinkRun();
+            health.KillWorks = false;
+            DateTime now = DateTime.UtcNow;
+            _reader.Now = () => now;
+            _reader.RequestKill();
+            _reader.Frame();
+            Assert.Equal(1, health.Killed);
+            now = now.AddSeconds(2);
+            _reader.Frame();
+            Assert.Equal(0, health.hp);
+            Assert.Equal(0f, health.shield);
+            Assert.Equal(1, health.Checked);
+            Assert.True(_log.Has("KillPlayer left the player alive, so their health was set to zero."));
+        }
+
+        [Fact]
+        public void ADeathLinkThatArrivesBetweenRunsLapses()
+        {
+            DateTime now = DateTime.UtcNow;
+            _reader.Now = () => now;
+            _reader.RequestKill();
+            _reader.Frame();                            // no player yet
+            now = now.AddSeconds(30);
+            _reader.Frame();
+            Assert.True(_log.Has("DeathLink: no player was found within ten seconds"));
+            PlayerHealth health = DeathLinkRun();
+            _reader.Frame();
+            Assert.Equal(0, health.Killed);
+        }
+
         [Fact]
         public void NothingBreaksBeforeTheGameHasAnythingToRead()
         {
@@ -296,6 +382,8 @@ namespace MegabonkAP.Tests
             _reader.ChallengeCompleted();
             _reader.StageBossDied();
             _reader.Kill(null);
+            _reader.RequestKill();
+            _reader.Frame();
             Assert.Empty(_link.Sent);
         }
     }

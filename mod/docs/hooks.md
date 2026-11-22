@@ -20,7 +20,7 @@ Most run after the game's method and only watch. Those that change the game are 
 | `TomeInventory.AddTome(TomeData, List<StatModifier>, ERarity)` | Tome levels | Attaches; unconfirmed |
 | `LevelupScreen.OnClose()` | Weapon and tome levels again after each level-up | Attaches; unconfirmed |
 | `PlayerHealth.PlayerDied()` | Sending DeathLink, and the run summary line | Attaches; unconfirmed |
-| `PlayerHealth.Tick()` | On a received DeathLink, calls the game's `PlayerHealth.KillPlayer()` | New in 0.2.0 |
+| `PlayerHealth.Tick()` | One more per-frame turn during a run (see the overlay's, below) | New in 0.2.0 |
 | `GraveyardBossRoom.Activate()` | The Crypt Keys check (that activating takes all four keys is assumed) | Attaches; unconfirmed |
 | `GraveyardBossRoom.OnEnemyDied(Enemy, DamageContainer)` | Big Bob: the dead enemy is the room's own `bossEnemy` | New in 0.2.0 |
 | `ChallengesTracker.CompleteChallenge()` | Challenge checks | New in 0.2.0 |
@@ -52,7 +52,7 @@ For the overlay, one of these gives the mod its turn every frame; whichever exis
 | `Enemy` | `enemyData.enemyName` (`EEnemy`), `enemyFlag` (`EEnemyFlag`) | Which enemy died and whether it is a boss |
 | `GraveyardBossRoom` | `bossEnemy` | The Graveyard's boss |
 | `ChallengesTracker` (static) | `GetCurrentChallenge()` | The challenge just completed |
-| `PlayerHealth` | `KillPlayer()` | DeathLink |
+| `PlayerHealth` | `IsDead()`, `KillPlayer()`; `hp`, `shield`, `overheal`, `CheckDead()` if that does not kill | DeathLink, both ways, looked at a few times a second. Found through `GameManager.Instance.player.inventory.playerHealth`, else `MyPlayer.Instance`, else `MapController.inventory` |
 | any game object | `Pointer` | Telling two wrappers of one object apart from two objects |
 | `MyButtonCharacter` | `characterData.eCharacter`, else any member of type `ECharacter`; else `CharacterMenu.selectedCharacter` | The character being confirmed. `MyButtonCharacter` is not in the probe, so its member is a guess with two fallbacks |
 | `WeaponData`, `TomeData` | `eWeapon` / `eTome`, else any member of type `EWeapon` / `ETome` | Which weapon or tome an offer is. Neither type is in the probe; the guess follows `CharacterData.eCharacter` and `MapData.eMap` |

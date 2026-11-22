@@ -36,7 +36,7 @@ namespace MegabonkAP.Plugin
             new("TomeInventory", "AddTome", null, nameof(AfterAddTome), "tome level checks"),
             new("LevelupScreen", "OnClose", null, nameof(AfterLevelup), "weapon and tome levels after each level-up"),
             new("PlayerHealth", "PlayerDied", 0, nameof(AfterPlayerDied), "sending DeathLink"),
-            new("PlayerHealth", "Tick", 0, nameof(AfterHealthTick), "dying when a DeathLink arrives"),
+            new("PlayerHealth", "Tick", 0, nameof(AfterHealthTick), "a turn every frame during a run"),
             new("GraveyardBossRoom", "Activate", 0, nameof(AfterCrypt), "the Crypt Keys check"),
             new("GraveyardBossRoom", "OnEnemyDied", 2, nameof(AfterGraveyardEnemyDied), "the Big Bob check and Graveyard runs"),
             new("ChallengesTracker", "CompleteChallenge", 0, nameof(AfterChallenge), "challenge checks"),
@@ -67,7 +67,6 @@ namespace MegabonkAP.Plugin
         private static Screen? _screen;
         private static bool _runRefused;        // StartNewMap was stopped: what runs after it must not count a run
         private static readonly HashSet<string> Failed = new();
-        private static long _killBefore;        // a DeathLink waits here for the game's own thread: ticks, 0 = none
 
         public static int Attach(Harmony harmony, GameReader reader, TypeFinder finder, ILog log)
         {
@@ -99,9 +98,8 @@ namespace MegabonkAP.Plugin
             return attached;
         }
 
-        /// <summary>Another player died. The player dies at the next health tick, if one comes within ten seconds.</summary>
-        public static void RequestKill() =>
-            System.Threading.Interlocked.Exchange(ref _killBefore, DateTime.UtcNow.AddSeconds(10).Ticks);
+        /// <summary>Another player died. The player dies at the next look at their health, if one comes within ten seconds.</summary>
+        public static void RequestKill() => _reader?.RequestKill();
 
         private static bool Attach(Harmony harmony, TypeFinder finder, ILog log, Hook hook)
         {
@@ -189,7 +187,7 @@ namespace MegabonkAP.Plugin
             long now = Environment.TickCount64;
             if (now < _nextOffersLook) return;
             _nextOffersLook = now + 300;
-            Safely(nameof(AfterFrame), r => r.RefreshOffers());
+            Safely(nameof(AfterFrame), r => r.Frame());
         }
 
         private static void AfterRestartRun() =>
@@ -222,14 +220,7 @@ namespace MegabonkAP.Plugin
         private static void AfterPlayerDied() =>
             Safely(nameof(AfterPlayerDied), r => r.PlayerDied());
 
-        private static void AfterHealthTick(object __instance)
-        {
-            AfterFrame();
-            if (_killBefore == 0) return;                   // every frame: nothing else may happen here
-            long before = System.Threading.Interlocked.Exchange(ref _killBefore, 0);
-            if (before == 0 || DateTime.UtcNow.Ticks > before) return;
-            Safely(nameof(AfterHealthTick), r => r.Kill(__instance));
-        }
+        private static void AfterHealthTick() => AfterFrame();
 
         private static void AfterCrypt() =>
             Safely(nameof(AfterCrypt), r => r.CryptOpened());

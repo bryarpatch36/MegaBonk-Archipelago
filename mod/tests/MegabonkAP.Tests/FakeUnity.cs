@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 // Stand-ins for the handful of Unity and TextMeshPro classes the overlay uses, with Unity's own
 // names for types and members, so the overlay's by-name code can be run without the game.
@@ -7,7 +8,7 @@ namespace UnityEngine
     public struct Vector2 { public float x, y; public Vector2(float x, float y) { this.x = x; this.y = y; } }
     public struct Color { public float r, g, b, a; public Color(float r, float g, float b, float a) { this.r = r; this.g = g; this.b = b; this.a = a; } }
     public enum RenderMode { ScreenSpaceOverlay = 0, ScreenSpaceCamera = 1, WorldSpace = 2 }
-    public enum KeyCode { None = 0, Tab = 9, F8 = 289 }
+    public enum KeyCode { None = 0, Tab = 9, F8 = 289, JoystickButton8 = 338, JoystickButton9 = 339 }
 
     public class Object
     {
@@ -53,6 +54,8 @@ namespace UnityEngine
 
         public Transform transform => _transform;
         public void SetActive(bool value) => active = value;
+        public bool activeInHierarchy => active;
+        public T? GetComponent<T>() where T : Component => components.OfType<T>().FirstOrDefault();
 
         public T AddComponent<T>() where T : Component, new()
         {
@@ -68,10 +71,14 @@ namespace UnityEngine
         public int sortingOrder { get; set; }
     }
 
+    public class CanvasGroup : Component { public float alpha { get; set; } = 1f; }
+
     public static class Input
     {
-        public static readonly HashSet<KeyCode> Down = new();
+        public static readonly HashSet<KeyCode> Down = new();      // went down this frame
+        public static readonly HashSet<KeyCode> Held = new();      // held since an earlier frame
         public static bool GetKeyDown(KeyCode key) => Down.Contains(key);
+        public static bool GetKey(KeyCode key) => Down.Contains(key) || Held.Contains(key);
         public static bool GetKeyDown(string name) => false;
     }
 }

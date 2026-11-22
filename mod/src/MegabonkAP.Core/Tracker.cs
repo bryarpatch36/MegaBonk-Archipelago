@@ -389,6 +389,32 @@ namespace MegabonkAP.Core
             }
         }
 
+        /// <summary>
+        /// The player tried to pick a weapon or tome at a level-up. Null: go ahead. Otherwise the
+        /// reason it is refused, already written to the log and the overlay.
+        /// </summary>
+        public string? OfferRefusal(string kind, string? gameName)
+        {
+            lock (_gate)
+            {
+                if (OfferAllowed(kind, gameName)) return null;
+                string name = _list.Resolve(kind, gameName)!;
+                return kind == "tome"
+                    ? Refuse($"{name} Tome is locked: you do not hold {_list.Tomes[name].Item}.")
+                    : Refuse($"{name} is locked: you do not hold {_list.Weapons[name].Item}.");
+            }
+        }
+
+        /// <summary>Put a line on the overlay and in the log.</summary>
+        public void Say(string text, bool bad = false)
+        {
+            lock (_gate)
+            {
+                if (bad) _log.Warn(text); else _log.Info(text);
+                Tell(text, bad);
+            }
+        }
+
         /// <summary>The plugin learned whether the server can be reached. Call it after every try.</summary>
         public void ConnectionSeen(bool connected)
         {

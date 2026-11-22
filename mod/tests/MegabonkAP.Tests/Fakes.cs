@@ -133,6 +133,28 @@ namespace MegabonkAP.Tests.FakeGame
     public sealed class PlainButton { public string label = ""; }
     public sealed class CharacterMenu { public ECharacter selectedCharacter; }
     public sealed class SelectionGroupToggleSingleButtonTier { public RunConfig? runConfig; }
+    public sealed class ItemData { public string name = ""; }
+
+    /// <summary>How the game hands an offer over: as "something upgradable" that must be asked for its real type.</summary>
+    public sealed class IUpgradable
+    {
+        private readonly object _real;
+        public IUpgradable(object real) { _real = real; }
+        public T? TryCast<T>() where T : class => _real as T;
+    }
+
+    public sealed class UpgradeButton
+    {
+        public string label = "";
+        public IUpgradable? upgradable;
+        public UnityEngine.GameObject gameObject = new("UpgradeButton");
+    }
+
+    public sealed class UpgradePicker
+    {
+        public GameList<UpgradeButton> buttons = new();
+        public bool banishMode;
+    }
 
     public sealed class ChallengeData
     {

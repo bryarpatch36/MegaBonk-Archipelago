@@ -43,7 +43,8 @@ namespace MegabonkAP.Core
         private object? _panel;         // the dark panel's RectTransform
         private object? _label;         // the TextMeshProUGUI
         private MethodInfo? _keyDown;
-        private object? _key;
+        private MethodInfo? _keyHeld;
+        private readonly List<object[]> _keys = new();
         private bool _keyTried;
 
         /// <summary>The text to show; empty hides the overlay. May be set from any thread.</summary>
@@ -235,36 +236,68 @@ namespace MegabonkAP.Core
 
         // ------------------------------------------------------------------ the key
 
+        /// <summary>
+        /// The setting is a list of alternatives separated by commas; each is one key or several
+        /// joined by + that must be held together: "F8, JoystickButton8+JoystickButton9".
+        /// </summary>
         private void CheckKey()
         {
             if (!_keyTried)
             {
                 _keyTried = true;
-                if (_keyName.Length == 0 || _keyName.Equals("none", StringComparison.OrdinalIgnoreCase)) return;
                 try
                 {
                     Type keyCode = Need("UnityEngine.KeyCode");
-                    _key = Enum.Parse(keyCode, _keyName, ignoreCase: true);
-                    _keyDown = Need("UnityEngine.Input").GetMethods(Any)
-                        .FirstOrDefault(m => m.Name == "GetKeyDown" && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == keyCode);
-                    if (_keyDown == null) _log.Warn("Overlay: the game has no key input to read; change the view with Mode in the settings file.");
+                    foreach (string alternative in _keyName.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                    {
+                        if (alternative.Equals("none", StringComparison.OrdinalIgnoreCase)) continue;
+                        try
+                        {
+                            _keys.Add(alternative.Split('+', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                                .Select(name => Enum.Parse(keyCode, name, ignoreCase: true)).ToArray());
+                        }
+                        catch (Exception problem)
+                        {
+                            _log.Warn($"Overlay: '{alternative}' is not a key the game knows ({Inner(problem).Message}).");
+                        }
+                    }
+                    if (_keys.Count == 0) return;
+                    MethodInfo? Reader(string name) => Need("UnityEngine.Input").GetMethods(Any)
+                        .FirstOrDefault(m => m.Name == name && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == keyCode);
+                    _keyDown = Reader("GetKeyDown");
+                    _keyHeld = Reader("GetKey");
+                    if (_keyDown == null || _keyHeld == null)
+                    {
+                        _keyDown = null;
+                        _log.Warn("Overlay: the game has no key input to read; change the view with Mode in the settings file.");
+                    }
                 }
                 catch (Exception problem)
                 {
                     _keyDown = null;
-                    _log.Warn($"Overlay: the key '{_keyName}' cannot be used ({Inner(problem).Message}); change the view with Mode in the settings file.");
+                    _log.Warn($"Overlay: keys cannot be read ({Inner(problem).Message}); change the view with Mode in the settings file.");
                 }
             }
-            if (_keyDown == null) return;
-            bool down;
-            try { down = _keyDown.Invoke(null, new[] { _key }) is bool b && b; }
+            if (_keyDown == null || _keyHeld == null) return;
+            bool pressed = false;
+            try
+            {
+                foreach (object[] combination in _keys)
+                {
+                    // every key of it is held, and one of them went down just now
+                    if (!combination.All(k => _keyHeld.Invoke(null, new[] { k }) is bool held && held)) continue;
+                    if (!combination.Any(k => _keyDown.Invoke(null, new[] { k }) is bool down && down)) continue;
+                    pressed = true;
+                    break;
+                }
+            }
             catch (Exception problem)
             {
                 _keyDown = null;
-                _log.Warn($"Overlay: reading the key failed ({Inner(problem).Message}); change the view with Mode in the settings file.");
+                _log.Warn($"Overlay: reading the keys failed ({Inner(problem).Message}); change the view with Mode in the settings file.");
                 return;
             }
-            if (!down) return;
+            if (!pressed) return;
             long now = Environment.TickCount64;
             if (now < _keyQuietUntil) return;       // the same press, seen again in the same frame
             _keyQuietUntil = now + 250;

@@ -1,6 +1,6 @@
 # Megabonk Archipelago
 
-Connects Megabonk to an [Archipelago](https://archipelago.gg) multiworld: the mod watches the game and sends your checks by itself, locks what you do not hold yet, and shows a tracker on screen (`F8` changes its view). It goes with the `manual_megabonk_bbush` world.
+Connects Megabonk to an [Archipelago](https://archipelago.gg) multiworld: the mod watches the game and sends your checks by itself, locks what you do not hold yet, and shows a tracker on screen (`F8`, or clicking both sticks of a controller, changes its view). It goes with the `manual_megabonk_bbush` world.
 
 ## Setting it up
 
@@ -20,6 +20,7 @@ Connects Megabonk to an [Archipelago](https://archipelago.gg) multiworld: the mo
 | `DeathLink` | on | Follows the `death_link` option of your YAML. Off: never |
 | `Mode` | `Compact` | The on-screen tracker: `Compact`, `Full` or `Hidden` |
 | `Key` | `F8` | Steps through the tracker's views. `None`: no key |
+| `ControllerButtons` | `JoystickButton8+JoystickButton9` | Controller buttons that do the same when held together: by default both sticks clicked at once |
 | `Position` | `MiddleLeft` | `TopLeft`, `MiddleLeft`, `BottomLeft`, `TopRight`, `MiddleRight` or `BottomRight` |
 | `FontSize`, `Width` | 20, 520 | Size of the tracker, as on a 1080p screen |
 | `Probe` | on | Writes `BepInEx/MegabonkAP-probe.txt` at every start: the names in the game's code |

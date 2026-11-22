@@ -92,6 +92,72 @@ namespace MegabonkAP.Core
             catch (Exception) { return null; }
         }
 
+        /// <summary>
+        /// Call a method that takes a type instead of arguments: button.GetComponent&lt;CanvasGroup&gt;(),
+        /// thing.TryCast&lt;WeaponData&gt;(). Null when it is missing or fails.
+        /// </summary>
+        public static object? Generic(object? target, string name, Type type)
+        {
+            if (target == null) return null;
+            for (Type? t = target.GetType(); t != null; t = t.BaseType)
+            {
+                foreach (MethodInfo candidate in t.GetMethods(Any | BindingFlags.DeclaredOnly))
+                {
+                    if (candidate.Name != name || !candidate.IsGenericMethodDefinition
+                        || candidate.GetGenericArguments().Length != 1 || candidate.GetParameters().Length != 0) continue;
+                    try { return candidate.MakeGenericMethod(type).Invoke(candidate.IsStatic ? null : target, null); }
+                    catch (Exception) { return null; }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>Set a field or property by name. False when there is none or it refuses the value.</summary>
+        public static bool Set(object? target, string member, object value)
+        {
+            if (target == null) return false;
+            try
+            {
+                for (Type? t = target.GetType(); t != null; t = t.BaseType)
+                {
+                    PropertyInfo? property = t.GetProperty(member, Any | BindingFlags.DeclaredOnly);
+                    if (property != null && property.SetMethod != null) { property.SetValue(target, value); return true; }
+                    FieldInfo? field = t.GetField(member, Any | BindingFlags.DeclaredOnly);
+                    if (field != null) { field.SetValue(target, value); return true; }
+                }
+            }
+            catch (Exception) { /* refused */ }
+            return false;
+        }
+
+        /// <summary>
+        /// Members of a game object that may hold one of the named types: fields and properties
+        /// declared by the game's own classes (not Unity's), whose type is one of these names or
+        /// has the word in its name. Found once per type.
+        /// </summary>
+        public static IReadOnlyList<string> MembersOfType(Type type, string word, params string[] typeNames)
+        {
+            return TypedMembers.GetOrAdd((type, word + "|" + string.Join("|", typeNames)), _ =>
+            {
+                var found = new List<string>();
+                for (Type? t = type; t != null && t != typeof(object); t = t.BaseType)
+                {
+                    if ((t.Namespace ?? "").StartsWith("UnityEngine", StringComparison.Ordinal) || t.Name == "Il2CppObjectBase") break;
+                    foreach (MemberInfo m in t.GetMembers(Any | BindingFlags.DeclaredOnly))
+                    {
+                        Type? holds = m is FieldInfo f ? f.FieldType
+                            : m is PropertyInfo p && p.GetIndexParameters().Length == 0 && p.GetMethod != null ? p.PropertyType : null;
+                        if (holds == null || holds.IsValueType || holds == typeof(string) || m.Name.Contains('<')
+                            || m.Name.StartsWith("Native", StringComparison.Ordinal)) continue;
+                        if (typeNames.Contains(holds.Name) || holds.Name.Contains(word, StringComparison.OrdinalIgnoreCase)) found.Add(m.Name);
+                    }
+                }
+                return found;
+            });
+        }
+
+        private static readonly ConcurrentDictionary<(Type, string), IReadOnlyList<string>> TypedMembers = new();
+
         /// <summary>Every value of the enum a method takes as its first argument: all weapons, from GetWeaponLevel(EWeapon).</summary>
         public static Array? EnumOfFirstArgument(Type type, string method)
         {

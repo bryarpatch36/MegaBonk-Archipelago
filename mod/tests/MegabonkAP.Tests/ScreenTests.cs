@@ -21,6 +21,7 @@ namespace MegabonkAP.Tests
             GameObject.Broken = false;
             UnityEngine.Object.Kept.Clear();
             Input.Down.Clear();
+            Input.Held.Clear();
         }
 
         private Screen Make(string corner = "MiddleLeft", string key = "F8") =>
@@ -134,6 +135,35 @@ namespace MegabonkAP.Tests
             Assert.Equal(1, _presses);
         }
 
+        [Fact]
+        public void TwoControllerButtonsHeldTogetherCountAsTheKey()
+        {
+            Screen screen = Make(key: "F8, JoystickButton8+JoystickButton9");
+            screen.Pump();
+            Input.Down.Add(KeyCode.JoystickButton8);            // one stick clicked: not enough
+            screen.Pump();
+            Assert.Equal(0, _presses);
+
+            Input.Down.Clear();
+            Input.Held.Add(KeyCode.JoystickButton8);
+            Input.Down.Add(KeyCode.JoystickButton9);            // the other goes down while the first is held
+            System.Threading.Thread.Sleep(260);
+            screen.Pump();
+            Assert.Equal(1, _presses);
+
+            Input.Down.Clear();
+            Input.Held.Add(KeyCode.JoystickButton9);            // both still held: no second press
+            System.Threading.Thread.Sleep(260);
+            screen.Pump();
+            Assert.Equal(1, _presses);
+
+            Input.Held.Clear();
+            Input.Down.Add(KeyCode.F8);                         // and the keyboard key still works
+            System.Threading.Thread.Sleep(260);
+            screen.Pump();
+            Assert.Equal(2, _presses);
+        }
+
         [Theory]
         [InlineData("None")]
         [InlineData("NoSuchKey")]
@@ -144,7 +174,7 @@ namespace MegabonkAP.Tests
             screen.Pump();
             Assert.False(screen.KeyWorks);
             Assert.Equal("text", Label().text);
-            Assert.Equal(key == "NoSuchKey", _log.Has("cannot be used"));
+            Assert.Equal(key == "NoSuchKey", _log.Has("'NoSuchKey' is not a key the game knows"));
         }
 
         [Fact]

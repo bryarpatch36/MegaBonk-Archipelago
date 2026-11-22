@@ -4,24 +4,25 @@ A BepInEx plugin for Megabonk that connects to the Manual world's slot and sends
 
 ## Status
 
-Version 0.3.0. Version 0.1.0 was run once on the real game (Megabonk 1.0.69, BepInEx 6.0.0-be.788 through r2modman, one Forest Tier 1 run): it loaded, every hook attached, it connected to the Archipelago server and read the map. It also showed three wrong guesses, which 0.2.0 corrects using the names the mod's own probe read from the game. 0.3.0 adds locks (what you do not hold cannot be used) and an on-screen tracker. **Neither 0.2.0 nor 0.3.0 has been run on the game yet.**
+Version 0.3.1. Version 0.1.0 was run once on the real game (Megabonk 1.0.69, BepInEx 6.0.0-be.788 through r2modman, one Forest Tier 1 run): it loaded, every hook attached, it connected to the Archipelago server and read the map. It also showed three wrong guesses, which 0.2.0 corrects using the names the mod's own probe read from the game. 0.3.0 added locks (what you do not hold cannot be used) and an on-screen tracker; it was played on a ROG Ally: the tracker showed and the locks on characters and maps held, but level-ups still offered weapons and tomes that were not held. 0.3.1 dims those offers and refuses them, and lets a controller change the tracker's view. **0.3.1 has not been run on the game yet.**
 
 | Part | State |
 |---|---|
-| Which check belongs to which event, and whether it counts under the world's rules | Works: 133 automated tests |
+| Which check belongs to which event, and whether it counts under the world's rules | Works: 143 automated tests |
 | Connecting to Archipelago, sending checks, receiving items, the goal, keeping checks earned offline | Works against a local Archipelago 0.6.8 server (`tests/e2e_mod_core.py`), and connected from inside the game |
-| The plugin loading in the game and its hooks attaching | Works (0.1.0: 9 of 9). 0.3.0 has 18 hooks, nine of them never seen on the game |
+| The plugin loading in the game and its hooks attaching | Works (0.1.0: 9 of 9). 0.3.1 has 20 hooks |
 | Reading the map of a run | Works on the real game |
 | Reading the character, the tier, levels, bosses, run completion | Rewritten in 0.2.0 against the game's real names; tested against stand-in classes shaped like the game's; not yet seen on the game |
 | DeathLink | Sending and receiving are built (receiving calls the game's own `KillPlayer`); neither seen on the game |
 | Spooky Steve | Not recognised yet: the game's name for him is unknown |
-| Locks: refusing a character, map or tier you do not hold, and offering only weapons and tomes you hold | New in 0.3.0. The rules are tested, also against a real Archipelago server; the four game methods they hang on are known to exist but have not been seen working |
-| The on-screen tracker | New in 0.3.0. Its text is tested against a real server; the drawing is tested against stand-ins for Unity's classes, not on the game |
+| Locks on characters, maps and tiers | Work on the real game (0.3.0) |
+| Locked weapons and tomes at a level-up | 0.3.0 tried to take them out of the offers and they were still offered; why is not known without that run's log. 0.3.1 leaves them on screen, dimmed, and refuses the pick. Tested against stand-ins; not seen on the game |
+| The on-screen tracker | Works on the real game (0.3.0). Changing its view from a controller is new in 0.3.1 and not seen on the game |
 
 ## How it is put together
 
 - `src/MegabonkAP.Core` holds everything that does not need the game: the Archipelago connection (`ArchipelagoLink`), the rules (`Tracker`), the names (`CheckList`, from `checks.json`, which `make_data.py` writes), and reading game objects by member name (`GameReader`, `Dyn`).
-- `src/MegabonkAP.Plugin` is the BepInEx plugin. It contains no game types. At start it finds eighteen game methods by name (`Hooks.cs`) and runs a little code after each, or before the few it may stop; that code hands the game's object to `GameReader`. The overlay is drawn the same way: `Screen` finds Unity's and TextMeshPro's classes by name.
+- `src/MegabonkAP.Plugin` is the BepInEx plugin. It contains no game types. At start it finds twenty game methods by name (`Hooks.cs`) and runs a little code after each, or before the few it may stop; that code hands the game's object to `GameReader`. The overlay is drawn the same way: `Screen` finds Unity's and TextMeshPro's classes by name.
 - Because nothing is compiled against the game, a game update that renames a method costs one feature and a line in the log, not a mod that fails to load. The log names the missing member and lists what the object has instead.
 - [docs/hooks.md](docs/hooks.md) lists every game name the mod relies on and what has been seen working. [docs/probes/](docs/probes/) keeps the probe of each game version looked at.
 
@@ -61,7 +62,7 @@ What you need there: Megabonk (Steam, Windows), the [.NET SDK](https://dotnet.mi
 
 | Line | Meaning |
 |---|---|
-| `MegabonkAP 0.3.0 loaded: 18 of 18 hooks attached` | Every game method was found. Fewer: a `Hook missing:` line above it names each one and what the type has instead |
+| `MegabonkAP 0.3.1 loaded: 20 of 20 hooks attached` | Every game method was found. Fewer: a `Hook missing:` line above it names each one and what the type has instead |
 | `Connected to ... as ...: N of M checks done.` | The Archipelago side works |
 | `Run started: Forest Tier 1` | The run's map and tier were read |
 | `Playing as Fox.` | The character was read, a moment after the run started |
@@ -93,7 +94,8 @@ Still to do after that, each needing its own run: a Tier 2 run (the tier is not 
 7. **The overlay.** Expect `Overlay: on screen.` in the log and a dark panel at the left edge, in the menu and in a run. `F8` steps through compact, full and hidden.
 8. **A locked character.** In the character menu, confirm one you do not hold: nothing should happen, and the overlay should say why. Then confirm the one you hold.
 9. **A locked tier.** Try Forest Tier 2, or Desert, without the items. If the menu ends up stuck after a refusal, say where: the game is stopped at `MapController.StartNewMap`, and what the menu does then is not known.
-10. **Level-up offers.** Only weapons and tomes you hold should be offered, plus your character's own weapon. The log line `Level-up weapons limited to ...` shows what the mod did; if offers look wrong or a level-up shows nothing to pick, set `Lock = false` and send the log.
+10. **Level-up offers.** A weapon or tome you do not hold should look faded and do nothing when picked, with the reason on the overlay. When every offer is locked, any can be picked (`Every offer here is locked, so pick any`). If a level-up ever leaves nothing to pick, set `Lock = false` and send the log.
+11. **The controller.** Click both sticks at once: the overlay should step to its next view.
 
 Locks and overlay can each be switched off in the settings if one misbehaves; the checks work without them.
 
@@ -111,8 +113,9 @@ Locks and overlay can each be switched off in the settings if one misbehaves; th
 | `DeathLink` | on | Follows the `death_link` option of your YAML. Off: never |
 | `Mode` | `Compact` | The on-screen tracker: `Compact`, `Full` (lists everything you hold, green when its checks are done) or `Hidden`. The key steps through them and the choice is remembered |
 | `Key` | `F8` | The key that changes the view, as a Unity key name. `None`: no key |
+| `ControllerButtons` | `JoystickButton8+JoystickButton9` | Controller buttons that change the view when held together: by default clicking both sticks at once. Unity numbers an Xbox-style pad's buttons 0 A, 1 B, 2 X, 3 Y, 4 LB, 5 RB, 6 View, 7 Menu, 8 left stick, 9 right stick. `None`: no buttons |
 | `Position` | `MiddleLeft` | `TopLeft`, `MiddleLeft`, `BottomLeft`, `TopRight`, `MiddleRight` or `BottomRight` |
-| `FontSize`, `Width` | 20, 520 | Size of the text and width of the panel, as on a 1080p screen; both grow with the screen |
+| `FontSize`, `Width` | 20, 520 | Size of the text and width of the panel, as on a 1080p screen; both grow with the screen. On a handheld's small screen a larger `FontSize` (26 or so) may read better |
 | `Probe` | on | Writes `BepInEx/MegabonkAP-probe.txt` at every start: the names in the game's code. It calls and changes nothing. Worth sending along after a game update |
 
 Checks earned while the server is unreachable are kept in `BepInEx/config/MegabonkAP.state.json` and sent on the next connection to the same seed and slot.

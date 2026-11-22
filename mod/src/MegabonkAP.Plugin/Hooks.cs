@@ -13,9 +13,9 @@ namespace MegabonkAP.Plugin
     /// log; the others still attach.
     ///
     /// Most hooks only watch. The ones that change the game: a received DeathLink calls the game's
-    /// own KillPlayer; the three "Before" hooks stop a locked character, map or tier from being
-    /// started; and the two offer hooks take locked weapons and tomes out of what the game may
-    /// offer. When one of those fails it lets the game go on as if the mod were not there.
+    /// own KillPlayer; the "Before" hooks stop a locked character, map, tier or level-up offer
+    /// from being taken; the two offer hooks take locked weapons and tomes out of what the game
+    /// may offer; and locked offers on screen are dimmed. When one of those fails it lets the game go on as if the mod were not there.
     ///
     /// The names are those of game version 1.0.69. docs/hooks.md says which were seen working.
     /// </summary>
@@ -44,6 +44,8 @@ namespace MegabonkAP.Plugin
             new("SelectionGroupToggleSingleButtonTier", "OnClick", 0, null, "locking tiers in the map menu", nameof(BeforeTierClick)),
             new("UnlockUtility", "GetAvailableWeapons", 0, nameof(AfterAvailableWeapons), "offering only weapons you hold"),
             new("UnlockUtility", "GetAvailableTomes", 0, nameof(AfterAvailableTomes), "offering only tomes you hold"),
+            new("UpgradePicker", "ShuffleUpgrades", 1, nameof(AfterShuffleUpgrades), "dimming locked level-up offers"),
+            new("UpgradePicker", "SelectUpgrade", 4, null, "refusing a locked level-up offer", nameof(BeforeSelectUpgrade)),
         };
 
         // Any one of these gives the overlay its turn on the game's own thread, in menus and in a run.
@@ -173,7 +175,22 @@ namespace MegabonkAP.Plugin
         private static void AfterAvailableTomes(object __result) =>
             Safely(nameof(AfterAvailableTomes), r => r.LimitOffers("tome", __result));
 
-        private static void AfterFrame() => _screen?.Pump();
+        private static void AfterShuffleUpgrades(object __instance) =>
+            Safely(nameof(AfterShuffleUpgrades), r => r.OffersShown(__instance));
+
+        private static bool BeforeSelectUpgrade(object __instance, object[] __args) =>
+            Allowed(nameof(BeforeSelectUpgrade), r => r.MayPickOffer(__instance, __args.Length > 0 ? __args[0] : null));
+
+        private static long _nextOffersLook;
+
+        private static void AfterFrame()
+        {
+            _screen?.Pump();
+            long now = Environment.TickCount64;
+            if (now < _nextOffersLook) return;
+            _nextOffersLook = now + 300;
+            Safely(nameof(AfterFrame), r => r.RefreshOffers());
+        }
 
         private static void AfterRestartRun() =>
             Safely(nameof(AfterRestartRun), r => r.RunRestarted());
@@ -207,7 +224,7 @@ namespace MegabonkAP.Plugin
 
         private static void AfterHealthTick(object __instance)
         {
-            _screen?.Pump();
+            AfterFrame();
             if (_killBefore == 0) return;                   // every frame: nothing else may happen here
             long before = System.Threading.Interlocked.Exchange(ref _killBefore, 0);
             if (before == 0 || DateTime.UtcNow.Ticks > before) return;

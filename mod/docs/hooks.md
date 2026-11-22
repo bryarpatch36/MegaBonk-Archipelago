@@ -30,6 +30,10 @@ Most run after the game's method and only watch. Those that change the game are 
 | `SelectionGroupToggleSingleButtonTier.OnClick()`, before | **Stops** picking a locked tier (the button's `runConfig`) | New in 0.3.0 |
 | `UnlockUtility.GetAvailableWeapons()` | **Removes** weapons not held from the returned `List<WeaponData>`. That the level-up offers are drawn from it is assumed from the name | New in 0.3.0 |
 | `UnlockUtility.GetAvailableTomes()` | **Removes** tomes not held from the returned `HashSet<TomeData>` | New in 0.3.0 |
+| `UpgradePicker.ShuffleUpgrades(EEncounter)` | A level-up's offers are on screen: **dims** the locked ones (a `CanvasGroup` on the button, alpha 0.3). Looked at again a few times a second while the picker is shown | New in 0.3.1 |
+| `UpgradePicker.SelectUpgrade(IUpgradable, List<StatModifier>, UpgradeButton, ERarity)`, before | **Stops** picking a locked weapon or tome, unless every offer is locked, the picker is in banish mode, or the other offers cannot be read | New in 0.3.1 |
+
+On the real game (0.3.0) the two `GetAvailable...` hooks did not keep locked weapons and tomes out of the offers. Whether they attached, fired, or edit a list the offers are not drawn from is in that run's log, which was not looked at; they are kept because they do no harm.
 
 For the overlay, one of these gives the mod its turn every frame; whichever exist are hooked: `UnityEngine.EventSystems.EventSystem.Update()`, `UnityEngine.Canvas.SendWillRenderCanvases()`, `WindowManager.Update()`, and `PlayerHealth.Tick()` during a run.
 
@@ -52,6 +56,7 @@ For the overlay, one of these gives the mod its turn every frame; whichever exis
 | any game object | `Pointer` | Telling two wrappers of one object apart from two objects |
 | `MyButtonCharacter` | `characterData.eCharacter`, else any member of type `ECharacter`; else `CharacterMenu.selectedCharacter` | The character being confirmed. `MyButtonCharacter` is not in the probe, so its member is a guess with two fallbacks |
 | `WeaponData`, `TomeData` | `eWeapon` / `eTome`, else any member of type `EWeapon` / `ETome` | Which weapon or tome an offer is. Neither type is in the probe; the guess follows `CharacterData.eCharacter` and `MapData.eMap` |
+| `UpgradePicker` | `buttons`, `banishMode`, `window.activeInHierarchy` | The offers on screen. `UpgradeButton` is not in the 1.0.69 probe: what it offers is found as any member of the game's own classes whose type is `WeaponData`, `TomeData`, `UnlockableBase` or has "upgrad" in its name, asked for its real type with `TryCast` |
 | the offer lists | `GetEnumerator()`, `Contains`, `Remove`, `Add` | Taking locked things out, and putting them back if the game hands out the same list again after an item arrived |
 
 ## The overlay (`Screen.cs`)

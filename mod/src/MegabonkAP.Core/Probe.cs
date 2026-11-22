@@ -61,6 +61,7 @@ namespace MegabonkAP.Core
             "ChallengesTracker", "ChallengeData", "MyAchievement", "DeathScreen", "WeaponBase", "WeaponData",
             "TomeData", "UnlockableBase", "InteractableCoffin", "InteractableCrypt", "GraveyardBossMetalGate",
             "InteractableGhostBossLeave", "InteractableCharacterFight", "UnlocksUi", "UnlockContainer",
+            "UpgradeButton", "IUpgradable", "MyButton", "MyButtonNormal", "MyButtonCharacter", "UnlockUtility", "UpgradeInventoryUI",
             "EMap", "ECharacter", "EWeapon", "ETome", "EEnemy", "EEnemyFlag", "EItem", "EDungeonType",
         };
 

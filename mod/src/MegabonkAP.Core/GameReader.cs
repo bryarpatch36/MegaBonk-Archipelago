@@ -353,6 +353,140 @@ namespace MegabonkAP.Core
             }
         }
 
+        /// <summary>
+        /// UpgradePicker.ShuffleUpgrades(EEncounter): a level-up's offers are on screen. Locked
+        /// weapons and tomes are dimmed. The picker is remembered so RefreshOffers can look again.
+        /// </summary>
+        public void OffersShown(object? picker)
+        {
+            lock (_gate)
+            {
+                _picker = picker;
+                DimLocked();
+            }
+        }
+
+        /// <summary>Look at the offers on screen again: the game may fill its buttons a moment after it says so.</summary>
+        public void RefreshOffers()
+        {
+            lock (_gate)
+            {
+                if (_picker == null) return;
+                try
+                {
+                    if (Dyn.First(_picker, "window.activeInHierarchy", "gameObject.activeInHierarchy") is bool shown && !shown)
+                    {
+                        _picker = null;                 // the level-up is over
+                        return;
+                    }
+                    DimLocked();
+                }
+                catch (Exception) { _picker = null; }
+            }
+        }
+
+        /// <summary>
+        /// UpgradePicker.SelectUpgrade(IUpgradable, List, UpgradeButton, ERarity), before the game
+        /// acts on it. False: that weapon or tome is locked and something else can be picked. When
+        /// every offer is locked, or the other offers cannot be seen, the pick is let through:
+        /// a level-up must never be left without a way out.
+        /// </summary>
+        public bool MayPickOffer(object? picker, object? upgradable)
+        {
+            lock (_gate)
+            {
+                if (!_tracker.Locking) return true;
+                (string kind, string name)? what = WhatIs(upgradable);
+                if (what == null || _tracker.OfferAllowed(what.Value.kind, what.Value.name)) return true;
+                if (Dyn.Get(picker, "banishMode") is bool banishing && banishing) return true;      // banishing a locked offer is fine
+
+                List<(object button, bool locked)> buttons = Buttons(picker);
+                if (buttons.Count == 0)
+                {
+                    Say("The level-up's other offers could not be seen, so a locked offer can still be picked."
+                        + (picker != null ? $" UpgradePicker has: {Dyn.Describe(picker.GetType())}" : ""));
+                    return true;
+                }
+                if (buttons.All(b => b.locked))
+                {
+                    _tracker.Say("Every offer here is locked, so pick any: it will not count.");
+                    return true;
+                }
+                return _tracker.OfferRefusal(what.Value.kind, what.Value.name) == null;
+            }
+        }
+
+        private object? _picker;
+
+        /// <summary>The offers on screen: each button in use, and whether what it offers is locked.</summary>
+        private List<(object button, bool locked)> Buttons(object? picker)
+        {
+            var buttons = new List<(object, bool)>();
+            foreach (object? button in Dyn.Items(Dyn.Get(picker, "buttons")))
+            {
+                if (button == null) continue;
+                if (Dyn.Get(button, "gameObject.activeInHierarchy") is bool shown && !shown) continue;
+                (string kind, string name)? what = null;
+                foreach (string member in Dyn.MembersOfType(button.GetType(), "upgrad", "WeaponData", "TomeData", "UnlockableBase"))
+                {
+                    what = WhatIs(Dyn.Get(button, member));
+                    if (what != null) break;
+                }
+                buttons.Add((button, what != null && !_tracker.OfferAllowed(what.Value.kind, what.Value.name)));
+            }
+            return buttons;
+        }
+
+        private void DimLocked()
+        {
+            List<(object button, bool locked)> buttons = Buttons(_picker);
+            bool dim = _tracker.Locking && buttons.Any(b => !b.locked);     // all locked: any may be picked, so none is dimmed
+            foreach ((object button, bool locked) in buttons) Dim(button, dim && locked);
+        }
+
+        /// <summary>Fade a button the way a thing you cannot afford is faded, or bring it back.</summary>
+        private void Dim(object button, bool dim)
+        {
+            Type? groupType = _findType("UnityEngine.CanvasGroup");
+            object? gameObject = Dyn.Get(button, "gameObject");
+            if (groupType == null || gameObject == null)
+            {
+                if (dim) Say("Locked offers cannot be dimmed: " + (groupType == null ? "the game has no CanvasGroup." : "the offer's button has no gameObject."));
+                return;
+            }
+            object? group = Dyn.Generic(gameObject, "GetComponent", groupType);
+            if (group == null && dim) group = Dyn.Generic(gameObject, "AddComponent", groupType);
+            if (group == null) return;
+            if (!Dyn.Set(group, "alpha", dim ? 0.3f : 1f) && dim) Say("Locked offers cannot be dimmed: CanvasGroup has no alpha.");
+        }
+
+        /// <summary>Which weapon or tome an offer is, under the game's name, or null when it is neither.</summary>
+        private (string kind, string name)? WhatIs(object? offered)
+        {
+            if (offered == null) return null;
+            foreach ((string kind, string typeName, string member, string enumName) in new[]
+                { ("weapon", "WeaponData", "eWeapon", "EWeapon"), ("tome", "TomeData", "eTome", "ETome") })
+            {
+                object? data = As(offered, typeName);
+                if (data == null) continue;
+                string? name = Dyn.Name(Dyn.First(data, member) ?? Dyn.OfEnum(data, enumName));
+                if (name != null) return (kind, name);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// The thing as the named game type, or null when it is not one. The game hands offers over
+        /// as "something upgradable"; its wrapper has to be asked for the real type (TryCast).
+        /// </summary>
+        private object? As(object thing, string typeName)
+        {
+            for (Type? t = thing.GetType(); t != null; t = t.BaseType)
+                if (t.Name == typeName) return thing;
+            Type? wanted = _findType(typeName);
+            return wanted == null ? null : Dyn.Generic(thing, "TryCast", wanted);
+        }
+
         private void SayOffers(Offers offers, string message)
         {
             if (offers.Said == message) return;

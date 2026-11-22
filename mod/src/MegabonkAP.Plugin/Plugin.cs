@@ -22,7 +22,7 @@ namespace MegabonkAP.Plugin
     {
         public const string Id = "bbush.megabonk.archipelago";
         public const string Name = "MegabonkAP";
-        public const string Version = "0.3.0";
+        public const string Version = "0.3.1";
 
         private ArchipelagoLink? _link;
         private Tracker? _tracker;
@@ -53,6 +53,9 @@ namespace MegabonkAP.Plugin
                 "The on-screen tracker: Compact, Full (lists everything you hold) or Hidden. The key below steps through them.");
             ConfigEntry<string> key = Config.Bind("Overlay", "Key", "F8",
                 "The key that changes the overlay's view, as a Unity key name (F8, Tab, BackQuote, ...). None: no key.");
+            ConfigEntry<string> pad = Config.Bind("Overlay", "ControllerButtons", "JoystickButton8+JoystickButton9",
+                "Controller buttons that change the overlay's view when held together, as Unity key names joined by +. "
+                + "The default is clicking both sticks at once (L3+R3 on an Xbox-style pad, as on the ROG Ally). None: no buttons.");
             ConfigEntry<string> corner = Config.Bind("Overlay", "Position", "MiddleLeft",
                 "Where the overlay sits: TopLeft, MiddleLeft, BottomLeft, TopRight, MiddleRight or BottomRight.");
             ConfigEntry<int> fontSize = Config.Bind("Overlay", "FontSize", 20,
@@ -93,7 +96,7 @@ namespace MegabonkAP.Plugin
 
             _mode = Overlay.ParseMode(mode.Value);
             Screen.LoadUnity(log, Path.Combine(Paths.BepInExRootPath, "interop"));
-            var screen = new Screen(log, finder, corner.Value, fontSize.Value, width.Value, key.Value, () =>
+            var screen = new Screen(log, finder, corner.Value, fontSize.Value, width.Value, key.Value + ", " + pad.Value, () =>
             {
                 _mode = Overlay.Next(_mode);
                 mode.Value = Overlay.ModeName(_mode);       // remembered for the next start
@@ -102,7 +105,10 @@ namespace MegabonkAP.Plugin
             _screen = screen;
             _list = list;
             _slotSet = !string.IsNullOrWhiteSpace(slot.Value);
-            _keyName = key.Value.Trim();
+            bool none(string s) => s.Trim().Length == 0 || s.Trim().Equals("none", StringComparison.OrdinalIgnoreCase);
+            string padName = pad.Value.Replace(" ", "").Equals("JoystickButton8+JoystickButton9", StringComparison.OrdinalIgnoreCase)
+                ? "both sticks" : pad.Value.Trim();
+            _keyName = string.Join(" or ", new[] { none(key.Value) ? null : key.Value.Trim(), none(pad.Value) ? null : padName }.Where(n => n != null));
             Hooks.AttachFrames(harmony, screen, finder, log);
             // the text is made away from the game's thread; the game's thread only puts it on screen
             _overlayTimer = new Timer(_ => RenderOverlay(), null, TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(400));
@@ -156,7 +162,7 @@ namespace MegabonkAP.Plugin
             try
             {
                 // the hint names the key only once it is known to work; hidden stays hidden
-                string? hint = screen.KeyWorks ? _keyName : null;
+                string? hint = screen.KeyWorks && _keyName.Length > 0 ? _keyName : null;
                 screen.Text = Overlay.Render(_tracker.Look(), _list, _mode, DateTime.UtcNow, _slotSet, hint);
             }
             catch (Exception problem)

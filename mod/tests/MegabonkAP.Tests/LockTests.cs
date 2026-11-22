@@ -289,7 +289,7 @@ namespace MegabonkAP.Tests
                 "Progressive Forest Tier", "Progressive Forest Tier");
             _now = _now.AddMinutes(1);          // the "Connected" note has gone
             Assert.Equal(
-                "Archipelago  1/110 checks\n"
+                "Archipelago  1/110 checks  DeathLink off\n"
                 + "Held: 2 characters, 1 weapons, 1 tomes\n"
                 + "Maps: Forest Tier 2, Desert locked, Graveyard locked",
                 Plain(Show(tracker)));
@@ -348,6 +348,24 @@ namespace MegabonkAP.Tests
             Assert.Contains("<color=#9be29b>Sword</color>", text);
             Assert.DoesNotContain("<color=#9be29b>Bone</color>", text);
             Assert.EndsWith("F8: hide", Plain(text));
+        }
+
+        [Fact]
+        public void ItSaysWhetherDeathLinkIsOnAndTheLogSaysWhyNot()
+        {
+            Tracker tracker = Start("Character - Fox");
+            Assert.Contains("DeathLink off", Plain(Show(tracker)));
+            Assert.True(_log.Has("DeathLink is off: this seed was generated with death_link off."));
+
+            _link.Slot["death_link"] = 1L;
+            _link.Announce();
+            Assert.Contains("DeathLink on", Plain(Show(tracker)));
+            Assert.True(_log.Has("DeathLink is on."));
+
+            tracker.DeathLinkAllowed = false;
+            _link.Announce();
+            Assert.Contains("DeathLink off", Plain(Show(tracker)));
+            Assert.True(_log.Has("DeathLink is off in the mod's settings."));
         }
 
         [Fact]

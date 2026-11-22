@@ -44,7 +44,8 @@ def main() -> int:
         players, out = Path(work) / "players", Path(work) / "out"
         players.mkdir()
         out.mkdir()
-        (players / "Bonker.yaml").write_text((ROOT / "Bonker.yaml").read_text(encoding="utf-8"), encoding="utf-8")
+        (players / "Bonker.yaml").write_text((ROOT / "Bonker.yaml").read_text(encoding="utf-8")
+                                             .replace("death_link: false", "death_link: true "), encoding="utf-8")
         generate = subprocess.run(
             [sys.executable, "Generate.py", "--player_files_path", str(players), "--outputpath", str(out)],
             cwd=source, env=env, capture_output=True, text=True)

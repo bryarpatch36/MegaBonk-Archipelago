@@ -47,6 +47,7 @@ namespace MegabonkAP.Core
                 text.Append($"{s.Done}/{s.Total} checks");
                 if (!s.Connected) text.Append($"  <color={Bad}>connection lost</color>");
                 if (s.Owed > 0) text.Append($"  <color={Dim}>({s.Owed} waiting to be sent)</color>");
+                if (s.DeathLink != null) text.Append($"  <color={Dim}>DeathLink {(s.DeathLink == "on" ? "on" : "off")}</color>");
             }
             text.Append('\n');
 

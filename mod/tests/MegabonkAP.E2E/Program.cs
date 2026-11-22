@@ -129,6 +129,21 @@ internal static class Program
         Expect(again.EnsureConnected() && again.IsChecked(tier1) && again.Session == link.Session,
             "a new connection sees the same seed and the checks already done");
 
+        // 6. DeathLink (the seed has death_link on): a death on one connection reaches the other, both ways
+        var tracker2 = new Tracker(list, again, log);
+        again.EnsureConnected();
+        string? killed1 = null, killed2 = null;
+        tracker.KillRequested += (who, why) => killed1 = who;
+        tracker2.KillRequested += (who, why) => killed2 = who;
+        Thread.Sleep(1000);
+        tracker.RunStarted(character, "Forest", 1);
+        tracker.PlayerDied();
+        Expect(Wait(() => killed2 != null, 8), $"a death sent by the first connection kills the second ({killed2})");
+        Thread.Sleep(11000);            // a received death is not sent back for ten seconds
+        tracker2.RunStarted(character, "Forest", 1);
+        tracker2.PlayerDied();
+        Expect(Wait(() => killed1 != null, 8), $"and a death sent by the second kills the first ({killed1})");
+
         Thread.Sleep(500);
         Console.WriteLine(_failed == 0 ? "all steps passed" : $"{_failed} step(s) failed");
         return _failed == 0 ? 0 : 1;

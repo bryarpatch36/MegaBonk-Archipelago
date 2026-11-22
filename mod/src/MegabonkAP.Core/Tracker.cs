@@ -47,6 +47,7 @@ namespace MegabonkAP.Core
         private bool _connected;
         private HashSet<string> _done = new();                   // checks the server counts as done
         private int _total;
+        private string? _deathLink;                              // "on", or why it is off; null before connecting
         private string? _picked;                                 // the character last confirmed in the menu
         private readonly List<Note> _notes = new();
 
@@ -441,6 +442,7 @@ namespace MegabonkAP.Core
                     Map = _map,
                     Tier = _tier,
                     RunProblem = _inRun ? RunProblem() : null,
+                    DeathLink = _deathLink,
                     Notes = _notes.ToList(),
                 };
             }
@@ -450,7 +452,7 @@ namespace MegabonkAP.Core
         {
             public bool Connected, ItemsKnown, Locking, InRun;
             public int Done, Total, Owed, Tier;
-            public string? Character, Map, RunProblem;
+            public string? Character, Map, RunProblem, DeathLink;
             public IReadOnlyCollection<string> DoneChecks = Array.Empty<string>();
             public IReadOnlyDictionary<string, int> Held = new Dictionary<string, int>();
             public IReadOnlyList<Note> Notes = Array.Empty<Note>();
@@ -479,6 +481,13 @@ namespace MegabonkAP.Core
         private void ReadProgress()
         {
             if (!_link.Connected) return;
+            string deathLink = !DeathLinkAllowed ? "off in the mod's settings"
+                : AsInt(_link.SlotValue("death_link")) == 1 ? "on" : "off: this seed was generated with death_link off";
+            if (deathLink != _deathLink)
+            {
+                _deathLink = deathLink;
+                _log.Info($"DeathLink is {deathLink}.");
+            }
             _done = new HashSet<string>(_link.CheckedNames);
             _total = _link.TotalChecks;
         }

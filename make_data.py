@@ -69,6 +69,10 @@ CHALLENGES = {
                "Oh no", "Oh shit", "What the fuck"],
 }
 
+# Minibosses defeated in total, over every run of the seed, the ones called up at boss statues
+# included: a check at each of these counts.
+MINIBOSS_HUNT = [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50]
+
 CHARACTER_LEVEL = 30   # "<character> - Reach Level 30"
 WEAPON_LEVEL = 10      # "<weapon> - Reach Level 10"
 TOME_LEVEL = 8         # "<tome> Tome - Reach Level 8"
@@ -142,6 +146,11 @@ locations += [
      "requires": "|Graveyard Access|" + POWER[3]},
 ]
 
+# a longer hunt is only expected of a player who holds enough to survive the statues
+for n in MINIBOSS_HUNT:
+    locations.append({"name": f"Miniboss Hunt - Defeat {n} Miniboss{'es' if n > 1 else ''}", "category": ["Miniboss Hunt"],
+                      "requires": ANY_MAP + (POWER[1] if n <= 10 else POWER[2] if n <= 25 else POWER[3])})
+
 # goals, easiest first; hooks/Options.py makes "Tier 2 Bosses" the default
 for n in (1, 2, 3):
     locations.append({
@@ -156,6 +165,7 @@ categories = {
     "Hidden Bosses": {"yaml_option": ["include_hidden_bosses"]},
     "Challenges": {"yaml_option": ["include_challenges"]},
     "Graveyard": {"yaml_option": ["include_graveyard"]},
+    "Miniboss Hunt": {"yaml_option": ["include_miniboss_hunt"]},
 }
 
 options = {
@@ -183,6 +193,13 @@ options = {
             "type": "Toggle",
             "display_name": "Graveyard",
             "description": ["Adds the Graveyard map: the Graveyard Access item and its checks."],
+            "default": True,
+        },
+        "include_miniboss_hunt": {
+            "type": "Toggle",
+            "display_name": "Miniboss hunt checks",
+            "description": [f"Adds {len(MINIBOSS_HUNT)} checks for minibosses defeated in total over all your runs, "
+                            f"up to {MINIBOSS_HUNT[-1]}. Minibosses called up at boss statues count."],
             "default": True,
         },
     }
@@ -283,6 +300,7 @@ mod_checks = {
     "maps": mod_maps,
     "enemies": {enemy: boss_check(where, boss) for enemy, (where, boss) in BOSS_ENEMIES.items()},
     "bosses": {boss: boss_check(where, boss) for boss, where in NAMED_BOSSES.items()},
+    "miniboss_hunt": {str(n): f"Miniboss Hunt - Defeat {n} Miniboss{'es' if n > 1 else ''}" for n in MINIBOSS_HUNT},
     "ignored": IGNORED,
     "goals": [f"Tier {n} Bosses" for n in (1, 2, 3)],   # in the order of the world's goal option
     "aliases": ALIASES,

@@ -18,5 +18,10 @@
     "yaml_option": [
       "include_graveyard"
     ]
+  },
+  "Miniboss Hunt": {
+    "yaml_option": [
+      "include_miniboss_hunt"
+    ]
   }
 }

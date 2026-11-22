@@ -411,6 +411,23 @@
     "Big Bob": "Graveyard - Defeat Big Bob",
     "Spooky Steve": "Graveyard - Defeat Spooky Steve"
   },
+  "miniboss_hunt": {
+    "1": "Miniboss Hunt - Defeat 1 Miniboss",
+    "2": "Miniboss Hunt - Defeat 2 Minibosses",
+    "3": "Miniboss Hunt - Defeat 3 Minibosses",
+    "4": "Miniboss Hunt - Defeat 4 Minibosses",
+    "5": "Miniboss Hunt - Defeat 5 Minibosses",
+    "6": "Miniboss Hunt - Defeat 6 Minibosses",
+    "8": "Miniboss Hunt - Defeat 8 Minibosses",
+    "10": "Miniboss Hunt - Defeat 10 Minibosses",
+    "12": "Miniboss Hunt - Defeat 12 Minibosses",
+    "15": "Miniboss Hunt - Defeat 15 Minibosses",
+    "20": "Miniboss Hunt - Defeat 20 Minibosses",
+    "25": "Miniboss Hunt - Defeat 25 Minibosses",
+    "30": "Miniboss Hunt - Defeat 30 Minibosses",
+    "40": "Miniboss Hunt - Defeat 40 Minibosses",
+    "50": "Miniboss Hunt - Defeat 50 Minibosses"
+  },
   "ignored": {
     "weapon": [
       "Test",

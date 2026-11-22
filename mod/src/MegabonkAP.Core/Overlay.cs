@@ -105,6 +105,15 @@ namespace MegabonkAP.Core
             int tomes = list.Tomes.Values.Count(t => Held(s, t.Item) > 0);
             text.Append($"<color={Dim}>Held:</color> {characters} characters, {weapons} weapons, {tomes} tomes\n");
             text.Append(Maps(s, list)).Append('\n');
+            AppendHunt(text, s, list);
+        }
+
+        private static void AppendHunt(StringBuilder text, Tracker.Snapshot s, CheckList list)
+        {
+            if (s.Minibosses == null) return;
+            int? next = list.MinibossHunt.Keys.Cast<int?>().FirstOrDefault(n => n > s.Minibosses);
+            text.Append($"<color={Dim}>Minibosses:</color> {s.Minibosses}"
+                + (next != null ? $" <color={Dim}>(next check at {next})</color>" : $" <color={Good}>(hunt done)</color>")).Append('\n');
         }
 
         private static void AppendLists(StringBuilder text, Tracker.Snapshot s, CheckList list)
@@ -119,6 +128,7 @@ namespace MegabonkAP.Core
                 .Where(t => Held(s, t.Item) > 0)
                 .Select(t => (t.Name, s.DoneChecks.Contains(t.LevelCheck))))).Append('\n');
             text.Append(Maps(s, list)).Append('\n');
+            AppendHunt(text, s, list);
             text.Append($"<size=75%><color={Good}>green</color><color={Dim}>: its checks are done</color></size>\n");
         }
 

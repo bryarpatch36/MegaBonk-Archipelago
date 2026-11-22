@@ -96,6 +96,7 @@ namespace MegabonkAP.Tests
                 "Forest - Defeat Chunkham the Terrible",
                 "Fox - Complete a Run",
                 "Fox - Reach Level 30",
+                "Miniboss Hunt - Defeat 1 Miniboss",        // Chunkham; the plain Golem and the stage bosses do not count
             }, _link.Sent.OrderBy(s => s));
             Assert.False(_log.Has("matches nothing"));     // Bounce is known and passed over
             Assert.True(_log.Has("Boss killed on Forest: the game calls it 'Ent1'."));
@@ -278,6 +279,19 @@ namespace MegabonkAP.Tests
             Assert.Equal(1, health.Killed);
             _reader.Kill(new RenamedEnemy());
             Assert.True(_log.Has("DeathLink: the game's KillPlayer could not be found"));
+        }
+
+        [Fact]
+        public void StatueMinibossesCountAndStageBossesDoNot()
+        {
+            _link.Give("Character - Fox", "Progressive Forest Tier");
+            Begin(Forest(1), ECharacter.Fox);
+            Dies(EEnemy.Goblin, EEnemyFlag.SummonerMiniboss);       // called up at a statue: any enemy can be one
+            Dies(EEnemy.MinibossPig, EEnemyFlag.Boss);
+            Dies(EEnemy.Ent1, EEnemyFlag.StageBoss);
+            Dies(EEnemy.Golem);
+            Assert.Contains("Miniboss Hunt - Defeat 2 Minibosses", _link.Sent);
+            Assert.DoesNotContain("Miniboss Hunt - Defeat 3 Minibosses", _link.Sent);
         }
 
         private PlayerHealth DeathLinkRun()

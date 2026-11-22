@@ -31,6 +31,14 @@
         "Adds the Graveyard map: the Graveyard Access item and its checks."
       ],
       "default": true
+    },
+    "include_miniboss_hunt": {
+      "type": "Toggle",
+      "display_name": "Miniboss hunt checks",
+      "description": [
+        "Adds 15 checks for minibosses defeated in total over all your runs, up to 50. Minibosses called up at boss statues count."
+      ],
+      "default": true
     }
   }
 }

@@ -68,13 +68,14 @@ If you are sent a character, weapon, tome or map tier that your save has not unl
 | Complete Forest Tier 1, 2, 3 (Lil Bark, Chadbark, Bark Vader) | 3 | always on |
 | Complete Desert Tier 1, 2, 3 (Lil Anubis, Anubruh, Juge Anubis) | 3 | always on |
 | Minibosses: Stone Golem, Chunkham the Terrible, Sand Golem, Scorpionussy | 4 | always on |
+| Miniboss hunt: minibosses defeated in total over all your runs, at 1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40 and 50. Ones called up at boss statues count. Needs the mod to count them | 15 | `include_miniboss_hunt` (default on; switch it off for a shorter solo seed) |
 | Hidden bosses: the Suspicious Bush, the Bandit, Spooky Steve | 3 | `include_hidden_bosses` (default on) |
 | Graveyard: collect the 4 Crypt Keys, defeat Big Bob | 2 | `include_graveyard` (default on; also removes Spooky Steve and `Graveyard Access`) |
 | Forest challenges (13) and Desert challenges (9) | 22 | `include_challenges` (default off) |
 
-With the defaults that is 110 checks. The item pool is 21 characters, 30 weapons, 23 tomes, 3 Forest tiers, 3 Desert tiers and `Graveyard Access` (81 items, 4 of them given at the start); the remaining checks hold `Bonk`, a filler item that does nothing.
+With the defaults that is 125 checks. The item pool is 21 characters, 30 weapons, 23 tomes, 3 Forest tiers, 3 Desert tiers and `Graveyard Access` (81 items, 4 of them given at the start); the remaining checks hold `Bonk`, a filler item that does nothing.
 
-So that nobody is asked for a long run with nothing in hand, the generator only expects a Tier 2 completion (and Big Bob) once you hold 3 weapons and 5 tomes, and a Tier 3 completion (and Spooky Steve) once you hold 6 weapons and 9 tomes.
+So that nobody is asked for a long run with nothing in hand, the generator only expects a Tier 2 completion (and Big Bob) once you hold 3 weapons and 5 tomes, and a Tier 3 completion (and Spooky Steve) once you hold 6 weapons and 9 tomes. The miniboss hunt follows the same steps: beyond 10 minibosses is expected with 3 weapons and 5 tomes, beyond 25 with 6 and 9.
 
 ## What this does not do
 

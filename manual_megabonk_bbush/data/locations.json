@@ -970,6 +970,111 @@
     "requires": "|Graveyard Access| and |@Weapons:6| and |@Tomes:9|"
   },
   {
+    "name": "Miniboss Hunt - Defeat 1 Miniboss",
+    "category": [
+      "Miniboss Hunt"
+    ],
+    "requires": "(|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Miniboss Hunt - Defeat 2 Minibosses",
+    "category": [
+      "Miniboss Hunt"
+    ],
+    "requires": "(|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Miniboss Hunt - Defeat 3 Minibosses",
+    "category": [
+      "Miniboss Hunt"
+    ],
+    "requires": "(|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Miniboss Hunt - Defeat 4 Minibosses",
+    "category": [
+      "Miniboss Hunt"
+    ],
+    "requires": "(|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Miniboss Hunt - Defeat 5 Minibosses",
+    "category": [
+      "Miniboss Hunt"
+    ],
+    "requires": "(|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Miniboss Hunt - Defeat 6 Minibosses",
+    "category": [
+      "Miniboss Hunt"
+    ],
+    "requires": "(|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Miniboss Hunt - Defeat 8 Minibosses",
+    "category": [
+      "Miniboss Hunt"
+    ],
+    "requires": "(|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Miniboss Hunt - Defeat 10 Minibosses",
+    "category": [
+      "Miniboss Hunt"
+    ],
+    "requires": "(|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|)"
+  },
+  {
+    "name": "Miniboss Hunt - Defeat 12 Minibosses",
+    "category": [
+      "Miniboss Hunt"
+    ],
+    "requires": "(|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|) and |@Weapons:3| and |@Tomes:5|"
+  },
+  {
+    "name": "Miniboss Hunt - Defeat 15 Minibosses",
+    "category": [
+      "Miniboss Hunt"
+    ],
+    "requires": "(|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|) and |@Weapons:3| and |@Tomes:5|"
+  },
+  {
+    "name": "Miniboss Hunt - Defeat 20 Minibosses",
+    "category": [
+      "Miniboss Hunt"
+    ],
+    "requires": "(|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|) and |@Weapons:3| and |@Tomes:5|"
+  },
+  {
+    "name": "Miniboss Hunt - Defeat 25 Minibosses",
+    "category": [
+      "Miniboss Hunt"
+    ],
+    "requires": "(|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|) and |@Weapons:3| and |@Tomes:5|"
+  },
+  {
+    "name": "Miniboss Hunt - Defeat 30 Minibosses",
+    "category": [
+      "Miniboss Hunt"
+    ],
+    "requires": "(|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|) and |@Weapons:6| and |@Tomes:9|"
+  },
+  {
+    "name": "Miniboss Hunt - Defeat 40 Minibosses",
+    "category": [
+      "Miniboss Hunt"
+    ],
+    "requires": "(|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|) and |@Weapons:6| and |@Tomes:9|"
+  },
+  {
+    "name": "Miniboss Hunt - Defeat 50 Minibosses",
+    "category": [
+      "Miniboss Hunt"
+    ],
+    "requires": "(|Progressive Forest Tier| or |Progressive Desert Tier| or |Graveyard Access|) and |@Weapons:6| and |@Tomes:9|"
+  },
+  {
     "name": "Tier 1 Bosses",
     "category": [
       "Goal"

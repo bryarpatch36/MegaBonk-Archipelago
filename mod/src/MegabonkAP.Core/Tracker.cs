@@ -47,6 +47,9 @@ namespace MegabonkAP.Core
         private bool _connected;
         private HashSet<string> _done = new();                   // checks the server counts as done
         private int _total;
+        private int _minibosses;                                 // defeated in this seed, over all runs
+        private int _minibossesThisStart;
+        private bool? _huntOn;                                   // whether this seed has the miniboss hunt; null before connecting
         private string? _deathLink;                              // "on", or why it is off; null before connecting
         private string? _picked;                                 // the character last confirmed in the menu
         private readonly List<Note> _notes = new();
@@ -168,11 +171,22 @@ namespace MegabonkAP.Core
         /// An enemy died, under the game's own name for it. boss: the game marks it as some kind of
         /// boss, which only matters for the log: a boss the list does not know is written down once.
         /// </summary>
-        public void EnemyKilled(string? name, bool boss)
+        public void EnemyKilled(string? name, bool boss, bool miniboss = false)
         {
             lock (_gate)
             {
                 if (!_inRun) return;
+                if (miniboss && _huntOn != false && _list.MinibossHunt.Count > 0 && RunCounts())
+                {
+                    _minibosses++;
+                    _minibossesThisStart++;
+                    int? next = _list.MinibossHunt.Keys.Cast<int?>().FirstOrDefault(n => n > _minibosses);
+                    _log.Info($"Miniboss defeated ({name}): {_minibosses} in this seed"
+                        + (next != null ? $", next check at {next}." : "."));
+                    foreach (KeyValuePair<int, string> step in _list.MinibossHunt)
+                        if (step.Key <= _minibosses) Earn(step.Value);
+                    SaveState();
+                }
                 string? check = _list.EnemyCheck(name);
                 if (check != null)
                 {
@@ -443,6 +457,7 @@ namespace MegabonkAP.Core
                     Tier = _tier,
                     RunProblem = _inRun ? RunProblem() : null,
                     DeathLink = _deathLink,
+                    Minibosses = _huntOn == true ? _minibosses : (int?)null,
                     Notes = _notes.ToList(),
                 };
             }
@@ -452,6 +467,7 @@ namespace MegabonkAP.Core
         {
             public bool Connected, ItemsKnown, Locking, InRun;
             public int Done, Total, Owed, Tier;
+            public int? Minibosses;         // defeated in this seed; null when the seed has no miniboss hunt
             public string? Character, Map, RunProblem, DeathLink;
             public IReadOnlyCollection<string> DoneChecks = Array.Empty<string>();
             public IReadOnlyDictionary<string, int> Held = new Dictionary<string, int>();
@@ -490,6 +506,13 @@ namespace MegabonkAP.Core
             }
             _done = new HashSet<string>(_link.CheckedNames);
             _total = _link.TotalChecks;
+            if (_list.MinibossHunt.Count > 0)
+            {
+                _huntOn = _link.Exists(_list.MinibossHunt.Values.First());
+                // the server remembers the hunt even when this computer's own count was lost
+                foreach (KeyValuePair<int, string> step in _list.MinibossHunt)
+                    if (_done.Contains(step.Value) && step.Key > _minibosses) _minibosses = step.Key;
+            }
         }
 
         /// <summary>Checks earned and not yet taken by the server.</summary>
@@ -611,6 +634,7 @@ namespace MegabonkAP.Core
             {
                 _owed.IntersectWith(_earnedThisStart);      // what was kept belongs to another seed
                 _sent.Clear();
+                _minibosses = _minibossesThisStart;
             }
             _session = session;
             _goalSent = false;
@@ -649,6 +673,7 @@ namespace MegabonkAP.Core
                 using JsonDocument document = JsonDocument.Parse(File.ReadAllText(_stateFile));
                 JsonElement root = document.RootElement;
                 _session = root.TryGetProperty("session", out JsonElement s) ? s.GetString() : null;
+                if (root.TryGetProperty("minibosses", out JsonElement m)) _minibosses = m.GetInt32();
                 foreach (JsonElement e in root.GetProperty("owed").EnumerateArray()) _owed.Add(e.GetString()!);
                 foreach (JsonElement e in root.GetProperty("sent").EnumerateArray()) _sent.Add(e.GetString()!);
             }
@@ -670,6 +695,7 @@ namespace MegabonkAP.Core
                 string json = JsonSerializer.Serialize(new Dictionary<string, object?>
                 {
                     ["session"] = _session,
+                    ["minibosses"] = _minibosses,
                     ["owed"] = _owed.OrderBy(c => c).ToList(),
                     ["sent"] = _sent.OrderBy(c => c).ToList(),
                 }, new JsonSerializerOptions { WriteIndented = true });

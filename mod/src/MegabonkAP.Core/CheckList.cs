@@ -89,6 +89,8 @@ namespace MegabonkAP.Core
             foreach (KeyValuePair<string, string> boss in Pairs(root.GetProperty("bosses"))) list._bossChecks[boss.Key] = boss.Value;
             foreach (KeyValuePair<string, string> enemy in Pairs(root.GetProperty("enemies")))
                 list._enemyChecks[Squeeze(enemy.Key)] = enemy.Value;
+            if (root.TryGetProperty("miniboss_hunt", out JsonElement hunt))
+                foreach (JsonProperty p in hunt.EnumerateObject()) list._hunt[int.Parse(p.Name)] = p.Value.GetString()!;
             foreach (JsonProperty kind in root.GetProperty("ignored").EnumerateObject())
                 list._ignored[kind.Name] = kind.Value.EnumerateArray().Select(e => Squeeze(e.GetString()!)).ToHashSet();
 
@@ -113,7 +115,12 @@ namespace MegabonkAP.Core
             }
             foreach (string check in _enemyChecks.Values) yield return check;
             foreach (string check in _bossChecks.Values) yield return check;
+            foreach (string check in _hunt.Values) yield return check;
         }
+
+        /// <summary>Minibosses defeated in total -> the check earned at that count, lowest first.</summary>
+        public IReadOnlyDictionary<int, string> MinibossHunt => _hunt;
+        private readonly SortedDictionary<int, string> _hunt = new();
 
         /// <summary>Every item the mod reads permissions from.</summary>
         public IEnumerable<string> AllItems() =>

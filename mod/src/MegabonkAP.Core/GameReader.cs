@@ -100,7 +100,10 @@ namespace MegabonkAP.Core
                 int flags = Dyn.Int(Dyn.Get(enemy, "enemyFlag")) ?? 0;
                 bool boss = (flags & (2 | 4 | 16 | 32)) != 0;
                 if (boss) _bossDeaths++;
-                _tracker.EnemyKilled(name, boss);
+                // a miniboss: named one, or called up at a boss statue; never the boss that ends a stage
+                bool miniboss = (flags & (4 | 32)) == 0
+                    && ((flags & 16) != 0 || name.StartsWith("Miniboss", StringComparison.OrdinalIgnoreCase));
+                _tracker.EnemyKilled(name, boss, miniboss);
 
                 if (!StageBossEvent && (flags & (4 | 32)) != 0) _tracker.StageBossDied(TierFinal());
             }

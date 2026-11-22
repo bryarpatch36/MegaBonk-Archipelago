@@ -180,6 +180,70 @@ namespace MegabonkAP.Tests
         }
 
         [Fact]
+        public void MinibossesAddUpOverRunsAndEarnAtEachStep()
+        {
+            Tracker tracker = Start("Character - Fox", "Progressive Forest Tier");
+            tracker.RunStarted("Fox", "Forest", 1);
+            tracker.EnemyKilled("MinibossPig", true, miniboss: true);
+            tracker.EnemyKilled("Goblin", false);
+            tracker.EnemyKilled("MinibossGolem", true, miniboss: true);
+            Assert.Contains("Miniboss Hunt - Defeat 2 Minibosses", _link.Sent);
+            Assert.DoesNotContain("Miniboss Hunt - Defeat 3 Minibosses", _link.Sent);
+
+            tracker.RunStarted("Fox", "Forest", 1);                 // the next run goes on counting
+            for (int i = 0; i < 6; i++) tracker.EnemyKilled("MinibossPig", true, miniboss: true);
+            Assert.Contains("Miniboss Hunt - Defeat 8 Minibosses", _link.Sent);
+            Assert.DoesNotContain("Miniboss Hunt - Defeat 10 Minibosses", _link.Sent);
+            Assert.True(_log.Has("Miniboss defeated (MinibossPig): 8 in this seed, next check at 10."));
+        }
+
+        [Fact]
+        public void MinibossesInARunThatDoesNotCountAreNotCounted()
+        {
+            Tracker tracker = Start("Character - Fox", "Progressive Forest Tier");
+            tracker.RunStarted("Calcium", "Forest", 1);
+            tracker.EnemyKilled("MinibossPig", true, miniboss: true);
+            Assert.Empty(_link.Sent);
+        }
+
+        [Fact]
+        public void ASeedWithoutTheHuntCountsNothing()
+        {
+            _link.NotInSeed.UnionWith(_list.MinibossHunt.Values);
+            Tracker tracker = Start("Character - Fox", "Progressive Forest Tier");
+            tracker.RunStarted("Fox", "Forest", 1);
+            tracker.EnemyKilled("MinibossPig", true, miniboss: true);
+            Assert.Equal(new[] { "Forest - Defeat Chunkham the Terrible" }, _link.Sent);
+            Assert.False(_log.Has("Miniboss defeated"));
+        }
+
+        [Fact]
+        public void TheCountSurvivesARestartAndIsTakenFromTheServerWhenLost()
+        {
+            string file = Path.Combine(Path.GetTempPath(), "megabonkap-hunt-" + Guid.NewGuid().ToString("N") + ".json");
+            try
+            {
+                var first = new Tracker(_list, _link, _log, file);
+                _link.Give("Character - Fox", "Progressive Forest Tier");
+                first.RunStarted("Fox", "Forest", 1);
+                for (int i = 0; i < 3; i++) first.EnemyKilled("MinibossPig", true, miniboss: true);
+
+                var second = new Tracker(_list, _link, _log, file);         // the game was restarted
+                _link.Announce();
+                second.RunStarted("Fox", "Forest", 1);
+                second.EnemyKilled("MinibossPig", true, miniboss: true);
+                Assert.Contains("Miniboss Hunt - Defeat 4 Minibosses", _link.Sent);
+
+                var fresh = new Tracker(_list, _link, _log);                // another computer: no file, only the server
+                _link.Announce();
+                fresh.RunStarted("Fox", "Forest", 1);
+                fresh.EnemyKilled("MinibossPig", true, miniboss: true);
+                Assert.Contains("Miniboss Hunt - Defeat 5 Minibosses", _link.Sent);
+            }
+            finally { File.Delete(file); }
+        }
+
+        [Fact]
         public void ATier1RunWithAHeldCharacterEarnsTheTierAndTheRun()
         {
             Tracker tracker = Start("Character - Fox", "Progressive Forest Tier");

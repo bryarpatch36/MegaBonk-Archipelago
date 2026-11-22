@@ -291,7 +291,8 @@ namespace MegabonkAP.Tests
             Assert.Equal(
                 "Archipelago  1/110 checks  DeathLink off\n"
                 + "Held: 2 characters, 1 weapons, 1 tomes\n"
-                + "Maps: Forest Tier 2, Desert locked, Graveyard locked",
+                + "Maps: Forest Tier 2, Desert locked, Graveyard locked\n"
+                + "Minibosses: 0 (next check at 1)",
                 Plain(Show(tracker)));
         }
 
@@ -366,6 +367,23 @@ namespace MegabonkAP.Tests
             _link.Announce();
             Assert.Contains("DeathLink off", Plain(Show(tracker)));
             Assert.True(_log.Has("DeathLink is off in the mod's settings."));
+        }
+
+        [Fact]
+        public void TheMinibossHuntShowsItsCountAndIsLeftOutWhenTheSeedHasNone()
+        {
+            Tracker tracker = Start("Character - Fox", "Progressive Forest Tier");
+            tracker.RunStarted("Fox", "Forest", 1);
+            for (int i = 0; i < 6; i++) tracker.EnemyKilled("MinibossPig", true, miniboss: true);
+            Assert.Contains("Minibosses: 6 (next check at 8)", Plain(Show(tracker)));
+            for (int i = 0; i < 44; i++) tracker.EnemyKilled("MinibossPig", true, miniboss: true);
+            Assert.Contains("Minibosses: 50 (hunt done)", Plain(Show(tracker)));
+
+            var other = new FakeLink();
+            other.NotInSeed.UnionWith(_list.MinibossHunt.Values);
+            var without = new Tracker(_list, other, _log, null, () => _now);
+            other.Give("Character - Fox");
+            Assert.DoesNotContain("Minibosses", Plain(Overlay.Render(without.Look(), _list, Overlay.Full, _now)));
         }
 
         [Fact]

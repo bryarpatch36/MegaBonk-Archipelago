@@ -20,8 +20,7 @@ namespace MegabonkAP.Core
         private readonly object _gate = new();
 
         private readonly Dictionary<string, int> _levels = new();      // "weapon:Sword" -> last level passed on
-        private readonly Queue<long> _recentOrder = new();
-        private readonly HashSet<long> _recent = new();                 // enemies whose death was already counted
+        private readonly Dictionary<long, DateTime> _recent = new();    // enemy -> when its death was last counted
         private int _playerLevel = -1;
         private int _deaths;
         private int _bossDeaths;
@@ -50,7 +49,6 @@ namespace MegabonkAP.Core
             {
                 _levels.Clear();
                 _recent.Clear();
-                _recentOrder.Clear();
                 _playerLevel = -1;
                 _deaths = 0;
                 _bossDeaths = 0;
@@ -100,9 +98,10 @@ namespace MegabonkAP.Core
                 int flags = Dyn.Int(Dyn.Get(enemy, "enemyFlag")) ?? 0;
                 bool boss = (flags & (2 | 4 | 16 | 32)) != 0;
                 if (boss) _bossDeaths++;
-                // a miniboss: named one, or called up at a boss statue; never the boss that ends a stage
+                // a miniboss: any boss that does not end a stage, the ones called up at a boss statue included
                 bool miniboss = (flags & (4 | 32)) == 0
-                    && ((flags & 16) != 0 || name.StartsWith("Miniboss", StringComparison.OrdinalIgnoreCase));
+                    && ((flags & (2 | 16)) != 0 || name.StartsWith("Miniboss", StringComparison.OrdinalIgnoreCase));
+                if (boss) _log.Info($"Boss death: {name}, flags {flags}" + (miniboss ? "." : ", not a miniboss."));
                 _tracker.EnemyKilled(name, boss, miniboss);
 
                 if (!StageBossEvent && (flags & (4 | 32)) != 0) _tracker.StageBossDied(TierFinal());
@@ -685,12 +684,19 @@ namespace MegabonkAP.Core
             return RuntimeHelpers.GetHashCode(thing);
         }
 
+        /// <summary>
+        /// False when this enemy's death was already counted a moment ago (the game can report one
+        /// death twice). The game reuses its enemy objects, so the same object dying again later
+        /// is a new enemy and counts.
+        /// </summary>
         private bool FirstTime(object enemy)
         {
             long id = Identity(enemy);
-            if (!_recent.Add(id)) return false;
-            _recentOrder.Enqueue(id);
-            if (_recentOrder.Count > 512) _recent.Remove(_recentOrder.Dequeue());
+            DateTime now = Now();
+            if (_recent.TryGetValue(id, out DateTime before) && (now - before).TotalSeconds < 1) return false;
+            _recent[id] = now;
+            if (_recent.Count > 2048)
+                foreach (long old in _recent.Where(r => (now - r.Value).TotalSeconds >= 1).Select(r => r.Key).ToList()) _recent.Remove(old);
             return true;
         }
 

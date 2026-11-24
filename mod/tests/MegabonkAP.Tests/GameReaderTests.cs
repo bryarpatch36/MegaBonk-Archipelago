@@ -288,10 +288,35 @@ namespace MegabonkAP.Tests
             Begin(Forest(1), ECharacter.Fox);
             Dies(EEnemy.Goblin, EEnemyFlag.SummonerMiniboss);       // called up at a statue: any enemy can be one
             Dies(EEnemy.MinibossPig, EEnemyFlag.Boss);
+            Dies(EEnemy.Goblin, EEnemyFlag.Boss);                   // a boss by its flag alone
             Dies(EEnemy.Ent1, EEnemyFlag.StageBoss);
+            Dies(EEnemy.Ent1, EEnemyFlag.Boss | EEnemyFlag.StageBoss);
+            Dies(EEnemy.Bush, EEnemyFlag.Boss);                     // a hidden boss has its own check and is no miniboss
             Dies(EEnemy.Golem);
-            Assert.Contains("Miniboss Hunt - Defeat 2 Minibosses", _link.Sent);
-            Assert.DoesNotContain("Miniboss Hunt - Defeat 3 Minibosses", _link.Sent);
+            Dies(EEnemy.Goblin, EEnemyFlag.Elite);
+            Assert.Contains("Miniboss Hunt - Defeat 3 Minibosses", _link.Sent);
+            Assert.DoesNotContain("Miniboss Hunt - Defeat 4 Minibosses", _link.Sent);
+            Assert.True(_log.Has("Boss death: Goblin, flags 16."));
+            Assert.True(_log.Has("Boss death: Ent1, flags 4, not a miniboss."));
+        }
+
+        [Fact]
+        public void TheGameReusesItsEnemyObjectsAndEachLifeCounts()
+        {
+            _link.Give("Character - Fox", "Progressive Forest Tier");
+            Begin(Forest(1), ECharacter.Fox);
+            DateTime now = DateTime.UtcNow;
+            _reader.Now = () => now;
+            var pig = new Enemy { enemyData = { enemyName = EEnemy.MinibossPig }, enemyFlag = EEnemyFlag.Boss, Pointer = new IntPtr(9001) };
+            _reader.EnemyDied(pig);
+            _reader.EnemyDied(pig);                                 // the same death, reported twice
+            Assert.DoesNotContain("Miniboss Hunt - Defeat 2 Minibosses", _link.Sent);
+
+            now = now.AddSeconds(20);                               // the same object, back as the next statue's miniboss
+            _reader.EnemyDied(pig);
+            now = now.AddSeconds(20);
+            _reader.EnemyDied(pig);
+            Assert.Contains("Miniboss Hunt - Defeat 3 Minibosses", _link.Sent);
         }
 
         private PlayerHealth DeathLinkRun()

@@ -176,6 +176,9 @@ namespace MegabonkAP.Core
             lock (_gate)
             {
                 if (!_inRun) return;
+                // a boss with a check of its own that is not a miniboss (the Suspicious Bush, the Bandit) is not one for the hunt
+                if (miniboss && _list.EnemyCheck(name) != null && !(name ?? "").StartsWith("Miniboss", StringComparison.OrdinalIgnoreCase))
+                    miniboss = false;
                 if (miniboss && _huntOn != false && _list.MinibossHunt.Count > 0 && RunCounts())
                 {
                     _minibosses++;
@@ -183,6 +186,8 @@ namespace MegabonkAP.Core
                     int? next = _list.MinibossHunt.Keys.Cast<int?>().FirstOrDefault(n => n > _minibosses);
                     _log.Info($"Miniboss defeated ({name}): {_minibosses} in this seed"
                         + (next != null ? $", next check at {next}." : "."));
+                    if (_huntOn == true && !_list.MinibossHunt.ContainsKey(_minibosses))
+                        Tell(next != null ? $"Miniboss {_minibosses} defeated: next check at {next}." : $"Miniboss {_minibosses} defeated.");
                     foreach (KeyValuePair<int, string> step in _list.MinibossHunt)
                         if (step.Key <= _minibosses) Earn(step.Value);
                     SaveState();

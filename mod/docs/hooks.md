@@ -50,7 +50,7 @@ For the overlay, one of these gives the mod its turn every frame; whichever exis
 | `WeaponInventory` | `weapons.ContainsKey(EWeapon)`, `GetWeaponLevel(EWeapon)` | Each weapon's level, asked for every `EWeapon` in turn |
 | `TomeInventory` | `HasTome(ETome)`, `GetTomeLevel(ETome)` | Each tome's level |
 | `PlayerXp` | `level` | The player's level |
-| `Enemy` | `enemyData.enemyName` (`EEnemy`), `enemyFlag` (`EEnemyFlag`) | Which enemy died and whether it is a boss. For the miniboss hunt: flag `SummonerMiniboss` (16) or a name starting with `Miniboss`, and neither `StageBoss` (4) nor `FinalBoss` (32) |
+| `Enemy` | `enemyData.enemyName` (`EEnemy`), `enemyFlag` (`EEnemyFlag`) | Which enemy died and whether it is a boss. For the miniboss hunt: flag `Boss` (2) or `SummonerMiniboss` (16) or a name starting with `Miniboss`, neither `StageBoss` (4) nor `FinalBoss` (32), and not the Bush or the Bandit. A death of the same object (`Pointer`) within a second is one death; later it is a new enemy, because the game reuses its enemy objects |
 | `GraveyardBossRoom` | `bossEnemy` | The Graveyard's boss |
 | `ChallengesTracker` (static) | `GetCurrentChallenge()` | The challenge just completed |
 | `PlayerHealth` | `IsDead()`, `KillPlayer()`; `hp`, `shield`, `overheal`, `CheckDead()` if that does not kill | DeathLink, both ways, looked at a few times a second. Found through `GameManager.Instance.player.inventory.playerHealth`, else `MyPlayer.Instance`, else `MapController.inventory` |

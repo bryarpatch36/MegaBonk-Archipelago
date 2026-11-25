@@ -30,7 +30,7 @@ jobs:
         id: versions
         run: |
           mod=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' mod/src/MegabonkAP.Plugin/MegabonkAP.Plugin.csproj)
-          world=$(python -c "import json; print(json.load(open('manual_megabonk_bryarpatch36/archipelago.json'))['world_version'])")
+          world=$(python -c "import json; print(json.load(open('manual_megabonk_ap/archipelago.json'))['world_version'])")
           test -n "$mod" && test -n "$world"
           echo "mod=$mod" >> "$GITHUB_OUTPUT"
           echo "world=$world" >> "$GITHUB_OUTPUT"
@@ -69,12 +69,12 @@ jobs:
         run: |
           cat > notes.md <<EOF
           - \`MegabonkAP-${MOD}.zip\`: the mod. Import it in r2modman or Gale, or install it by hand (see mod/README.md).
-          - \`manual_megabonk_bryarpatch36.apworld\`: the world, version ${WORLD}. Every Megabonk player and whoever generates needs this same file.
+          - \`manual_megabonk_ap.apworld\`: the world, version ${WORLD}. Every Megabonk player and whoever generates needs this same file.
           - \`Bonker.yaml\`: a player file to start from.
           EOF
           gh release create "$TAG" \
             "MegabonkAP-${MOD}.zip" \
-            manual_megabonk_bryarpatch36.apworld \
+            manual_megabonk_ap.apworld \
             Bonker.yaml \
             --target "$GITHUB_SHA" \
             --title "MegabonkAP ${MOD}, world ${WORLD}" \

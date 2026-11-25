@@ -1,11 +1,11 @@
-"""Package the manual_megabonk_bryarpatch36 folder into manual_megabonk_bryarpatch36.apworld.
+"""Package the manual_megabonk_ap folder into manual_megabonk_ap.apworld.
 
 Run from anywhere:  python build_apworld.py
 """
 import zipfile
 from pathlib import Path
 
-NAME = "manual_megabonk_bryarpatch36"
+NAME = "manual_megabonk_ap"
 root = Path(__file__).resolve().parent
 src = root / NAME
 target = root / f"{NAME}.apworld"

@@ -22,7 +22,7 @@ namespace MegabonkAP.Tests
             throw new FileNotFoundException(string.Join("/", parts));
         }
 
-        private static string WorldData(string file) => Repo("manual_megabonk_bryarpatch36", "data", file);
+        private static string WorldData(string file) => Repo("manual_megabonk_ap", "data", file);
 
         /// <summary>The value names of an enum of the real game (game-enums-1.0.69.txt, next to this file).</summary>
         private static string[] GameEnum(string name)

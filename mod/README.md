@@ -33,7 +33,7 @@ Version 0.5.0. It has been played on the real game up to version 0.4.1. The game
 1. **Back up your save and consider the leaderboard.** Megabonk has online leaderboards, and community guides say modded play can get scores flagged. Check the game's own setting for uploading scores before playing modded.
 2. In r2modman, select Megabonk and a profile, then **Settings → Import local mod** and pick the zip. Gale has the same under **File → Import local mod**. BepInEx (`BepInExPack_IL2CPP`) is named as a dependency; install it from the Online tab if the manager does not add it.
 3. Start the game once and close it. BepInEx sets itself up on that first start, which takes a few minutes, and the mod's settings file appears.
-4. Set `Server` and `Slot` in the manager's config editor (`bryarpatch36.megabonk.archipelago.cfg`).
+4. Set `Server` and `Slot` in the manager's config editor (`megabonk.archipelago.cfg`).
 5. Start the game with the room running.
 
 ### Installing it by hand
@@ -42,7 +42,7 @@ A mod manager is not required. The mod is four `.dll` files that BepInEx loads f
 
 1. Install BepInEx 6 for IL2CPP into the game folder (the Megabonk community uses the bleeding-edge build, packaged on Thunderstore as `BepInExPack_IL2CPP`), start the game once and close it.
 2. Unpack the zip and copy its four `.dll` files (`MegabonkAP.dll`, `MegabonkAP.Core.dll`, `Archipelago.MultiClient.Net.dll`, `Newtonsoft.Json.dll`) into a new folder `BepInEx/plugins/MegabonkAP/`. The other files in the zip are for mod managers and are not needed.
-3. Start the game once more and close it, so the settings file appears, then set `Server` and `Slot` in `BepInEx/config/bryarpatch36.megabonk.archipelago.cfg` with a text editor:
+3. Start the game once more and close it, so the settings file appears, then set `Server` and `Slot` in `BepInEx/config/megabonk.archipelago.cfg` with a text editor:
 
    ```
    Server = archipelago.gg:38281
@@ -53,13 +53,13 @@ Install it one way or the other, not both, or the mod loads twice. The runs reco
 
 ### Coming from a build before 0.5.0
 
-- The settings file had a different name. 0.5.0 creates `bryarpatch36.megabonk.archipelago.cfg`: set `Server` and `Slot` again there, and delete the older `...megabonk.archipelago.cfg` next to it.
+- The settings file had a longer name. 0.5.0 creates `megabonk.archipelago.cfg`: set `Server` and `Slot` again there, and delete the older file next to it, whose name ends in `.megabonk.archipelago.cfg`.
 - The world's game ID changed too, so 0.5.0 needs world 0.3.0 and a seed generated with it. A seed generated with an older world cannot be continued.
 - If you installed an earlier build by hand, delete `BepInEx/plugins/MegabonkAP` in the profile folder first, or the mod loads twice.
 
 ## Settings
 
-`BepInEx/config/bryarpatch36.megabonk.archipelago.cfg`, created on first start.
+`BepInEx/config/megabonk.archipelago.cfg`, created on first start.
 
 | Setting | Default | Does |
 |---|---|---|

@@ -20,7 +20,7 @@ from pathlib import Path
 
 import websockets
 
-GAME = "Manual_Megabonk_bryarpatch36"
+GAME = "Manual_Megabonk_AP"
 
 
 def free_port() -> int:

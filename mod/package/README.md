@@ -1,13 +1,13 @@
 # Megabonk Archipelago
 
-Connects Megabonk to an [Archipelago](https://archipelago.gg) multiworld: the mod watches the game and sends your checks by itself, locks what you do not hold yet, and shows a tracker on screen (`F8`, or clicking both sticks of a controller, changes its view). It goes with the `manual_megabonk_bryarpatch36` world, on the same [Releases page](https://github.com/bryarpatch36/MegaBonk-Archipelago/releases).
+Connects Megabonk to an [Archipelago](https://archipelago.gg) multiworld: the mod watches the game and sends your checks by itself, locks what you do not hold yet, and shows a tracker on screen (`F8`, or clicking both sticks of a controller, changes its view). It goes with the `manual_megabonk_ap` world, on the same [Releases page](https://github.com/bryarpatch36/MegaBonk-Archipelago/releases).
 
 This is an unofficial fan project. It is not affiliated with or endorsed by vedinad or the Archipelago project.
 
 ## Setting it up
 
 1. Start the game once through the mod manager and close it. This creates the settings file.
-2. In the mod manager open the config editor and pick `bryarpatch36.megabonk.archipelago.cfg`. Set `Server` to your room's address and port, and `Slot` to your slot name. Nothing is sent while `Slot` is empty.
+2. In the mod manager open the config editor and pick `megabonk.archipelago.cfg`. Set `Server` to your room's address and port, and `Slot` to your slot name. Nothing is sent while `Slot` is empty.
 3. Start the game with the room running. Lines from the mod in `BepInEx/LogOutput.log` start with `[Info :MegabonkAP]`.
 
 ## Settings

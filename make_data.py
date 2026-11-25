@@ -8,7 +8,7 @@ The lists are the single place to change when the game adds a character, weapon,
 import json
 from pathlib import Path
 
-WORLD = "manual_megabonk_bryarpatch36"
+WORLD = "manual_megabonk_ap"
 data = Path(__file__).resolve().parent / WORLD / "data"
 
 # character -> the weapon that character always starts a run with
@@ -207,7 +207,7 @@ options = {
 
 game = {
     "game": "Megabonk",
-    "creator": "bryarpatch36",
+    "creator": "AP",
     "filler_item_name": "Bonk",
     "death_link": True,
     "starting_items": [
@@ -282,7 +282,7 @@ mod_maps["Graveyard"] = {
 }
 
 mod_checks = {
-    "game": "Manual_Megabonk_bryarpatch36",
+    "game": "Manual_Megabonk_AP",
     "levels": {"character": CHARACTER_LEVEL, "weapon": WEAPON_LEVEL, "tome": TOME_LEVEL},
     "characters": {
         name: {"item": f"Character - {name}", "weapon": weapon,

@@ -3,9 +3,9 @@
 
 name: Bonker                       # your slot name: what you type when the client asks who you are
 description: Megabonk, hand-checked
-game: Manual_Megabonk_bryarpatch36
+game: Manual_Megabonk_AP
 
-Manual_Megabonk_bryarpatch36:
+Manual_Megabonk_AP:
   goal: tier 2 bosses              # tier 1 bosses, tier 2 bosses or tier 3 bosses: finish that tier on Forest and on Desert
   include_character_levels: true   # a check for reaching Level 30 with each character
   include_hidden_bosses: true      # checks for the Suspicious Bush, the Bandit and Spooky Steve

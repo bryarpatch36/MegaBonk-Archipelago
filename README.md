@@ -27,11 +27,11 @@ The lists of characters, weapons and tomes come from a public Megabonk database 
 
 ## Install and play
 
-1. Download `manual_megabonk_bryarpatch36.apworld` from the [Releases page](https://github.com/bryarpatch36/MegaBonk-Archipelago/releases) and give it to every Megabonk player and to whoever generates.
+1. Download `manual_megabonk_ap.apworld` from the [Releases page](https://github.com/bryarpatch36/MegaBonk-Archipelago/releases) and give it to every Megabonk player and to whoever generates.
 2. In the Archipelago Launcher, click "Install APWorld", pick the file, and restart the Launcher.
-3. Each Megabonk player needs a YAML with `game: Manual_Megabonk_bryarpatch36`. [Bonker.yaml](Bonker.yaml) is ready to use (it is on the Releases page too): copy it into the `Players` folder and change `name` to your slot name.
+3. Each Megabonk player needs a YAML with `game: Manual_Megabonk_AP`. [Bonker.yaml](Bonker.yaml) is ready to use (it is on the Releases page too): copy it into the `Players` folder and change `name` to your slot name.
 4. Generate the multiworld locally, then host the result.
-5. Each Megabonk player opens "Manual Client" in the Launcher and connects with the game ID `Manual_Megabonk_bryarpatch36`.
+5. Each Megabonk player opens "Manual Client" in the Launcher and connects with the game ID `Manual_Megabonk_AP`.
 6. Before each run, look at the items you hold and set the Toggler to match. After the run, tick what you did in the client's "Manual" tab.
 
 With the mod, step 6 is done for you: install it as [mod/README.md](mod/README.md) describes. The Manual Client can stay open next to it.
@@ -88,8 +88,8 @@ So that nobody is asked for a long run with nothing in hand, the generator only 
 
 - `make_data.py` holds every list (characters and their starting weapons, weapons, tomes, bosses, challenges) and the level numbers (`CHARACTER_LEVEL`, `WEAPON_LEVEL`, `TOME_LEVEL`), and writes the world's `data/*.json` from them. Change a name or a number there, never in the JSON.
 - `make_data.py` also writes `mod/src/MegabonkAP.Core/checks.json`, the same names for the mod, so the two cannot disagree.
-- `build_apworld.py` packs `manual_megabonk_bryarpatch36/` into `manual_megabonk_bryarpatch36.apworld`. The built file is not committed: releases are built from the source.
-- Bump `world_version` in `manual_megabonk_bryarpatch36/archipelago.json` on every change, and give the new `.apworld` to every player before generating: all players need the same one.
+- `build_apworld.py` packs `manual_megabonk_ap/` into `manual_megabonk_ap.apworld`. The built file is not committed: releases are built from the source.
+- Bump `world_version` in `manual_megabonk_ap/archipelago.json` on every change, and give the new `.apworld` to every player before generating: all players need the same one.
 
 ```
 python make_data.py

@@ -19,8 +19,8 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-WORLD = "manual_megabonk_bryarpatch36"
-GAME = "Manual_Megabonk_bryarpatch36"
+WORLD = "manual_megabonk_ap"
+GAME = "Manual_Megabonk_AP"
 DATA = ROOT / WORLD / "data"
 
 locations = json.loads((DATA / "locations.json").read_text(encoding="utf-8"))

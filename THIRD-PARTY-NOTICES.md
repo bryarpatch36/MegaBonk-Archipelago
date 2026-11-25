@@ -5,7 +5,7 @@ redistributes the following third-party software, each under the MIT License.
 
 | Software | Where it is | Copyright |
 |---|---|---|
-| [Manual for Archipelago](https://github.com/ManualForArchipelago/Manual) | The world template: the Python files in `manual_megabonk_bryarpatch36/` (everything except `data/`, `docs/` and the Megabonk-specific code in `hooks/`), and so the `.apworld` | Copyright (c) 2023 Manual for Archipelago |
+| [Manual for Archipelago](https://github.com/ManualForArchipelago/Manual) | The world template: the Python files in `manual_megabonk_ap/` (everything except `data/`, `docs/` and the Megabonk-specific code in `hooks/`), and so the `.apworld` | Copyright (c) 2023 Manual for Archipelago |
 | [Archipelago.MultiClient.Net](https://github.com/ArchipelagoMW/Archipelago.MultiClient.Net) | `Archipelago.MultiClient.Net.dll` in the mod's zip | Copyright (c) 2022 Hussein Farran, Jarno Westhof |
 | [Json.NET (Newtonsoft.Json)](https://github.com/JamesNK/Newtonsoft.Json) | `Newtonsoft.Json.dll` in the mod's zip | Copyright (c) 2007 James Newton-King |
 

@@ -21,8 +21,11 @@ version = re.search(r"<Version>([^<]+)</Version>", project.read_text(encoding="u
 
 subprocess.run(["dotnet", "build", str(project), "-c", "Release", "--nologo", "-v", "quiet"], check=True)
 
+# "author" is not part of Thunderstore's manifest, but r2modman and Gale read it when a zip is
+# imported by hand; without it r2modman shows the author as "Unknown".
 manifest = {
     "name": "MegabonkArchipelago",
+    "author": "bryarpatch36",
     "version_number": version,
     "website_url": "https://github.com/bryarpatch36/MegaBonk-Archipelago",
     "description": "Sends your Megabonk checks to an Archipelago multiworld automatically.",

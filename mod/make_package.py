@@ -38,6 +38,9 @@ with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as zf:
     zf.writestr("manifest.json", json.dumps(manifest, indent=2) + "\n")
     zf.write(mod / "package" / "icon.png", "icon.png")
     zf.write(mod / "package" / "README.md", "README.md")
+    # the licence of the mod and of the two libraries packed with it
+    for notice in ("LICENSE", "THIRD-PARTY-NOTICES.md"):
+        zf.write(mod.parent / notice, notice)
     for p in dlls:
         zf.write(p, p.name)
 

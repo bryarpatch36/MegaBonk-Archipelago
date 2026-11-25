@@ -3,7 +3,7 @@
 Megabonk as a game in an [Archipelago](https://archipelago.gg) multiworld. It has two parts:
 
 - **A Manual world.** Nothing is installed into the game. You play Megabonk normally, the items you are sent decide which characters, weapons, tomes and maps you may use, and you tick off what you have done in Archipelago's Manual Client.
-- **MegabonkAP, a mod (in progress).** A BepInEx plugin that sends the checks for you as you play. It loads in the game, attaches its hooks and connects; reading the game correctly is still being worked through, one test run at a time: see [mod/README.md](mod/README.md).
+- **MegabonkAP, an optional mod.** A BepInEx plugin that sends the checks for you as you play, locks what you do not hold yet and shows a tracker on screen. It has been played on the real game; a few parts are still untested: see [mod/README.md](mod/README.md).
 
 This is an unofficial fan project. It is not affiliated with or endorsed by vedinad or the Archipelago project.
 
@@ -13,11 +13,10 @@ This is an unofficial fan project. It is not affiliated with or endorsed by vedi
 |---|---|
 | Generating a multiworld with every option combination | Works (automated test) |
 | Hosting a seed, connecting as the slot, sending checks, receiving items, reaching the goal | Works against a local Archipelago 0.6.8 server (automated test, no game involved) |
-| Playing it with the Manual Client and the real game | Not yet tried |
-| Checks sent by themselves (the mod) | Loads in Megabonk 1.0.69, attaches its hooks and connects. No check has been sent from the game yet ([mod/README.md](mod/README.md)) |
-| Rules enforced by the game | Not built |
+| Playing it on the real game with the mod: checks sent by themselves, locks, the tracker, DeathLink, the miniboss hunt | Works on the real game. Not yet confirmed there: the Graveyard checks, Spooky Steve, the challenge checks ([mod/README.md](mod/README.md)) |
+| Playing it on the real game without the mod, ticking every check in the Manual Client | Not tried on its own. The world is the same one the mod plays |
 
-The lists of characters, weapons and tomes come from a public Megabonk database as of November 2026, and all match the game's own code (version 1.0.69). The game's code also names four tomes the world does not have (Bounce, Balance, Gambler, Hoarder); they are not offered in a run, so they stay out. Megabonk was not available on the PC this was built on, so three things were taken from guides rather than seen in the game and may need a correction after a first session: the challenge names, the Graveyard checks, and the level numbers the checks ask for (see "Building and changing it").
+The lists of characters, weapons and tomes come from a public Megabonk database as of November 2026, and all match the game's own code (version 1.0.69). The game's code also names four tomes the world does not have (Bounce, Balance, Gambler, Hoarder); they are not offered in a run, so they stay out. Three things were taken from guides rather than checked in the game and may need correcting: the challenge names, the Graveyard checks, and the level numbers the checks ask for (see "Building and changing it").
 
 ## What you need
 
@@ -28,14 +27,16 @@ The lists of characters, weapons and tomes come from a public Megabonk database 
 
 ## Install and play
 
-1. Give `manual_megabonk_bbush.apworld` from this folder to every Megabonk player and to whoever generates.
+1. Download `manual_megabonk_bryarpatch36.apworld` from the [Releases page](https://github.com/bryarpatch36/MegaBonk-Archipelago/releases) and give it to every Megabonk player and to whoever generates.
 2. In the Archipelago Launcher, click "Install APWorld", pick the file, and restart the Launcher.
-3. Each Megabonk player needs a YAML with `game: Manual_Megabonk_bbush`. [Bonker.yaml](Bonker.yaml) is ready to use: copy it into the `Players` folder and change `name` to your slot name.
+3. Each Megabonk player needs a YAML with `game: Manual_Megabonk_bryarpatch36`. [Bonker.yaml](Bonker.yaml) is ready to use (it is on the Releases page too): copy it into the `Players` folder and change `name` to your slot name.
 4. Generate the multiworld locally, then host the result.
-5. Each Megabonk player opens "Manual Client" in the Launcher and connects with the game ID `Manual_Megabonk_bbush`.
+5. Each Megabonk player opens "Manual Client" in the Launcher and connects with the game ID `Manual_Megabonk_bryarpatch36`.
 6. Before each run, look at the items you hold and set the Toggler to match. After the run, tick what you did in the client's "Manual" tab.
 
-An APWorld is Python code that runs whenever Archipelago starts. Install this one, like any other, only if you trust where it came from; the full source is in this folder.
+With the mod, step 6 is done for you: install it as [mod/README.md](mod/README.md) describes. The Manual Client can stay open next to it.
+
+An APWorld is Python code that runs whenever Archipelago starts. Install this one, like any other, only if you trust where it came from; the full source is in this repository.
 
 ## Rules of play
 
@@ -48,7 +49,7 @@ An APWorld is Python code that runs whenever Archipelago starts. Install this on
 - **Goal.** Complete the chosen tier on both Forest and Desert: `tier 1 bosses`, `tier 2 bosses` (the default) or `tier 3 bosses`.
 - **DeathLink** (off by default). The Manual Client gets a Death Link button: press it when you die, and when someone else dies, end your run.
 
-These rules are on your honour, as in any Manual game.
+Without the mod these rules are on your honour, as in any Manual game. The mod enforces them: a locked character, map or tier cannot be started, and a locked weapon or tome cannot be picked.
 
 ### Things your save has not unlocked
 
@@ -79,16 +80,16 @@ So that nobody is asked for a long run with nothing in hand, the generator only 
 
 ## What this does not do
 
-- **No automatic checks yet.** You tick every check yourself until the mod in [mod/](mod/README.md) has been tried in the game. Two other attempts at a Megabonk Archipelago mod are public, both unfinished as of November 2026: one repository of empty files, and Bonkipelago, a two-day prototype without a release or a world.
-- **No enforcement.** The game does not know what you hold. The Toggler covers weapons and tomes; characters and tiers are on your honour.
+- **Nothing is automatic without the mod.** You tick every check yourself, and the game does not know what you hold: the Toggler covers weapons and tomes; characters and tiers are on your honour. The mod in [mod/](mod/README.md) sends the checks and enforces the rules.
+- **The miniboss hunt needs the mod.** The game shows no total of minibosses defeated, so without the mod you would have to count them yourself; `include_miniboss_hunt: false` takes those checks out.
 - **In-run items are not part of it.** The game's 85 pickup items are not in the item pool.
 
 ## Building and changing it
 
 - `make_data.py` holds every list (characters and their starting weapons, weapons, tomes, bosses, challenges) and the level numbers (`CHARACTER_LEVEL`, `WEAPON_LEVEL`, `TOME_LEVEL`), and writes the world's `data/*.json` from them. Change a name or a number there, never in the JSON.
 - `make_data.py` also writes `mod/src/MegabonkAP.Core/checks.json`, the same names for the mod, so the two cannot disagree.
-- `build_apworld.py` packs `manual_megabonk_bbush/` into `manual_megabonk_bbush.apworld`.
-- Bump `world_version` in `manual_megabonk_bbush/archipelago.json` on every change, and give the new `.apworld` to every player before generating: all players need the same one.
+- `build_apworld.py` packs `manual_megabonk_bryarpatch36/` into `manual_megabonk_bryarpatch36.apworld`. The built file is not committed: releases are built from the source.
+- Bump `world_version` in `manual_megabonk_bryarpatch36/archipelago.json` on every change, and give the new `.apworld` to every player before generating: all players need the same one.
 
 ```
 python make_data.py
@@ -104,7 +105,20 @@ python tests/e2e_local_server.py <archipelago source folder> <seed zip> Bonker
 
 `test_generate.py` generates a seed for every option combination and checks the number of checks, the goal and the starting items. `e2e_local_server.py` hosts a seed on a local server and plays the slot without the game. The mod has its own tests: see [mod/README.md](mod/README.md).
 
+### Publishing a release
+
+The "Release" workflow (`.github/workflows/release.yml`) builds the `.apworld` and the mod's zip from the source, runs the mod's tests and publishes both files, with `Bonker.yaml`, on the [Releases page](https://github.com/bryarpatch36/MegaBonk-Archipelago/releases). On GitHub: **Actions → Release → Run workflow**. The release is tagged from the two versions (`mod-<mod version>_world-<world version>`), so bump at least one of them first: `world_version` in `archipelago.json`, or `<Version>` in `mod/src/MegabonkAP.Plugin/MegabonkAP.Plugin.csproj` together with `Version` in `Plugin.cs`.
+
+## Problems and questions
+
+Open an issue on the [Issues page](https://github.com/bryarpatch36/MegaBonk-Archipelago/issues). For anything about the mod, attach `BepInEx/LogOutput.log`: [mod/README.md](mod/README.md#reporting-a-problem) says what to check in it before posting.
+
 ## Credits
 
 - [Manual for Archipelago](https://github.com/ManualForArchipelago/Manual): the world template and the Manual Client.
 - Game data: [Bloxodes Megabonk database](https://bloxodes.com/wiki/megabonk) (characters, weapons, tomes) and the megabonk.org map, Graveyard and challenge guides.
+- The mod's own credits are in [mod/README.md](mod/README.md#credits-and-license).
+
+## License
+
+MIT: see [LICENSE](LICENSE). The world is built from the Manual for Archipelago template and the mod's zip includes two libraries, all MIT as well: see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Megabonk belongs to its developer; no game code or assets are in this repository.

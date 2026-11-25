@@ -7,8 +7,8 @@ namespace MegabonkAP.Core
 {
     /// <summary>
     /// Takes the game's own objects from the plugin's hooks, reads what the tracker needs out of
-    /// them by member name, and passes it on. The names are those of game version 1.0.69
-    /// (docs/probes/probe-1.0.69.txt); docs/hooks.md says which have been seen working. When a
+    /// them by member name, and passes it on. The names are those of game version 1.0.69;
+    /// docs/hooks.md lists them and says which have been seen working. When a
     /// member is missing the log says which, and lists the members the object really has.
     /// </summary>
     public sealed class GameReader

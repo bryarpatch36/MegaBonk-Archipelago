@@ -60,8 +60,8 @@ namespace MegabonkAP.Tests
     }
 }
 
-// Stand-ins for the game's own classes, shaped after game version 1.0.69 as the probe recorded it
-// (docs/probes/probe-1.0.69.txt): the same type names, member names, statics and enum values.
+// Stand-ins for the game's own classes, shaped after game version 1.0.69 as the mod's probe
+// recorded it: the same type names, member names, statics and enum values.
 // The collections are deliberately not .NET collections, like the game's.
 namespace MegabonkAP.Tests.FakeGame
 {

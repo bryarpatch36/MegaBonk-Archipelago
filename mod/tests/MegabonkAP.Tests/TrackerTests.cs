@@ -22,14 +22,14 @@ namespace MegabonkAP.Tests
             throw new FileNotFoundException(string.Join("/", parts));
         }
 
-        private static string WorldData(string file) => Repo("manual_megabonk_bbush", "data", file);
+        private static string WorldData(string file) => Repo("manual_megabonk_bryarpatch36", "data", file);
 
-        /// <summary>The value names of an enum as the probe of the real game recorded them.</summary>
+        /// <summary>The value names of an enum of the real game (game-enums-1.0.69.txt, next to this file).</summary>
         private static string[] GameEnum(string name)
         {
-            string[] lines = File.ReadAllLines(Repo("mod", "docs", "probes", "probe-1.0.69.txt"));
+            string[] lines = File.ReadAllLines(Repo("mod", "tests", "MegabonkAP.Tests", "game-enums-1.0.69.txt"));
             int start = Array.FindIndex(lines, l => l.StartsWith("enum ") && (l.EndsWith(" " + name) || l.EndsWith("." + name)));
-            Assert.True(start >= 0, "the probe has no enum " + name);
+            Assert.True(start >= 0, "game-enums-1.0.69.txt has no enum " + name);
             return lines.Skip(start + 1).TakeWhile(l => l.StartsWith("    ")).Select(l => l.Trim().Split(' ')[0]).ToArray();
         }
 
@@ -95,7 +95,7 @@ namespace MegabonkAP.Tests
         public void EveryNameInTheRealGamesListsIsKnownOrDeliberatelyPassedOver(string kind, string gameEnum)
         {
             string[] game = GameEnum(gameEnum);
-            Assert.True(game.Length > 3, gameEnum + " was not read from the probe");
+            Assert.True(game.Length > 3, gameEnum + " was not read from game-enums-1.0.69.txt");
             Assert.DoesNotContain(game, g => List.Resolve(kind, g) == null && !List.IsIgnored(kind, g));
 
             // and nothing of the world is unreachable: each of its names is what some game name resolves to

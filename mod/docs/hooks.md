@@ -1,40 +1,40 @@
 # The game names the mod relies on
 
-Every name below is looked up at run time. They are the names of **game version 1.0.69**, taken from [probes/probe-1.0.69.txt](probes/probe-1.0.69.txt), which the mod itself wrote from the installed game on 2026-11-20. So each name is known to exist. What is not yet known for most of them is whether the mod's *use* of it is right: the last column says what has been seen on the real game.
+Every name below is looked up at run time. They are the names of **game version 1.0.69**, read from the installed game by the mod's own probe (see "What the probe is for" below), so each name is known to exist in that version. Which features have been seen working on the real game is in the status table of the [mod's README](../README.md); the last column here says which mod version first used each method.
 
-The first run on the real game (mod 0.1.0, one Forest Tier 1 run) showed: all hooks of 0.1.0 attached, the Archipelago connection worked, and the map was read. It also showed three wrong guesses, corrected in 0.2.0: the character is not in the run settings, the tier has its own field, and `GameManager.StopDungeon` is about crypts, not the end of a run.
+Three first guesses were wrong and were corrected in 0.2.0: the character is not in the run settings, the tier has its own field, and `GameManager.StopDungeon` is about crypts, not the end of a run.
 
 ## Methods hooked (`Hooks.cs`)
 
 Most run after the game's method and only watch. Those that change the game are marked: `PlayerHealth.Tick` when a DeathLink has arrived, the three that run *before* the game's method and can stop it, and the two that edit a list the game returned. Each of them lets the game go on untouched when it fails or cannot read what it needs.
 
-| Method | Used for | Seen on the real game |
+| Method | Used for | Since |
 |---|---|---|
-| `MapController.StartNewMap(RunConfig)` | A run begins: map, tier, challenge | Attaches and fires; the map was read |
-| `MapController.RestartRun()` | The same run again | New in 0.2.0 |
-| `MyPlayer.StartPlayer(ECharacter, Vector3)` | The character being played | New in 0.2.0 |
-| `TrackStats.OnEnemyDied(Enemy, DamageContainer)` | Every enemy death: minibosses, hidden bosses | Attaches; no death was confirmed in the log |
-| `GameManager.OnStageBossDied()` | A stage's boss is dead; with `MapController.IsTierFinalStage()` that completes the tier and the run | New in 0.2.0 |
-| `PlayerXp.AddXp(int)` | The player's level | Attaches; unconfirmed |
-| `WeaponInventory.AddWeapon(WeaponData, List<StatModifier>)` | Weapon levels | Attaches and fires |
-| `TomeInventory.AddTome(TomeData, List<StatModifier>, ERarity)` | Tome levels | Attaches; unconfirmed |
-| `LevelupScreen.OnClose()` | Weapon and tome levels again after each level-up | Attaches; unconfirmed |
-| `PlayerHealth.PlayerDied()` | Sending DeathLink, and the run summary line | Attaches; unconfirmed |
-| `PlayerHealth.Tick()` | One more per-frame turn during a run (see the overlay's, below) | New in 0.2.0 |
-| `GraveyardBossRoom.Activate()` | The Crypt Keys check (that activating takes all four keys is assumed) | Attaches; unconfirmed |
-| `GraveyardBossRoom.OnEnemyDied(Enemy, DamageContainer)` | Big Bob: the dead enemy is the room's own `bossEnemy` | New in 0.2.0 |
-| `ChallengesTracker.CompleteChallenge()` | Challenge checks | New in 0.2.0 |
-| `Enemy.EnemyDied()` | Only if `TrackStats.OnEnemyDied` is missing | Not used |
-| `MapController.StartNewMap(RunConfig)`, before | **Stops** a run on a map or tier that is locked | New in 0.3.0 |
-| `CharacterMenu.OnConfirmCharacter(MyButtonCharacter)`, before | **Stops** confirming a locked character | New in 0.3.0 |
-| `SelectionGroupToggleSingleButtonTier.OnClick()`, before | **Stops** picking a locked tier (the button's `runConfig`) | New in 0.3.0 |
-| `UnlockUtility.GetAvailableWeapons()` | **Removes** weapons not held from the returned `List<WeaponData>`. That the level-up offers are drawn from it is assumed from the name | New in 0.3.0 |
-| `UnlockUtility.GetAvailableTomes()` | **Removes** tomes not held from the returned `HashSet<TomeData>` | New in 0.3.0 |
-| `UpgradePicker.ShuffleUpgrades(EEncounter)` | A level-up's offers are on screen: **dims** the locked ones (a `CanvasGroup` on the button, alpha 0.3). Looked at again a few times a second while the picker is shown | New in 0.3.1 |
-| `UpgradePicker.SelectUpgrade(IUpgradable, List<StatModifier>, UpgradeButton, ERarity)`, before | **Stops** picking a locked weapon or tome, unless the picker is in banish mode or the other offers cannot be read. When every offer is locked, the pick is stopped and the mod calls `LevelupScreen.Skip()` at its next turn, then `CloseLevelupScreen()` if the offers are still there a second later | 0.3.1; works on the game. The skip is new in 0.3.4 |
-| `LevelupScreen.GetShopToolPrice(int)` | **Returns 0** while every offer on screen is locked, so Skip (and Refresh, Banish: the game has one price method for all three) is free there; `RefreshUtilityButtons()` is called when that begins. That this method prices the Skip button is assumed from its name | New in 0.3.4 |
+| `MapController.StartNewMap(RunConfig)` | A run begins: map, tier, challenge | 0.1.0 |
+| `MapController.RestartRun()` | The same run again | 0.2.0 |
+| `MyPlayer.StartPlayer(ECharacter, Vector3)` | The character being played | 0.2.0 |
+| `TrackStats.OnEnemyDied(Enemy, DamageContainer)` | Every enemy death: minibosses, hidden bosses | 0.1.0 |
+| `GameManager.OnStageBossDied()` | A stage's boss is dead; with `MapController.IsTierFinalStage()` that completes the tier and the run | 0.2.0 |
+| `PlayerXp.AddXp(int)` | The player's level | 0.1.0 |
+| `WeaponInventory.AddWeapon(WeaponData, List<StatModifier>)` | Weapon levels | 0.1.0 |
+| `TomeInventory.AddTome(TomeData, List<StatModifier>, ERarity)` | Tome levels | 0.1.0 |
+| `LevelupScreen.OnClose()` | Weapon and tome levels again after each level-up | 0.1.0 |
+| `PlayerHealth.PlayerDied()` | Sending DeathLink, and the run summary line | 0.1.0 |
+| `PlayerHealth.Tick()` | One more per-frame turn during a run (see the overlay's, below) | 0.2.0 |
+| `GraveyardBossRoom.Activate()` | The Crypt Keys check (that activating takes all four keys is assumed) | 0.1.0 |
+| `GraveyardBossRoom.OnEnemyDied(Enemy, DamageContainer)` | Big Bob: the dead enemy is the room's own `bossEnemy` | 0.2.0 |
+| `ChallengesTracker.CompleteChallenge()` | Challenge checks | 0.2.0 |
+| `Enemy.EnemyDied()` | Only if `TrackStats.OnEnemyDied` is missing | Fallback only |
+| `MapController.StartNewMap(RunConfig)`, before | **Stops** a run on a map or tier that is locked | 0.3.0 |
+| `CharacterMenu.OnConfirmCharacter(MyButtonCharacter)`, before | **Stops** confirming a locked character | 0.3.0 |
+| `SelectionGroupToggleSingleButtonTier.OnClick()`, before | **Stops** picking a locked tier (the button's `runConfig`) | 0.3.0 |
+| `UnlockUtility.GetAvailableWeapons()` | **Removes** weapons not held from the returned `List<WeaponData>`. That the level-up offers are drawn from it is assumed from the name | 0.3.0 |
+| `UnlockUtility.GetAvailableTomes()` | **Removes** tomes not held from the returned `HashSet<TomeData>` | 0.3.0 |
+| `UpgradePicker.ShuffleUpgrades(EEncounter)` | A level-up's offers are on screen: **dims** the locked ones (a `CanvasGroup` on the button, alpha 0.3). Looked at again a few times a second while the picker is shown | 0.3.1 |
+| `UpgradePicker.SelectUpgrade(IUpgradable, List<StatModifier>, UpgradeButton, ERarity)`, before | **Stops** picking a locked weapon or tome, unless the picker is in banish mode or the other offers cannot be read. When every offer is locked, the pick is stopped and the mod calls `LevelupScreen.Skip()` at its next turn, then `CloseLevelupScreen()` if the offers are still there a second later | 0.3.1; the skip since 0.3.4 |
+| `LevelupScreen.GetShopToolPrice(int)` | **Returns 0** while every offer on screen is locked, so Skip (and Refresh, Banish: the game has one price method for all three) is free there; `RefreshUtilityButtons()` is called when that begins. That this method prices the Skip button is assumed from its name | 0.3.4 |
 
-On the real game (0.3.0) the two `GetAvailable...` hooks did not keep locked weapons and tomes out of the offers. Whether they attached, fired, or edit a list the offers are not drawn from is in that run's log, which was not looked at; they are kept because they do no harm.
+On the real game the two `GetAvailable...` hooks did not keep locked weapons and tomes out of the offers; whether they failed to fire or edit a list the offers are not drawn from is not known. They are kept because they do no harm. What enforces the lock at a level-up is `UpgradePicker.ShuffleUpgrades` and `UpgradePicker.SelectUpgrade`.
 
 For the overlay, one of these gives the mod its turn every frame; whichever exist are hooked: `UnityEngine.EventSystems.EventSystem.Update()`, `UnityEngine.Canvas.SendWillRenderCanvases()`, `WindowManager.Update()`, and `PlayerHealth.Tick()` during a run.
 
@@ -62,11 +62,11 @@ For the overlay, one of these gives the mod its turn every frame; whichever exis
 
 ## The overlay (`Screen.cs`)
 
-Unity and TextMeshPro members used, all by name: `GameObject(string)`, `AddComponent<T>()`, `SetActive`, `transform`; `Object.DontDestroyOnLoad`; `Canvas.renderMode`, `sortingOrder`; `CanvasScaler.uiScaleMode`, `referenceResolution`, `matchWidthOrHeight`; `Image.color`, `raycastTarget`, `rectTransform`; `RectTransform.SetParent`, `anchorMin`, `anchorMax`, `pivot`, `anchoredPosition`, `sizeDelta`, `offsetMin`, `offsetMax`; `TextMeshProUGUI.text`, `fontSize`, `alignment`, `enableWordWrapping`, `richText`, `font`, `GetPreferredValues(string, float, float)`; `Input.GetKeyDown(KeyCode)`. None has been seen working on the game. The game itself uses TextMeshPro and `OnGUI`, so the classes are there; whether every member survived the game's build is what the first run shows.
+Unity and TextMeshPro members used, all by name: `GameObject(string)`, `AddComponent<T>()`, `SetActive`, `transform`; `Object.DontDestroyOnLoad`; `Canvas.renderMode`, `sortingOrder`; `CanvasScaler.uiScaleMode`, `referenceResolution`, `matchWidthOrHeight`; `Image.color`, `raycastTarget`, `rectTransform`; `RectTransform.SetParent`, `anchorMin`, `anchorMax`, `pivot`, `anchoredPosition`, `sizeDelta`, `offsetMin`, `offsetMax`; `TextMeshProUGUI.text`, `fontSize`, `alignment`, `enableWordWrapping`, `richText`, `font`, `GetPreferredValues(string, float, float)`; `Input.GetKeyDown(KeyCode)`. The overlay has been seen on screen on the real game.
 
 ## Names matched (`make_data.py`)
 
-A test reads the enums out of the probe and fails if any value is neither known nor deliberately passed over, or if anything in the world cannot be reached from a game name.
+A test reads the game's enums from `mod/tests/MegabonkAP.Tests/game-enums-1.0.69.txt` and fails if any value is neither known nor deliberately passed over, or if anything in the world cannot be reached from a game name.
 
 - **`EWeapon`**: all 30 real weapons match; `Test` and `None` are passed over.
 - **`ECharacter`**: all 21 match (`Cl4nk`, `SirOofie`, `TonyMcZoom`, `SirChadwell` by ignoring case and spaces).
@@ -77,4 +77,4 @@ A test reads the enums out of the probe and fails if any value is neither known 
 
 ## What the probe is for
 
-`BepInEx/MegabonkAP-probe.txt` lists, from the installed game: the members of the types the mod uses (static ones marked from format 2 on), the values of the enums it matches, and every type whose name suggests something still needed. After a game update, put the new probe next to the old one in `probes/` and compare.
+`BepInEx/MegabonkAP-probe.txt` lists, from the installed game: the members of the types the mod uses (static ones marked from format 2 on), the values of the enums it matches, and every type whose name suggests something still needed. It calls and changes nothing in the game. Probe files are not kept in this repository; only the value names of the five enums the mod matches are, in `mod/tests/MegabonkAP.Tests/game-enums-1.0.69.txt`. After a game update, compare the new probe with the one from before the update: renamed members show up there, and as `Hook missing:` or `Could not read ...` lines in the log.

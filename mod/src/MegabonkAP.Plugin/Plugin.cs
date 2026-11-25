@@ -14,15 +14,15 @@ namespace MegabonkAP.Plugin
 {
     /// <summary>
     /// Megabonk Archipelago: connects to the Manual world's slot and sends its checks as you play.
-    /// Settings are in BepInEx/config/bbush.megabonk.archipelago.cfg; what it does is written to
+    /// Settings are in BepInEx/config/bryarpatch36.megabonk.archipelago.cfg; what it does is written to
     /// BepInEx/LogOutput.log with the prefix [MegabonkAP].
     /// </summary>
     [BepInPlugin(Id, Name, Version)]
     public sealed class Plugin : BasePlugin
     {
-        public const string Id = "bbush.megabonk.archipelago";
+        public const string Id = "bryarpatch36.megabonk.archipelago";
         public const string Name = "MegabonkAP";
-        public const string Version = "0.4.1";
+        public const string Version = "0.5.0";
 
         private ArchipelagoLink? _link;
         private Tracker? _tracker;

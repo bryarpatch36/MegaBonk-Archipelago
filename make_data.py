@@ -8,7 +8,7 @@ The lists are the single place to change when the game adds a character, weapon,
 import json
 from pathlib import Path
 
-WORLD = "manual_megabonk_bbush"
+WORLD = "manual_megabonk_bryarpatch36"
 data = Path(__file__).resolve().parent / WORLD / "data"
 
 # character -> the weapon that character always starts a run with
@@ -207,7 +207,7 @@ options = {
 
 game = {
     "game": "Megabonk",
-    "creator": "bbush",
+    "creator": "bryarpatch36",
     "filler_item_name": "Bonk",
     "death_link": True,
     "starting_items": [
@@ -225,7 +225,7 @@ game = {
 
 # What the game calls things in its own code, where that differs from the name players see.
 # Names are compared without case, spaces or punctuation, so only real differences are listed.
-# Source: the enums of game version 1.0.69 (mod/docs/probes/probe-1.0.69.txt).
+# Source: the enums of game version 1.0.69 (mod/tests/MegabonkAP.Tests/game-enums-1.0.69.txt).
 ALIASES = {
     "weapon": {
         "Sniper": "Sniper Rifle",
@@ -282,7 +282,7 @@ mod_maps["Graveyard"] = {
 }
 
 mod_checks = {
-    "game": "Manual_Megabonk_bbush",
+    "game": "Manual_Megabonk_bryarpatch36",
     "levels": {"character": CHARACTER_LEVEL, "weapon": WEAPON_LEVEL, "tome": TOME_LEVEL},
     "characters": {
         name: {"item": f"Character - {name}", "weapon": weapon,

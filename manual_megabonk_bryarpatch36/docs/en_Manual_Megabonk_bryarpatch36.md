@@ -1,7 +1,9 @@
 # Megabonk (Manual)
 
 ## What is this?
-Megabonk as a Manual game. There is no mod: you play Megabonk normally and mark checks by hand in the Manual Client, and you hold yourself to the items you have been sent.
+Megabonk as a Manual game. No mod is needed: you play Megabonk normally and mark checks by hand in the Manual Client, and you hold yourself to the items you have been sent.
+
+An optional mod, MegabonkAP, sends the checks for you and locks what you do not hold: https://github.com/bryarpatch36/MegaBonk-Archipelago
 
 ## What are the items?
 - `Character - <name>`: you may only start a run with a character you hold. You start with one random character.
@@ -16,6 +18,7 @@ Megabonk as a Manual game. There is no mod: you play Megabonk normally and mark 
 - With each weapon: get it to Level 10 in a run.
 - With each tome: get it to Level 8 in a run.
 - On Forest and Desert: complete Tier 1, Tier 2 and Tier 3, and defeat each miniboss and hidden boss.
+- Optional: the miniboss hunt, 15 checks for minibosses defeated in total over all your runs. It needs the mod to count them.
 - On the Graveyard: collect the 4 Crypt Keys, defeat Big Bob, defeat Spooky Steve.
 - Optional: each Forest and Desert challenge.
 

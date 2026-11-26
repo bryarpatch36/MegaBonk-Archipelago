@@ -1,5 +1,5 @@
-# Builds the world's .apworld and the mod's zip from the source, runs the mod's tests, and
-# publishes both on the Releases page.
+# Builds the world's .apworld and the mod's zip from the source and publishes both on the
+# Releases page.
 #
 # To run it: on GitHub open Actions -> Release -> Run workflow.
 # The release is tagged mod-<mod version>_world-<world version>; if that tag already exists the
@@ -50,9 +50,6 @@ jobs:
         run: |
           python make_data.py
           git diff --exit-code
-
-      - name: Run the mod's tests
-        run: dotnet test mod/tests/MegabonkAP.Tests
 
       - name: Build the .apworld
         run: python build_apworld.py

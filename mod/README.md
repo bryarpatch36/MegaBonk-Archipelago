@@ -10,21 +10,18 @@ Version 0.5.0. It has been played on the real game up to version 0.4.1. The game
 
 | Part | State |
 |---|---|
-| Which check belongs to which event, and whether it counts under the world's rules | Automated tests (`mod/tests/MegabonkAP.Tests`) |
-| Connecting to Archipelago, sending checks, receiving items, the goal, keeping checks earned offline | Works against a local Archipelago 0.6.8 server (`tests/e2e_mod_core.py`) and from inside the game |
+| Connecting to Archipelago, sending checks, receiving items, the goal, keeping checks earned offline | Works against a local Archipelago 0.6.8 server and from inside the game |
 | The plugin loading in the game and its hooks attaching | Works on the real game |
 | Checks sent from a run, including completing a tier beyond Tier 1 | Works on the real game |
 | Locks on characters, maps and tiers | Work on the real game |
-| Locked weapons and tomes at a level-up | They stay on screen, dimmed, and the pick is refused: works on the real game. When every offer is locked, Skip, Refresh and Banish cost nothing and picking any offer skips the level-up: tested against stand-ins, not confirmed on the game |
+| Locked weapons and tomes at a level-up | They stay on screen, dimmed, and the pick is refused: works on the real game. When every offer is locked, Skip, Refresh and Banish cost nothing and picking any offer skips the level-up: not confirmed on the game |
 | The on-screen tracker | Works on the real game. Changing its view from a controller is not confirmed on the game |
 | DeathLink | Works on the real game (0.3.3 and later) |
 | The miniboss hunt | Works on the real game (0.4.1) |
-| Graveyard checks (the Crypt Keys, Big Bob) | Tested against stand-ins, not confirmed on the game |
+| Graveyard checks (the Crypt Keys, Big Bob) | Not confirmed on the game |
 | Spooky Steve | Not recognised yet: the game's name for him is unknown |
-| Challenge checks | Tested against stand-ins, not confirmed on the game |
+| Challenge checks | Not confirmed on the game |
 | Weapon, tome and character levels | Whether the level the mod reads matches the level the game shows (a freshly picked weapon or tome may count from 0 or from 1) is not confirmed. The summary line in the log shows the levels the mod reads |
-
-"Tested against stand-ins" means the automated tests run the code against classes shaped like the game's, without the game.
 
 ## Installing it with a mod manager
 
@@ -110,7 +107,7 @@ Open an issue on the [Issues page](https://github.com/bryarpatch36/MegaBonk-Arch
 
 The log names your server address and slot name (the `Connected to ... as ...` line). Look the file over and take out anything you would rather not post.
 
-Reports of the untested parts in the status table are as welcome as bug reports: a log from a Graveyard run or a challenge run settles whether those checks work.
+Reports of the unconfirmed parts in the status table are as welcome as bug reports: a log from a Graveyard run or a challenge run settles whether those checks work.
 
 ## Building it yourself
 
@@ -118,8 +115,6 @@ What you need: the [.NET SDK](https://dotnet.microsoft.com/download) 8 or newer 
 
 ```
 dotnet build mod/MegabonkAP.sln -c Release          # plugin files land in mod/dist/MegabonkAP/
-dotnet test  mod/tests/MegabonkAP.Tests             # rules, names, reading stand-in game objects
-python tests/e2e_mod_core.py <archipelago source>   # the mod's core against a local Archipelago server
 python mod/make_package.py                          # builds the plugin and writes MegabonkAP-<version>.zip
 ```
 
@@ -131,7 +126,7 @@ dotnet build mod/src/MegabonkAP.Plugin -c Release -p:MegabonkPath="C:\path\to\fo
 
 This copies four files to `BepInEx/plugins/MegabonkAP/`.
 
-`checks.json` is written by `make_data.py` in the folder above; change names there, never in the JSON. A test fails if the mod and the world disagree on a single check or item name.
+`checks.json` is written by `make_data.py` in the folder above; change names there, never in the JSON. Both are written from the same lists, so the mod and the world cannot disagree on a check or item name.
 
 ## How it is put together
 

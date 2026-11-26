@@ -11,8 +11,8 @@ This is an unofficial fan project. It is not affiliated with or endorsed by vedi
 
 | Part | State |
 |---|---|
-| Generating a multiworld with every option combination | Works (automated test) |
-| Hosting a seed, connecting as the slot, sending checks, receiving items, reaching the goal | Works against a local Archipelago 0.6.8 server (automated test, no game involved) |
+| Generating a multiworld with every option combination | Works |
+| Hosting a seed, connecting as the slot, sending checks, receiving items, reaching the goal | Works against a local Archipelago 0.6.8 server |
 | Playing it on the real game with the mod: checks sent by themselves, locks, the tracker, DeathLink, the miniboss hunt | Works on the real game. Not yet confirmed there: the Graveyard checks, Spooky Steve, the challenge checks ([mod/README.md](mod/README.md)) |
 | Playing it on the real game without the mod, ticking every check in the Manual Client | Not tried on its own. The world is the same one the mod plays |
 
@@ -96,18 +96,9 @@ python make_data.py
 python build_apworld.py
 ```
 
-Tests need an Archipelago source checkout with the `.apworld` copied into its `custom_worlds` folder, and a Python that has Archipelago's core requirements:
-
-```
-python tests/test_generate.py <archipelago source folder>
-python tests/e2e_local_server.py <archipelago source folder> <seed zip> Bonker
-```
-
-`test_generate.py` generates a seed for every option combination and checks the number of checks, the goal and the starting items. `e2e_local_server.py` hosts a seed on a local server and plays the slot without the game. The mod has its own tests: see [mod/README.md](mod/README.md).
-
 ### Publishing a release
 
-The "Release" workflow (`.github/workflows/release.yml`) builds the `.apworld` and the mod's zip from the source, runs the mod's tests and publishes both files, with `Bonker.yaml`, on the [Releases page](https://github.com/bryarpatch36/MegaBonk-Archipelago/releases). On GitHub: **Actions → Release → Run workflow**. The release is tagged from the two versions (`mod-<mod version>_world-<world version>`), so bump at least one of them first: `world_version` in `archipelago.json`, or `<Version>` in `mod/src/MegabonkAP.Plugin/MegabonkAP.Plugin.csproj` together with `Version` in `Plugin.cs`.
+The "Release" workflow (`.github/workflows/release.yml`) builds the `.apworld` and the mod's zip from the source and publishes both files, with `Bonker.yaml`, on the [Releases page](https://github.com/bryarpatch36/MegaBonk-Archipelago/releases). On GitHub: **Actions → Release → Run workflow**. The release is tagged from the two versions (`mod-<mod version>_world-<world version>`), so bump at least one of them first: `world_version` in `archipelago.json`, or `<Version>` in `mod/src/MegabonkAP.Plugin/MegabonkAP.Plugin.csproj` together with `Version` in `Plugin.cs`.
 
 ## Problems and questions
 

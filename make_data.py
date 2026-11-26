@@ -225,7 +225,7 @@ game = {
 
 # What the game calls things in its own code, where that differs from the name players see.
 # Names are compared without case, spaces or punctuation, so only real differences are listed.
-# Source: the enums of game version 1.0.69 (mod/tests/MegabonkAP.Tests/game-enums-1.0.69.txt).
+# Source: the enums of game version 1.0.69, as the mod's probe read them from the game.
 ALIASES = {
     "weapon": {
         "Sniper": "Sniper Rifle",

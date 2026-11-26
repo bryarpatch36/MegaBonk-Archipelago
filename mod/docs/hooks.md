@@ -66,7 +66,7 @@ Unity and TextMeshPro members used, all by name: `GameObject(string)`, `AddCompo
 
 ## Names matched (`make_data.py`)
 
-A test reads the game's enums from `mod/tests/MegabonkAP.Tests/game-enums-1.0.69.txt` and fails if any value is neither known nor deliberately passed over, or if anything in the world cannot be reached from a game name.
+How the names in the game's enums (version 1.0.69) line up with the world's names:
 
 - **`EWeapon`**: all 30 real weapons match; `Test` and `None` are passed over.
 - **`ECharacter`**: all 21 match (`Cl4nk`, `SirOofie`, `TonyMcZoom`, `SirChadwell` by ignoring case and spaces).
@@ -77,4 +77,4 @@ A test reads the game's enums from `mod/tests/MegabonkAP.Tests/game-enums-1.0.69
 
 ## What the probe is for
 
-`BepInEx/MegabonkAP-probe.txt` lists, from the installed game: the members of the types the mod uses (static ones marked from format 2 on), the values of the enums it matches, and every type whose name suggests something still needed. It calls and changes nothing in the game. Probe files are not kept in this repository; only the value names of the five enums the mod matches are, in `mod/tests/MegabonkAP.Tests/game-enums-1.0.69.txt`. After a game update, compare the new probe with the one from before the update: renamed members show up there, and as `Hook missing:` or `Could not read ...` lines in the log.
+`BepInEx/MegabonkAP-probe.txt` lists, from the installed game: the members of the types the mod uses (static ones marked from format 2 on), the values of the enums it matches, and every type whose name suggests something still needed. It calls and changes nothing in the game. Probe files are not kept in this repository. After a game update, compare the new probe with the one from before the update: renamed members show up there, and as `Hook missing:` or `Could not read ...` lines in the log.

@@ -330,7 +330,7 @@ namespace MegabonkAP.Core
         private DateTime? _killBefore;      // a DeathLink waits until then
         private DateTime? _killCheck;       // when to see whether the kill worked
 
-        /// <summary>The clock, replaceable in tests.</summary>
+        /// <summary>The clock, replaceable.</summary>
         public Func<DateTime> Now { get; set; } = () => DateTime.UtcNow;
 
         /// <summary>DeathLink: end the player through the game's own PlayerHealth.KillPlayer().</summary>

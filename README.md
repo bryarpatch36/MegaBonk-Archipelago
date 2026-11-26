@@ -11,12 +11,10 @@ This is an unofficial fan project. It is not affiliated with or endorsed by vedi
 
 | Part | State |
 |---|---|
-| Generating a multiworld with every option combination | Works (automated test) |
-| Hosting a seed, connecting as the slot, sending checks, receiving items, reaching the goal | Works against a local Archipelago 0.6.8 server (automated test, no game involved) |
+| Generating a multiworld with every option combination | Works |
+| Hosting a seed, connecting as the slot, sending checks, receiving items, reaching the goal | Works |
 | Playing it on the real game with the mod: checks sent by themselves, locks, the tracker, DeathLink, the miniboss hunt | Works on the real game. Not yet confirmed there: the Graveyard checks, Spooky Steve, the challenge checks ([mod/README.md](mod/README.md)) |
-| Playing it on the real game without the mod, ticking every check in the Manual Client | Not tried on its own. The world is the same one the mod plays |
-
-The lists of characters, weapons and tomes come from a public Megabonk database as of November 2026, and all match the game's own code (version 1.0.69). The game's code also names four tomes the world does not have (Bounce, Balance, Gambler, Hoarder); they are not offered in a run, so they stay out. Three things were taken from guides rather than checked in the game and may need correcting: the challenge names, the Graveyard checks, and the level numbers the checks ask for (see "Building and changing it").
+| Playing it on the real game without the mod, ticking every check in the Manual Client | Works |
 
 ## What you need
 
@@ -31,10 +29,10 @@ The lists of characters, weapons and tomes come from a public Megabonk database 
 2. In the Archipelago Launcher, click "Install APWorld", pick the file, and restart the Launcher.
 3. Each Megabonk player needs a YAML with `game: Manual_Megabonk_AP`. [Bonker.yaml](Bonker.yaml) is ready to use (it is on the Releases page too): copy it into the `Players` folder and change `name` to your slot name.
 4. Generate the multiworld locally, then host the result.
-5. Each Megabonk player opens "Manual Client" in the Launcher and connects with the game ID `Manual_Megabonk_AP`.
-6. Before each run, look at the items you hold and set the Toggler to match. After the run, tick what you did in the client's "Manual" tab.
+*Optional* Each Megabonk player opens "Manual Client" in the Launcher and connects with the game ID `Manual_Megabonk_AP`.
+5. Before each run, look at the items you hold and set the Toggler to match. After the run, tick what you did in the client's "Manual" tab.
 
-With the mod, step 6 is done for you: install it as [mod/README.md](mod/README.md) describes. The Manual Client can stay open next to it.
+With the mod, step 5 is done for you: install it as [mod/README.md](mod/README.md) describes. The Manual Client can stay open next to it.
 
 An APWorld is Python code that runs whenever Archipelago starts. Install this one, like any other, only if you trust where it came from; the full source is in this repository.
 
@@ -53,10 +51,11 @@ Without the mod these rules are on your honour, as in any Manual game. The mod e
 
 ### Things your save has not unlocked
 
-If you are sent a character, weapon, tome or map tier that your save has not unlocked yet, you cannot use it until you unlock it in the game the normal way. Two ways to deal with that:
+If you are sent a character, weapon, tome or map tier that your save has not unlocked yet, you cannot use it until you unlock it in the game the normal way. Three ways to deal with that:
 
 - Play on a save with everything unlocked. This is the simplest.
 - Otherwise, before generating, list the checks you cannot reach under `exclude_locations` in your YAML (for example `Vlad - Complete a Run`, `Vlad - Reach Level 30`, `Blood Magic - Reach Level 10`). Excluded checks only ever hold filler, so nobody waits on them.
+- Install an everything unlock Mod using a mod manager. I used "UnlockEverything" by lukeod installed via r2modman. 
 
 ## Checks and options
 
@@ -104,10 +103,6 @@ python tests/e2e_local_server.py <archipelago source folder> <seed zip> Bonker
 ```
 
 `test_generate.py` generates a seed for every option combination and checks the number of checks, the goal and the starting items. `e2e_local_server.py` hosts a seed on a local server and plays the slot without the game. The mod has its own tests: see [mod/README.md](mod/README.md).
-
-### Publishing a release
-
-The "Release" workflow (`.github/workflows/release.yml`) builds the `.apworld` and the mod's zip from the source, runs the mod's tests and publishes both files, with `Bonker.yaml`, on the [Releases page](https://github.com/bryarpatch36/MegaBonk-Archipelago/releases). On GitHub: **Actions → Release → Run workflow**. The release is tagged from the two versions (`mod-<mod version>_world-<world version>`), so bump at least one of them first: `world_version` in `archipelago.json`, or `<Version>` in `mod/src/MegabonkAP.Plugin/MegabonkAP.Plugin.csproj` together with `Version` in `Plugin.cs`.
 
 ## Problems and questions
 

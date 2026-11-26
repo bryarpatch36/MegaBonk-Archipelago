@@ -51,12 +51,6 @@ A mod manager is not required. The mod is four `.dll` files that BepInEx loads f
 
 Install it one way or the other, not both, or the mod loads twice. The runs recorded in the status table above were made through r2modman; a by-hand install on a BepInEx set up without a mod manager uses the same files but has not been tried.
 
-### Coming from a build before 0.5.0
-
-- The settings file had a longer name. 0.5.0 creates `megabonk.archipelago.cfg`: set `Server` and `Slot` again there, and delete the older file next to it, whose name ends in `.megabonk.archipelago.cfg`.
-- The world's game ID changed too, so 0.5.0 needs world 0.3.0 and a seed generated with it. A seed generated with an older world cannot be continued.
-- If you installed an earlier build by hand, delete `BepInEx/plugins/MegabonkAP` in the profile folder first, or the mod loads twice.
-
 ## Settings
 
 `BepInEx/config/megabonk.archipelago.cfg`, created on first start.

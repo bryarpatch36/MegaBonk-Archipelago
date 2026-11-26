@@ -30,11 +30,33 @@ namespace MegabonkAP.Core
 
         public static string ModeName(int mode) => mode == Hidden ? "Hidden" : mode == Full ? "Full" : "Compact";
 
+        /// <summary>Where the overlay can sit, in the order the move key steps through them: round the screen's edge.</summary>
+        public static readonly IReadOnlyList<string> Positions = new[]
+        {
+            "TopLeft", "TopCenter", "TopRight", "MiddleRight", "BottomRight", "BottomCenter", "BottomLeft", "MiddleLeft",
+        };
+
+        /// <summary>A position as the settings file may spell it ("top left", "Bottom-Centre"), in the spelling of Positions; fallback when it is none of them.</summary>
+        public static string ParsePosition(string? text, string fallback = "MiddleLeft")
+        {
+            string squeezed = new string((text ?? "").Where(char.IsLetter).ToArray()).ToLowerInvariant().Replace("centre", "center");
+            if (squeezed == "top" || squeezed == "bottom") squeezed += "center";
+            return Positions.FirstOrDefault(p => p.ToLowerInvariant() == squeezed) ?? fallback;
+        }
+
+        /// <summary>The next position when the move key is pressed.</summary>
+        public static string NextPosition(string? position)
+        {
+            int at = Positions.ToList().IndexOf(ParsePosition(position, ""));
+            return Positions[(at + 1) % Positions.Count];
+        }
+
         /// <summary>
         /// The overlay's text. slotSet: a slot name is configured. key: the key that changes the
-        /// view, shown as a hint, or null when there is none.
+        /// view, moveKey: the key that moves the overlay; each is shown as a hint, or null when
+        /// there is none.
         /// </summary>
-        public static string Render(Tracker.Snapshot s, CheckList list, int mode, DateTime now, bool slotSet = true, string? key = null)
+        public static string Render(Tracker.Snapshot s, CheckList list, int mode, DateTime now, bool slotSet = true, string? key = null, string? moveKey = null)
         {
             if (mode == Hidden) return "";
             var text = new StringBuilder();
@@ -71,11 +93,18 @@ namespace MegabonkAP.Core
                 else AppendCounts(text, s, list);
             }
 
+            if (s.TrapsWaiting > 0)
+                text.Append($"<color={Bad}>Traps waiting: {s.TrapsWaiting}</color>"
+                    + (s.InRun ? "" : $" <color={Dim}>(they arrive in your next run)</color>")).Append('\n');
+
             foreach (Tracker.Note note in s.Notes.Where(n => now - n.At < NoteLife).TakeLast(mode == Full ? 6 : 4))
                 text.Append(note.Bad ? $"<color={Bad}>> {note.Text}</color>\n" : $"<color={Good}>> {note.Text}</color>\n");
 
-            if (key != null) text.Append($"<size=75%><color={Dim}>{key}: {(mode == Full ? "hide" : "show everything")}"
-                + (s.Locking ? "" : s.ItemsKnown ? "  |  nothing is locked" : "") + "</color></size>");
+            var hints = new List<string>();
+            if (key != null) hints.Add($"{key}: {(mode == Full ? "hide" : "show everything")}");
+            if (moveKey != null) hints.Add($"{moveKey}: move");
+            if (!s.Locking && s.ItemsKnown && hints.Count > 0) hints.Add("nothing is locked");
+            if (hints.Count > 0) text.Append($"<size=75%><color={Dim}>{string.Join("  |  ", hints)}</color></size>");
             return text.ToString().TrimEnd('\n');
         }
 

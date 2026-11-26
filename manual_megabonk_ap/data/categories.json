@@ -23,5 +23,10 @@
     "yaml_option": [
       "include_miniboss_hunt"
     ]
+  },
+  "Traps": {
+    "yaml_option": [
+      "traps"
+    ]
   }
 }

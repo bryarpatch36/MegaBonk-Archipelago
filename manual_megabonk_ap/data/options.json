@@ -39,6 +39,14 @@
         "Adds 15 checks for minibosses defeated in total over all your runs, up to 50. Minibosses called up at boss statues count."
       ],
       "default": true
+    },
+    "traps": {
+      "type": "Toggle",
+      "display_name": "Trap items",
+      "description": [
+        "Adds 12 traps to the item pool: a miniboss, a swarm, a pack of elites, poison, slowness or a freeze arrives in your run when the item does. They need the mod; without it they do nothing."
+      ],
+      "default": true
     }
   }
 }

@@ -22,7 +22,7 @@ namespace MegabonkAP.Plugin
     {
         public const string Id = "megabonk.archipelago";
         public const string Name = "MegabonkAP";
-        public const string Version = "0.5.0";
+        public const string Version = "0.6.0";
 
         private ArchipelagoLink? _link;
         private Tracker? _tracker;
@@ -57,7 +57,16 @@ namespace MegabonkAP.Plugin
                 "Controller buttons that change the overlay's view when held together, as Unity key names joined by +. "
                 + "The default is clicking both sticks at once (L3+R3 on an Xbox-style pad, as on the ROG Ally). None: no buttons.");
             ConfigEntry<string> corner = Config.Bind("Overlay", "Position", "MiddleLeft",
-                "Where the overlay sits: TopLeft, MiddleLeft, BottomLeft, TopRight, MiddleRight or BottomRight.");
+                "Where the overlay sits during a run: TopLeft, TopCenter, TopRight, MiddleLeft, MiddleRight, BottomLeft, "
+                + "BottomCenter or BottomRight. The move key below changes it while you are in a run.");
+            ConfigEntry<string> menuCorner = Config.Bind("Overlay", "MenuPosition", "TopCenter",
+                "Where the overlay sits in the menus, the character select included: the same names. "
+                + "The move key changes it while you are in a menu.");
+            ConfigEntry<string> moveKey = Config.Bind("Overlay", "MoveKey", "F7",
+                "The key that moves the overlay to the next place round the screen's edge, as a Unity key name. None: no key.");
+            ConfigEntry<string> movePad = Config.Bind("Overlay", "MoveControllerButtons", "JoystickButton8+JoystickButton4",
+                "Controller buttons that move the overlay when held together, as Unity key names joined by +. "
+                + "The default is clicking the left stick while holding the left bumper (L3+LB on an Xbox-style pad). None: no buttons.");
             ConfigEntry<int> fontSize = Config.Bind("Overlay", "FontSize", 20,
                 "Text size, as on a 1080p screen. The overlay grows with the screen.");
             ConfigEntry<int> width = Config.Bind("Overlay", "Width", 520,
@@ -96,19 +105,33 @@ namespace MegabonkAP.Plugin
 
             _mode = Overlay.ParseMode(mode.Value);
             Screen.LoadUnity(log, Path.Combine(Paths.BepInExRootPath, "interop"));
-            var screen = new Screen(log, finder, corner.Value, fontSize.Value, width.Value, key.Value + ", " + pad.Value, () =>
-            {
-                _mode = Overlay.Next(_mode);
-                mode.Value = Overlay.ModeName(_mode);       // remembered for the next start
-                RenderOverlay();
-            });
+            // a run and the menus each have their own place: what is free in one is covered in the other
+            _corner = () => Overlay.ParsePosition(reader.Playing ? corner.Value : menuCorner.Value, reader.Playing ? "MiddleLeft" : "TopCenter");
+            Screen? made = null;
+            var screen = made = new Screen(log, finder, _corner(), fontSize.Value, width.Value,
+                (key.Value + ", " + pad.Value, () =>
+                {
+                    _mode = Overlay.Next(_mode);
+                    mode.Value = Overlay.ModeName(_mode);       // remembered for the next start
+                    RenderOverlay();
+                }),
+                (moveKey.Value + ", " + movePad.Value, () =>
+                {
+                    ConfigEntry<string> place = reader.Playing ? corner : menuCorner;
+                    place.Value = Overlay.NextPosition(_corner());  // remembered for the next start
+                    if (made != null) made.Corner = _corner();
+                }));
             _screen = screen;
             _list = list;
             _slotSet = !string.IsNullOrWhiteSpace(slot.Value);
             bool none(string s) => s.Trim().Length == 0 || s.Trim().Equals("none", StringComparison.OrdinalIgnoreCase);
-            string padName = pad.Value.Replace(" ", "").Equals("JoystickButton8+JoystickButton9", StringComparison.OrdinalIgnoreCase)
-                ? "both sticks" : pad.Value.Trim();
-            _keyName = string.Join(" or ", new[] { none(key.Value) ? null : key.Value.Trim(), none(pad.Value) ? null : padName }.Where(n => n != null));
+            string name(string keyValue, string padValue, string usual, string usualName)
+            {
+                string padName = padValue.Replace(" ", "").Equals(usual, StringComparison.OrdinalIgnoreCase) ? usualName : padValue.Trim();
+                return string.Join(" or ", new[] { none(keyValue) ? null : keyValue.Trim(), none(padValue) ? null : padName }.Where(n => n != null));
+            }
+            _keyName = name(key.Value, pad.Value, "JoystickButton8+JoystickButton9", "both sticks");
+            _moveKeyName = name(moveKey.Value, movePad.Value, "JoystickButton8+JoystickButton4", "left stick + LB");
             Hooks.AttachFrames(harmony, screen, finder, log);
             // the text is made away from the game's thread; the game's thread only puts it on screen
             _overlayTimer = new Timer(_ => RenderOverlay(), null, TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(400));
@@ -154,6 +177,8 @@ namespace MegabonkAP.Plugin
         private CheckList? _list;
         private bool _slotSet;
         private string _keyName = "";
+        private string _moveKeyName = "";
+        private Func<string>? _corner;      // where the overlay belongs right now
 
         private void RenderOverlay()
         {
@@ -161,9 +186,11 @@ namespace MegabonkAP.Plugin
             if (screen == null || _tracker == null || _list == null) return;
             try
             {
-                // the hint names the key only once it is known to work; hidden stays hidden
+                // the hints name the keys only once they are known to work; hidden stays hidden
                 string? hint = screen.KeyWorks && _keyName.Length > 0 ? _keyName : null;
-                screen.Text = Overlay.Render(_tracker.Look(), _list, _mode, DateTime.UtcNow, _slotSet, hint);
+                string? moveHint = screen.KeyWorks && _moveKeyName.Length > 0 ? _moveKeyName : null;
+                if (_corner != null) screen.Corner = _corner();
+                screen.Text = Overlay.Render(_tracker.Look(), _list, _mode, DateTime.UtcNow, _slotSet, hint, moveHint);
             }
             catch (Exception problem)
             {

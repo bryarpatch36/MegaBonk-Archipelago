@@ -42,6 +42,15 @@ namespace MegabonkAP.Core
         /// <summary>An option of the slot as generated ("goal", "death_link", ...), or null.</summary>
         object? SlotValue(string option);
 
+        /// <summary>
+        /// How many of the received items have been acted on (traps carried out), as the server
+        /// remembers it for this slot: read once after connecting. Null until it has been read.
+        /// </summary>
+        int? ItemsActedOn { get; }
+
+        /// <summary>Have the server remember how many received items have been acted on. The number only ever goes up.</summary>
+        void SetItemsActedOn(int count);
+
         /// <summary>Raised after connecting and whenever an item arrives. May come from another thread.</summary>
         event Action? Changed;
 

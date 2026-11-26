@@ -35,6 +35,10 @@ namespace MegabonkAP.Core
         public IReadOnlyDictionary<string, Map> Maps => _maps;
         public IReadOnlyList<string> Goals => _goals;
 
+        /// <summary>Trap items, each with what the mod does when one arrives ("swarm", "freeze", ...).</summary>
+        public IReadOnlyDictionary<string, string> Traps => _traps;
+        private readonly Dictionary<string, string> _traps = new();
+
         /// <summary>Bosses the mod recognises by what happens ("Big Bob"), each with its check.</summary>
         public IReadOnlyDictionary<string, string> BossChecks => _bossChecks;
 
@@ -91,6 +95,8 @@ namespace MegabonkAP.Core
                 list._enemyChecks[Squeeze(enemy.Key)] = enemy.Value;
             if (root.TryGetProperty("miniboss_hunt", out JsonElement hunt))
                 foreach (JsonProperty p in hunt.EnumerateObject()) list._hunt[int.Parse(p.Name)] = p.Value.GetString()!;
+            if (root.TryGetProperty("traps", out JsonElement traps))
+                foreach (JsonProperty p in traps.EnumerateObject()) list._traps[p.Name] = p.Value.GetString()!;
             foreach (JsonProperty kind in root.GetProperty("ignored").EnumerateObject())
                 list._ignored[kind.Name] = kind.Value.EnumerateArray().Select(e => Squeeze(e.GetString()!)).ToHashSet();
 
@@ -127,7 +133,8 @@ namespace MegabonkAP.Core
             _characters.Values.Select(c => c.Item)
                 .Concat(_weapons.Values.Select(w => w.Item))
                 .Concat(_tomes.Values.Select(t => t.Item))
-                .Concat(_maps.Values.Select(m => m.Item));
+                .Concat(_maps.Values.Select(m => m.Item))
+                .Concat(_traps.Keys);
 
         /// <summary>
         /// The world's name for something the game names in its own way ("FireStaff", "Sniper",

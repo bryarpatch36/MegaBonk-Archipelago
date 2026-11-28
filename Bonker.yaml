@@ -12,4 +12,5 @@ Manual_Megabonk_AP:
   include_challenges: false        # a check for each Forest and Desert challenge (22 checks)
   include_graveyard: true          # the Graveyard map: its access item and its checks
   include_miniboss_hunt: true      # 15 checks for minibosses defeated in total (statue ones count); false for a shorter solo seed
+  traps: true                      # 12 traps in the item pool: minibosses, swarms, elites, poison, slowness, a freeze (need the mod)
   death_link: false                # when you die the others die, and the other way round (button in the Manual Client)

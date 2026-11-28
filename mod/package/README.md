@@ -1,6 +1,6 @@
 # Megabonk Archipelago
 
-Connects Megabonk to an [Archipelago](https://archipelago.gg) multiworld: the mod watches the game and sends your checks by itself, locks what you do not hold yet, and shows a tracker on screen (`F8`, or clicking both sticks of a controller, changes its view). It goes with the `manual_megabonk_ap` world, on the same [Releases page](https://github.com/bryarpatch36/MegaBonk-Archipelago/releases).
+Connects Megabonk to an [Archipelago](https://archipelago.gg) multiworld: the mod watches the game and sends your checks by itself, locks what you do not hold yet, springs the traps you are sent, and shows a tracker on screen (`F8`, or clicking both sticks of a controller, changes its view; `F7`, or clicking the left stick while holding the left bumper, moves it). It goes with the `manual_megabonk_ap` world, on the same [Releases page](https://github.com/bryarpatch36/MegaBonk-Archipelago/releases).
 
 This is an unofficial fan project. It is not affiliated with or endorsed by vedinad or the Archipelago project.
 
@@ -23,7 +23,10 @@ This is an unofficial fan project. It is not affiliated with or endorsed by vedi
 | `Mode` | `Compact` | The on-screen tracker: `Compact`, `Full` or `Hidden` |
 | `Key` | `F8` | Steps through the tracker's views. `None`: no key |
 | `ControllerButtons` | `JoystickButton8+JoystickButton9` | Controller buttons that do the same when held together: by default both sticks clicked at once |
-| `Position` | `MiddleLeft` | `TopLeft`, `MiddleLeft`, `BottomLeft`, `TopRight`, `MiddleRight` or `BottomRight` |
+| `Position` | `MiddleLeft` | Where the tracker sits during a run: `TopLeft`, `TopCenter`, `TopRight`, `MiddleLeft`, `MiddleRight`, `BottomLeft`, `BottomCenter` or `BottomRight` |
+| `MenuPosition` | `TopCenter` | Where it sits in the menus, the character select included |
+| `MoveKey` | `F7` | Moves the tracker to the next place round the screen's edge: the run's place during a run, the menus' place in a menu. `None`: no key |
+| `MoveControllerButtons` | `JoystickButton8+JoystickButton4` | Controller buttons that do the same when held together: by default the left stick clicked while the left bumper is held |
 | `FontSize`, `Width` | 20, 520 | Size of the tracker, as on a 1080p screen |
 | `Probe` | on | Writes `BepInEx/MegabonkAP-probe.txt` at every start: the names in the game's code |
 

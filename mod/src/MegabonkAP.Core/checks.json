@@ -428,6 +428,14 @@
     "40": "Miniboss Hunt - Defeat 40 Minibosses",
     "50": "Miniboss Hunt - Defeat 50 Minibosses"
   },
+  "traps": {
+    "Trap - Miniboss": "miniboss",
+    "Trap - Swarm": "swarm",
+    "Trap - Elite Pack": "pack",
+    "Trap - Poison": "poison",
+    "Trap - Slow": "slow",
+    "Trap - Freeze": "freeze"
+  },
   "ignored": {
     "weapon": [
       "Test",

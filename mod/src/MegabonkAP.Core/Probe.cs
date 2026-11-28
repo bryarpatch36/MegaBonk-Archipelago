@@ -62,6 +62,8 @@ namespace MegabonkAP.Core
             "TomeData", "UnlockableBase", "InteractableCoffin", "InteractableCrypt", "GraveyardBossMetalGate",
             "InteractableGhostBossLeave", "InteractableCharacterFight", "UnlocksUi", "UnlockContainer",
             "UpgradeButton", "IUpgradable", "MyButton", "MyButtonNormal", "MyButtonCharacter", "UnlockUtility", "UpgradeInventoryUI",
+            "EnemyManager", "SummonerController", "BaseSummoner", "StageSummoner", "StageTimeline", "TimelineEvent", "ETimelineEvent",
+            "PlayerStatusEffects", "EStatusEffect", "SpawnPositions", "MyTime",
             "EMap", "ECharacter", "EWeapon", "ETome", "EEnemy", "EEnemyFlag", "EItem", "EDungeonType",
         };
 

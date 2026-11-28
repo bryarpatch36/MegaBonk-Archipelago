@@ -73,6 +73,17 @@ CHALLENGES = {
 # included: a check at each of these counts.
 MINIBOSS_HUNT = [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50]
 
+# Trap items: name -> (how many are in the pool, what the mod is told to do when one arrives).
+# Each is carried out once, in a run, when its item arrives. Without the mod they do nothing.
+TRAPS = {
+    "Miniboss": (2, "miniboss"),      # a miniboss of the stage appears next to you
+    "Swarm": (3, "swarm"),            # the stage's swarm event starts now
+    "Elite Pack": (2, "pack"),        # a pack of elite enemies appears around you
+    "Poison": (2, "poison"),          # you are poisoned for a few seconds
+    "Slow": (2, "slow"),              # you are slowed for a few seconds
+    "Freeze": (1, "freeze"),          # you are frozen in place for a moment
+}
+
 CHARACTER_LEVEL = 30   # "<character> - Reach Level 30"
 WEAPON_LEVEL = 10      # "<weapon> - Reach Level 10"
 TOME_LEVEL = 8         # "<tome> Tome - Reach Level 8"
@@ -101,6 +112,8 @@ for name in TOMES:
 for map_name in TIER_BOSSES:
     items.append({"name": f"Progressive {map_name} Tier", "category": ["Maps"], "count": 3, "progression": True})
 items.append({"name": "Graveyard Access", "category": ["Maps", "Graveyard"], "count": 1, "progression": True})
+for name, (count, _) in TRAPS.items():
+    items.append({"name": f"Trap - {name}", "category": ["Traps"], "count": count, "trap": True})
 
 locations = []
 
@@ -166,6 +179,7 @@ categories = {
     "Challenges": {"yaml_option": ["include_challenges"]},
     "Graveyard": {"yaml_option": ["include_graveyard"]},
     "Miniboss Hunt": {"yaml_option": ["include_miniboss_hunt"]},
+    "Traps": {"yaml_option": ["traps"]},
 }
 
 options = {
@@ -200,6 +214,14 @@ options = {
             "display_name": "Miniboss hunt checks",
             "description": [f"Adds {len(MINIBOSS_HUNT)} checks for minibosses defeated in total over all your runs, "
                             f"up to {MINIBOSS_HUNT[-1]}. Minibosses called up at boss statues count."],
+            "default": True,
+        },
+        "traps": {
+            "type": "Toggle",
+            "display_name": "Trap items",
+            "description": [f"Adds {sum(count for count, _ in TRAPS.values())} traps to the item pool: a miniboss, a swarm, "
+                            "a pack of elites, poison, slowness or a freeze arrives in your run when the item does. "
+                            "They need the mod; without it they do nothing."],
             "default": True,
         },
     }
@@ -301,6 +323,7 @@ mod_checks = {
     "enemies": {enemy: boss_check(where, boss) for enemy, (where, boss) in BOSS_ENEMIES.items()},
     "bosses": {boss: boss_check(where, boss) for boss, where in NAMED_BOSSES.items()},
     "miniboss_hunt": {str(n): f"Miniboss Hunt - Defeat {n} Miniboss{'es' if n > 1 else ''}" for n in MINIBOSS_HUNT},
+    "traps": {f"Trap - {name}": effect for name, (_, effect) in TRAPS.items()},   # item -> what the mod does
     "ignored": IGNORED,
     "goals": [f"Tier {n} Bosses" for n in (1, 2, 3)],   # in the order of the world's goal option
     "aliases": ALIASES,

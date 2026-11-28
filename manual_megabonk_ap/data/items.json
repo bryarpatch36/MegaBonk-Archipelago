@@ -615,5 +615,53 @@
     ],
     "count": 1,
     "progression": true
+  },
+  {
+    "name": "Trap - Miniboss",
+    "category": [
+      "Traps"
+    ],
+    "count": 2,
+    "trap": true
+  },
+  {
+    "name": "Trap - Swarm",
+    "category": [
+      "Traps"
+    ],
+    "count": 3,
+    "trap": true
+  },
+  {
+    "name": "Trap - Elite Pack",
+    "category": [
+      "Traps"
+    ],
+    "count": 2,
+    "trap": true
+  },
+  {
+    "name": "Trap - Poison",
+    "category": [
+      "Traps"
+    ],
+    "count": 2,
+    "trap": true
+  },
+  {
+    "name": "Trap - Slow",
+    "category": [
+      "Traps"
+    ],
+    "count": 2,
+    "trap": true
+  },
+  {
+    "name": "Trap - Freeze",
+    "category": [
+      "Traps"
+    ],
+    "count": 1,
+    "trap": true
   }
 ]

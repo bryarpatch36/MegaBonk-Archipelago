@@ -34,6 +34,8 @@ Most run after the game's method and only watch. Those that change the game are 
 | `UpgradePicker.SelectUpgrade(IUpgradable, List<StatModifier>, UpgradeButton, ERarity)`, before | **Stops** picking a locked weapon or tome, unless the picker is in banish mode or the other offers cannot be read. When every offer is locked, the pick is stopped and the mod calls `LevelupScreen.Skip()` at its next turn, then `CloseLevelupScreen()` if the offers are still there a second later | 0.3.1; the skip since 0.3.4 |
 | `LevelupScreen.GetShopToolPrice(int)` | **Returns 0** while every offer on screen is locked, so Skip (and Refresh, Banish: the game has one price method for all three) is free there; `RefreshUtilityButtons()` is called when that begins. That this method prices the Skip button is assumed from its name | 0.3.4 |
 
+The traps (0.6.0) need no hook of their own: they are carried out from the per-frame turn below.
+
 On the real game the two `GetAvailable...` hooks did not keep locked weapons and tomes out of the offers; whether they failed to fire or edit a list the offers are not drawn from is not known. They are kept because they do no harm. What enforces the lock at a level-up is `UpgradePicker.ShuffleUpgrades` and `UpgradePicker.SelectUpgrade`.
 
 For the overlay, one of these gives the mod its turn every frame; whichever exist are hooked: `UnityEngine.EventSystems.EventSystem.Update()`, `UnityEngine.Canvas.SendWillRenderCanvases()`, `WindowManager.Update()`, and `PlayerHealth.Tick()` during a run.
@@ -60,9 +62,26 @@ For the overlay, one of these gives the mod its turn every frame; whichever exis
 | `UpgradePicker` | `buttons`, `banishMode`, `window.activeInHierarchy` | The offers on screen. `UpgradeButton` is not in the 1.0.69 probe: what it offers is found as any member of the game's own classes whose type is `WeaponData`, `TomeData`, `UnlockableBase` or has "upgrad" in its name, asked for its real type with `TryCast` |
 | the offer lists | `GetEnumerator()`, `Contains`, `Remove`, `Add` | Taking locked things out, and putting them back if the game hands out the same list again after an item arrived |
 
+## Methods called for traps (`GameReader.cs`)
+
+These names were not read by the mod's probe of 1.0.69. They come from the reference copy of the game's `Assembly-CSharp` that [megabonk-together](https://github.com/Fcornaire/megabonk-together) builds against (names and signatures only: such a copy holds no code). Which game version it was made from is not stated there; the 21 methods hooked above and the members read below are all in it under the same names. megabonk-together itself calls `SpawnBoss(kind, 0, Boss, position, size)` and `EventSwarm(event)`. From 0.6.0 the probe lists these types, so a probe from the installed game will confirm or correct them. None has been seen working from this mod on the real game.
+
+| Trap | Called | With |
+|---|---|---|
+| Slow, Freeze, Poison | `PlayerStatusEffects.SlowPlayer(float time)`, `FreezePlayer(float time)`, `PoisonPlayer(float duration)` on the player's `inventory.statusEffects` | 10, 3 and 8. That the number is seconds is assumed from the parameter names |
+| Swarm | `SummonerController.EventSwarm(TimelineEvent)` on `EnemyManager.Instance.summonerController` | The first event of the stage's own `timeline.events` whose `eTimelineEvent` is `ESwarm`: the object the game itself passes when the timeline reaches it. Not called when `AreEventsDisabled()` is true or the stage has no such event: then a crowd, as below, of 20 with no flag |
+| Elite Pack | `EnemyManager.SpawnEnemy(EnemyData, int summonerId, bool forceSpawn, EEnemyFlag flag, bool useDirectionBias)`, 6 times | `DataManager.Instance.GetEnemyData(EEnemy)` of a random one of the stage's enemies (`summonerController.stageSummoner.currentEnemies`, else `stageSummoner.enemyPool`, else `timeline.startEnemies`), summoner 0, forced, `Elite` (1), direction bias on. This form lets the game choose the place. That it honours the `Elite` flag is assumed |
+| Miniboss | `EnemyManager.SpawnBoss(EEnemy, int summonerId, EEnemyFlag, Vector3 pos, float extraSizeMultiplier)` | A random one of `summonerController.timeline.minibosses`, else `summonerController.minibossPool`, else any `EEnemy` whose name starts with `Miniboss`; summoner 0, `Boss` (2), 3 to the side of and 1 above `MyPlayer.GetFeetPosition()`, size 1 |
+
+Before a trap is carried out: `PlayerHealth.IsDead()` is false, `MyTime.paused` is false, `GameManager.Instance.IsPlaying()` is true, and no level-up is on screen. Each of the three reads is skipped when the member is not there.
+
+A run is told from the menus by the player object being alive: `UnityEngine.Object.op_Implicit(Object)`, Unity's own "does this still exist", asked of `GameManager.Instance.player` (else `MyPlayer.Instance`). After a run the game may still point at a player it has destroyed. This decides which of the overlay's two places is used, and no trap is carried out without it.
+
 ## The overlay (`Screen.cs`)
 
-Unity and TextMeshPro members used, all by name: `GameObject(string)`, `AddComponent<T>()`, `SetActive`, `transform`; `Object.DontDestroyOnLoad`; `Canvas.renderMode`, `sortingOrder`; `CanvasScaler.uiScaleMode`, `referenceResolution`, `matchWidthOrHeight`; `Image.color`, `raycastTarget`, `rectTransform`; `RectTransform.SetParent`, `anchorMin`, `anchorMax`, `pivot`, `anchoredPosition`, `sizeDelta`, `offsetMin`, `offsetMax`; `TextMeshProUGUI.text`, `fontSize`, `alignment`, `enableWordWrapping`, `richText`, `font`, `GetPreferredValues(string, float, float)`; `Input.GetKeyDown(KeyCode)`. The overlay has been seen on screen on the real game.
+Unity and TextMeshPro members used, all by name: `GameObject(string)`, `AddComponent<T>()`, `SetActive`, `transform`; `Object.DontDestroyOnLoad`; `Canvas.renderMode`, `sortingOrder`; `CanvasScaler.uiScaleMode`, `referenceResolution`, `matchWidthOrHeight`; `Image.color`, `raycastTarget`, `rectTransform`; `RectTransform.SetParent`, `anchorMin`, `anchorMax`, `pivot`, `anchoredPosition`, `sizeDelta`, `offsetMin`, `offsetMax`; `TextMeshProUGUI.text`, `fontSize`, `alignment`, `enableWordWrapping`, `richText`, `font`, `GetPreferredValues(string, float, float)`; `Input.GetKeyDown(KeyCode)`, `Input.GetKey(KeyCode)`. The overlay has been seen on screen on the real game.
+
+Moving it (0.6.0) sets the same four members it is first placed with (`anchorMin`, `anchorMax`, `pivot`, `anchoredPosition`) on the panel that is already there; nothing is built again. The move key is read like the view key.
 
 ## Names matched (`make_data.py`)
 

@@ -26,14 +26,13 @@ namespace MegabonkAP.Core
 
         private readonly ILog _log;
         private readonly TypeFinder _finder;
-        private readonly string _corner;
         private readonly float _fontSize;
         private readonly float _width;
-        private readonly string _keyName;
-        private readonly Action _keyPressed;
 
         private volatile string _text = "";
+        private volatile string _corner;
         private string _shown = "\0";
+        private string? _placed;        // the corner the panel was last put in
         private long _nextLook;
         private long _keyQuietUntil;
         private int _builds;
@@ -44,13 +43,20 @@ namespace MegabonkAP.Core
         private object? _label;         // the TextMeshProUGUI
         private MethodInfo? _keyDown;
         private MethodInfo? _keyHeld;
-        private readonly List<object[]> _keys = new();
+        private readonly List<(string keys, Action pressed)> _bindings = new();
+        private readonly List<(object[] combination, Action pressed)> _keys = new();
         private bool _keyTried;
 
         /// <summary>The text to show; empty hides the overlay. May be set from any thread.</summary>
         public string Text { set => _text = value ?? ""; }
 
-        /// <summary>Whether the key that changes the view works; false until the first frame was seen.</summary>
+        /// <summary>
+        /// Where the overlay sits: Top, Middle or Bottom with Left, Center or Right. It moves at
+        /// its next turn. May be set from any thread.
+        /// </summary>
+        public string Corner { get => _corner; set => _corner = value ?? ""; }
+
+        /// <summary>Whether the overlay's keys can be read; false until the first frame was seen.</summary>
         public bool KeyWorks => _keyDown != null;
 
         /// <summary>Whether the game's own thread has reached the overlay at least once.</summary>
@@ -59,16 +65,24 @@ namespace MegabonkAP.Core
         /// <summary>Whether the overlay gave up after repeated failures.</summary>
         public bool Dead => _dead;
 
-        public Screen(ILog log, TypeFinder finder, string corner, int fontSize, int width, string key, Action keyPressed)
+        /// <summary>
+        /// bindings: for each thing a key can do, the keys that do it ("F8, JoystickButton8+JoystickButton9":
+        /// alternatives separated by commas, each one key or several joined by + that are held together)
+        /// and what to run when they are pressed.
+        /// </summary>
+        public Screen(ILog log, TypeFinder finder, string corner, int fontSize, int width, params (string keys, Action pressed)[] bindings)
         {
             _log = log;
             _finder = finder;
             _corner = corner;
             _fontSize = Math.Clamp(fontSize, 8, 64);
             _width = Math.Clamp(width, 200, 1600);
-            _keyName = key.Trim();
-            _keyPressed = keyPressed;
+            _bindings.AddRange(bindings);
         }
+
+        /// <summary>One key setting, for a single thing a key can do.</summary>
+        public Screen(ILog log, TypeFinder finder, string corner, int fontSize, int width, string key, Action keyPressed)
+            : this(log, finder, corner, fontSize, width, (key, keyPressed)) { }
 
         /// <summary>
         /// Load the Unity assemblies the overlay names, so their types can be found. folder: where
@@ -100,12 +114,19 @@ namespace MegabonkAP.Core
                 _nextLook = now + 200;
 
                 string text = _text;
-                if (text == _shown && _root != null) return;
+                string corner = _corner;
+                if (text == _shown && corner == _placed && _root != null) return;
                 if (_root == null)
                 {
                     if (text.Length == 0) return;       // nothing to show yet: build when there is
                     Build();
                 }
+                if (corner != _placed)
+                {
+                    Place(corner);
+                    _placed = corner;
+                }
+                if (text == _shown) return;
                 Show(text);
                 _shown = text;
             }
@@ -114,6 +135,7 @@ namespace MegabonkAP.Core
                 Exception cause = problem is TargetInvocationException && problem.InnerException != null ? problem.InnerException : problem;
                 _root = null;
                 _shown = "\0";
+                _placed = null;
                 if (++_builds >= 3)
                 {
                     _dead = true;
@@ -152,17 +174,12 @@ namespace MegabonkAP.Core
                 catch (Exception problem) { _log.Info($"Overlay: no scaling with the screen size ({Inner(problem).Message})."); }
             }
 
-            (float x, float y) = Anchor();
             object panelObject = Activator.CreateInstance(gameObject, "Panel")!;
             object image = Add(panelObject, imageType);
             Set(image, "color", Color(0.05f, 0.07f, 0.1f, 0.72f));
             Set(image, "raycastTarget", false);
             object panel = Get(image, "rectTransform");
             Call(panel, "SetParent", Get(root, "transform"), false);
-            Set(panel, "anchorMin", Vector2(x, y));
-            Set(panel, "anchorMax", Vector2(x, y));
-            Set(panel, "pivot", Vector2(x, y));
-            Set(panel, "anchoredPosition", Vector2(x < 0.5f ? 14f : -14f, y > 0.75f ? -14f : y < 0.25f ? 14f : 0f));
             Set(panel, "sizeDelta", Vector2(_width, 60f));
 
             object labelObject = Activator.CreateInstance(gameObject, "Text")!;
@@ -183,7 +200,19 @@ namespace MegabonkAP.Core
             _root = root;
             _panel = panel;
             _label = label;
+            _placed = null;                             // Pump puts it in its corner next
             _log.Info("Overlay: on screen.");
+        }
+
+        /// <summary>Put the panel at an edge of the screen: it grows away from that edge as the text gets longer.</summary>
+        private void Place(string corner)
+        {
+            if (_panel == null) return;
+            (float x, float y) = Anchor(corner);
+            Set(_panel, "anchorMin", Vector2(x, y));
+            Set(_panel, "anchorMax", Vector2(x, y));
+            Set(_panel, "pivot", Vector2(x, y));
+            Set(_panel, "anchoredPosition", Vector2(x < 0.25f ? 14f : x > 0.75f ? -14f : 0f, y > 0.75f ? -14f : y < 0.25f ? 14f : 0f));
         }
 
         private void Show(string text)
@@ -226,10 +255,13 @@ namespace MegabonkAP.Core
             catch (Exception problem) { _log.Info($"Overlay: no font could be borrowed ({Inner(problem).Message})."); }
         }
 
-        private (float x, float y) Anchor()
+        /// <summary>Where on the screen a corner's name puts the panel: 0 to 1 from the left, and from the bottom.</summary>
+        public static (float x, float y) Anchor(string name)
         {
-            string corner = _corner.Replace(" ", "").ToLowerInvariant();
-            float x = corner.EndsWith("right", StringComparison.Ordinal) ? 1f : 0f;
+            string corner = name.Replace(" ", "").ToLowerInvariant();
+            float x = corner.EndsWith("right", StringComparison.Ordinal) ? 1f
+                : corner.EndsWith("center", StringComparison.Ordinal) || corner.EndsWith("centre", StringComparison.Ordinal)
+                    || corner == "top" || corner == "bottom" ? 0.5f : 0f;
             float y = corner.StartsWith("top", StringComparison.Ordinal) ? 1f : corner.StartsWith("bottom", StringComparison.Ordinal) ? 0f : 0.5f;
             return (x, y);
         }
@@ -237,7 +269,7 @@ namespace MegabonkAP.Core
         // ------------------------------------------------------------------ the key
 
         /// <summary>
-        /// The setting is a list of alternatives separated by commas; each is one key or several
+        /// A key setting is a list of alternatives separated by commas; each is one key or several
         /// joined by + that must be held together: "F8, JoystickButton8+JoystickButton9".
         /// </summary>
         private void CheckKey()
@@ -248,17 +280,20 @@ namespace MegabonkAP.Core
                 try
                 {
                     Type keyCode = Need("UnityEngine.KeyCode");
-                    foreach (string alternative in _keyName.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                    foreach ((string keys, Action whenPressed) in _bindings)
                     {
-                        if (alternative.Equals("none", StringComparison.OrdinalIgnoreCase)) continue;
-                        try
+                        foreach (string alternative in keys.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
                         {
-                            _keys.Add(alternative.Split('+', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                                .Select(name => Enum.Parse(keyCode, name, ignoreCase: true)).ToArray());
-                        }
-                        catch (Exception problem)
-                        {
-                            _log.Warn($"Overlay: '{alternative}' is not a key the game knows ({Inner(problem).Message}).");
+                            if (alternative.Equals("none", StringComparison.OrdinalIgnoreCase)) continue;
+                            try
+                            {
+                                _keys.Add((alternative.Split('+', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                                    .Select(name => Enum.Parse(keyCode, name, ignoreCase: true)).ToArray(), whenPressed));
+                            }
+                            catch (Exception problem)
+                            {
+                                _log.Warn($"Overlay: '{alternative}' is not a key the game knows ({Inner(problem).Message}).");
+                            }
                         }
                     }
                     if (_keys.Count == 0) return;
@@ -279,15 +314,15 @@ namespace MegabonkAP.Core
                 }
             }
             if (_keyDown == null || _keyHeld == null) return;
-            bool pressed = false;
+            Action? pressed = null;
             try
             {
-                foreach (object[] combination in _keys)
+                foreach ((object[] combination, Action whenPressed) in _keys)
                 {
                     // every key of it is held, and one of them went down just now
                     if (!combination.All(k => _keyHeld.Invoke(null, new[] { k }) is bool held && held)) continue;
                     if (!combination.Any(k => _keyDown.Invoke(null, new[] { k }) is bool down && down)) continue;
-                    pressed = true;
+                    pressed = whenPressed;
                     break;
                 }
             }
@@ -297,12 +332,12 @@ namespace MegabonkAP.Core
                 _log.Warn($"Overlay: reading the keys failed ({Inner(problem).Message}); change the view with Mode in the settings file.");
                 return;
             }
-            if (!pressed) return;
+            if (pressed == null) return;
             long now = Environment.TickCount64;
             if (now < _keyQuietUntil) return;       // the same press, seen again in the same frame
             _keyQuietUntil = now + 250;
             _nextLook = 0;
-            _keyPressed();
+            pressed();
         }
 
         // ------------------------------------------------------------------ Unity by name

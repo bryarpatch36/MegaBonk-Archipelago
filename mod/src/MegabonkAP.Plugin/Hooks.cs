@@ -16,6 +16,7 @@ namespace MegabonkAP.Plugin
     /// own KillPlayer; the "Before" hooks stop a locked character, map, tier or level-up offer
     /// from being taken; the two offer hooks take locked weapons and tomes out of what the game
     /// may offer; and locked offers on screen are dimmed. When one of those fails it lets the game go on as if the mod were not there.
+    /// A trap item is carried out from the per-frame turn, through the game's own methods (GameReader).
     ///
     /// The names are those of game version 1.0.69. docs/hooks.md says which were seen working.
     /// </summary>

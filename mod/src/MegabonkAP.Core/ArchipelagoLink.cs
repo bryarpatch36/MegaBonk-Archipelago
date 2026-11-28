@@ -5,6 +5,7 @@ using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Helpers;
+using Archipelago.MultiClient.Net.Models;
 
 namespace MegabonkAP.Core
 {
@@ -24,6 +25,10 @@ namespace MegabonkAP.Core
         private string _slot = "";
         private string? _lastProblem;
         private DateTime _quietUntil = DateTime.MinValue;   // on connecting the server repeats every item
+        private int? _actedOn;                              // received items acted on, as the server keeps it
+
+        /// <summary>The server's own storage for this slot: it outlives this computer's settings folder.</summary>
+        private const string ActedOnKey = "MegabonkAP.items_acted_on";
 
         public string Server { get; set; } = "";
         public string Slot { get; set; } = "";
@@ -109,8 +114,55 @@ namespace MegabonkAP.Core
                     return false;
                 }
             }
+            ReadActedOn();
             Changed?.Invoke();
             return true;
+        }
+
+        public int? ItemsActedOn
+        {
+            get { lock (_gate) return _actedOn; }
+        }
+
+        public void SetItemsActedOn(int count)
+        {
+            lock (_gate)
+            {
+                if (_session == null || !_session.Socket.Connected) return;
+                try
+                {
+                    _session.DataStorage[Scope.Slot, ActedOnKey] += Operation.Max(count);
+                    if (_actedOn == null || count > _actedOn) _actedOn = count;
+                }
+                catch (Exception problem) { Problem($"Could not tell the server which traps are done: {problem.Message}"); }
+            }
+        }
+
+        /// <summary>
+        /// Ask the server how many received items were already acted on. The answer comes in on
+        /// the connection's own thread, so this waits outside the lock that thread may want.
+        /// </summary>
+        private void ReadActedOn()
+        {
+            ArchipelagoSession? session;
+            lock (_gate) session = _session;
+            if (session == null) return;
+            int? stored = null;
+            try
+            {
+                session.DataStorage[Scope.Slot, ActedOnKey].Initialize(0);
+                var answer = session.DataStorage[Scope.Slot, ActedOnKey].GetAsync<int?>();
+                if (answer.Wait(TimeSpan.FromSeconds(5))) stored = answer.Result ?? 0;
+                else Problem("The server did not say which traps are already done; going by this computer's own record.");
+            }
+            catch (Exception problem)
+            {
+                Problem($"Could not ask the server which traps are already done ({problem.GetBaseException().Message}); going by this computer's own record.");
+            }
+            lock (_gate)
+            {
+                if (_session == session) _actedOn = stored ?? 0;
+            }
         }
 
         public bool IsChecked(string check)
@@ -240,6 +292,7 @@ namespace MegabonkAP.Core
             ArchipelagoSession? old = _session;
             _session = null;
             _deathLink = null;
+            _actedOn = null;
             if (old == null) return;
             try { old.Socket.DisconnectAsync().Wait(2000); }
             catch (Exception) { /* it is going away anyway */ }

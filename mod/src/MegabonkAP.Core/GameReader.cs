@@ -263,13 +263,22 @@ namespace MegabonkAP.Core
         /// <summary>
         /// Call a few times a second from the game's own thread. It looks at the player's health:
         /// a death is reported even if the game's PlayerDied was never seen, and a waiting
-        /// DeathLink is carried out. Then it looks at the level-up offers on screen.
+        /// DeathLink is carried out. Then it looks at the level-up offers on screen, and carries
+        /// out a trap that is due.
         /// </summary>
         public void Frame()
         {
             WatchHealth();
             RefreshOffers();
+            RunTraps();
         }
+
+        /// <summary>
+        /// Whether a run is on screen: the player exists and has not been destroyed with their
+        /// scene. False in the menus. As of the last Frame.
+        /// </summary>
+        public bool Playing => _playing;
+        private volatile bool _playing;
 
         private void WatchHealth()
         {
@@ -282,6 +291,7 @@ namespace MegabonkAP.Core
                     ?? Dyn.GetStatic(_findType("MapController"), "inventory.playerHealth");
                 if (health == null)                                                   // between runs
                 {
+                    _playing = false;
                     if (_killBefore != null && Now() > _killBefore)
                     {
                         _killBefore = null;
@@ -291,6 +301,10 @@ namespace MegabonkAP.Core
                     _killCheck = null;
                     return;
                 }
+                // after a run the game may still point at a player it has destroyed: that is a menu, not a run
+                object? body = Player() ?? Dyn.GetStatic(_findType("MyPlayer"), "Instance");
+                _playing = body == null || Dyn.Alive(body);
+
                 bool? dead = Dyn.Get(health, "IsDead()") as bool?;
                 if (dead == null) Say($"Could not ask the game whether the player is dead (PlayerHealth.IsDead). It has: {Dyn.Describe(health.GetType())}");
 
@@ -344,6 +358,191 @@ namespace MegabonkAP.Core
             Dyn.Call(playerHealth, "KillPlayer");
             _log.Info("DeathLink: the game's KillPlayer was called.");
         }
+
+        // ------------------------------------------------------------------ traps
+
+        /// <summary>Seconds a Slow, Freeze and Poison trap lasts.</summary>
+        public const float SlowSeconds = 10f, FreezeSeconds = 3f, PoisonSeconds = 8f;
+
+        /// <summary>Enemies in an Elite Pack trap, and in a Swarm trap on a stage that has no swarm of its own.</summary>
+        public const int PackSize = 6, CrowdSize = 20;
+
+        private DateTime? _trapWaiting;     // since when a due trap has been held back
+        private readonly Random _random = new();
+
+        /// <summary>
+        /// Carry out the trap that is due, if there is one and the game is in a state to take it:
+        /// a living player, a run on screen, nothing paused. Otherwise it waits.
+        /// </summary>
+        private void RunTraps()
+        {
+            Tracker.Trap? trap = _tracker.NextTrap();
+            if (trap == null || !_playing) { _trapWaiting = null; return; }     // in the menus a trap simply waits for the next run
+            lock (_gate)
+            {
+                string? wait = TrapMustWait();
+                if (wait != null)
+                {
+                    DateTime now = Now();
+                    _trapWaiting ??= now;
+                    if ((now - _trapWaiting.Value).TotalSeconds > 60) Say($"{trap.Item} has been waiting for over a minute: {wait}.");
+                    return;
+                }
+                _trapWaiting = null;
+                string? problem;
+                try { problem = Spring(trap.Effect); }
+                catch (Exception failure) { problem = $"{failure.GetType().Name}: {failure.Message}"; }
+                _tracker.TrapDone(trap, problem);
+            }
+        }
+
+        /// <summary>Why a trap cannot be carried out right now, or null when it can.</summary>
+        private string? TrapMustWait()
+        {
+            object? health = PlayerPart("playerHealth");
+            if (health == null) return "the player's health was not found";
+            if (Dyn.Get(health, "IsDead()") is bool dead && dead) return "the player is dead";
+            if (_picker != null) return "a level-up is on screen";
+            if (Dyn.GetStatic(_findType("MyTime"), "paused") is bool paused && paused) return "the game is paused";
+            if (Dyn.GetStatic(_findType("GameManager"), "Instance.IsPlaying()") is bool playing && !playing) return "the game says it is not playing";
+            return null;
+        }
+
+        /// <summary>Do what a trap does. Null when the game did it, otherwise why it could not be made to.</summary>
+        private string? Spring(string effect) => effect switch
+        {
+            "slow" => Afflict("SlowPlayer", SlowSeconds),
+            "freeze" => Afflict("FreezePlayer", FreezeSeconds),
+            "poison" => Afflict("PoisonPlayer", PoisonSeconds),
+            "swarm" => Swarm(),
+            "pack" => Crowd(PackSize, elite: true),
+            "miniboss" => Miniboss(),
+            _ => $"this version of the mod does not know the effect '{effect}'",
+        };
+
+        /// <summary>PlayerStatusEffects.SlowPlayer(float) / FreezePlayer(float) / PoisonPlayer(float): the game's own afflictions.</summary>
+        private string? Afflict(string method, float seconds)
+        {
+            object? effects = PlayerPart("statusEffects");
+            if (effects == null) return "the player's status effects were not found (inventory.statusEffects)";
+            return Dyn.Invoke(effects, method, out _, seconds);
+        }
+
+        /// <summary>
+        /// SummonerController.EventSwarm(TimelineEvent) with the stage's own swarm event: the swarm
+        /// the stage has on its timeline, now. On a stage without one, or while the game holds its
+        /// events back, a crowd of the stage's enemies instead.
+        /// </summary>
+        private string? Swarm()
+        {
+            object? controller = Dyn.GetStatic(_findType("EnemyManager"), "Instance.summonerController");
+            object? swarm = Dyn.Items(Dyn.Get(controller, "timeline.events"))
+                .FirstOrDefault(e => e != null && Dyn.Name(Dyn.Get(e, "eTimelineEvent")) == "ESwarm");
+            bool held = Dyn.Get(controller, "AreEventsDisabled()") is bool disabled && disabled;
+            string? problem = controller == null ? "the game's summoner was not found (EnemyManager.Instance.summonerController)"
+                : swarm == null ? "this stage has no swarm on its timeline"
+                : held ? "the game is holding its events back"
+                : Dyn.Invoke(controller, "EventSwarm", out _, swarm);
+            if (problem == null) return null;
+            string? crowd = Crowd(CrowdSize, elite: false);
+            if (crowd == null) _log.Info($"Trap: {problem}, so a crowd of {CrowdSize} was called up instead.");
+            return crowd == null ? null : $"{problem}; and no crowd either: {crowd}";
+        }
+
+        /// <summary>
+        /// EnemyManager.SpawnEnemy(EnemyData, int, bool, EEnemyFlag, bool) so many times, with
+        /// enemies of the kinds the stage is using: the game places each one itself, as it does
+        /// its own. elite: with the Elite flag.
+        /// </summary>
+        private string? Crowd(int size, bool elite)
+        {
+            object? manager = Dyn.GetStatic(_findType("EnemyManager"), "Instance");
+            if (manager == null) return "the game's enemy manager was not found (EnemyManager.Instance)";
+            object? data = Dyn.GetStatic(_findType("DataManager"), "Instance");
+            if (data == null) return "the game's data was not found (DataManager.Instance)";
+
+            var kinds = new List<object>();
+            foreach (string path in new[] { "summonerController.stageSummoner.currentEnemies", "summonerController.stageSummoner.enemyPool", "summonerController.timeline.startEnemies" })
+            {
+                kinds = Dyn.Items(Dyn.Get(manager, path)).Where(k => k != null).Select(k => k!).ToList();
+                if (kinds.Count > 0) break;
+            }
+            if (kinds.Count == 0) return $"the stage's enemies could not be read. SummonerController has: {Describe(Dyn.Get(manager, "summonerController"))}";
+
+            int spawned = 0;
+            string? last = null;
+            for (int i = 0; i < size; i++)
+            {
+                object kind = kinds[_random.Next(kinds.Count)];
+                object? enemyData = Dyn.Call(data, "GetEnemyData", kind);
+                if (enemyData == null) { last = $"the game has no data for the enemy {kind} (DataManager.GetEnemyData)"; continue; }
+                // summoner 0, forced past the enemy limit, EEnemyFlag.Elite is 1, placed ahead of the player as the game likes to
+                string? problem = Dyn.Invoke(manager, "SpawnEnemy", out object? enemy, enemyData, 0, true, elite ? 1 : 0, true);
+                if (problem == null && enemy != null) spawned++;
+                else last = problem ?? "the game placed no enemy (SpawnEnemy returned nothing)";
+            }
+            if (spawned == 0) return last;
+            if (spawned < size) _log.Info($"Trap: {spawned} of {size} enemies were placed" + (last != null ? $" ({last})." : "."));
+            return null;
+        }
+
+        /// <summary>
+        /// EnemyManager.SpawnBoss(EEnemy, int, EEnemyFlag, Vector3, float): one of the stage's own
+        /// minibosses, a few steps from the player.
+        /// </summary>
+        private string? Miniboss()
+        {
+            object? manager = Dyn.GetStatic(_findType("EnemyManager"), "Instance");
+            if (manager == null) return "the game's enemy manager was not found (EnemyManager.Instance)";
+
+            var kinds = new List<object>();
+            foreach (string path in new[] { "summonerController.timeline.minibosses", "summonerController.minibossPool" })
+            {
+                kinds = Dyn.Items(Dyn.Get(manager, path)).Where(k => k != null).Select(k => k!).ToList();
+                if (kinds.Count > 0) break;
+            }
+            if (kinds.Count == 0)
+            {
+                // the stage names none: any enemy the game itself calls a miniboss
+                Type? enemies = _findType("EEnemy");
+                if (enemies != null && enemies.IsEnum)
+                    kinds = Enum.GetValues(enemies).Cast<object>()
+                        .Where(k => k.ToString()!.StartsWith("Miniboss", StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+            if (kinds.Count == 0) return "the game's minibosses could not be read (StageTimeline.minibosses, SummonerController.minibossPool, EEnemy)";
+
+            object? player = Player() ?? Dyn.GetStatic(_findType("MyPlayer"), "Instance");
+            object? feet = Dyn.First(player, "GetFeetPosition()", "transform.position");
+            if (feet == null) return "the player's position could not be read (MyPlayer.GetFeetPosition)";
+
+            object kind = kinds[_random.Next(kinds.Count)];
+            // summoner 0, EEnemyFlag.Boss is 2, its own size
+            string? problem = Dyn.Invoke(manager, "SpawnBoss", out object? boss, kind, 0, 2, Beside(feet), 1f);
+            if (problem != null) return problem;
+            if (boss == null) return $"the game placed no {kind} (SpawnBoss returned nothing)";
+            _log.Info($"Trap: the game placed a {kind}.");
+            return null;
+        }
+
+        /// <summary>A point a few steps to the side of this one and a little above it; the point itself when it cannot be made.</summary>
+        private static object Beside(object point)
+        {
+            try
+            {
+                if (Dyn.Get(point, "x") is float x && Dyn.Get(point, "y") is float y && Dyn.Get(point, "z") is float z)
+                    return Activator.CreateInstance(point.GetType(), x + 3f, y + 1f, z) ?? point;
+            }
+            catch (Exception) { /* the point itself will do */ }
+            return point;
+        }
+
+        /// <summary>A part of the player's inventory ("playerHealth", "statusEffects"), by each way the game is known to keep it.</summary>
+        private object? PlayerPart(string part) =>
+            Dyn.Get(Player(), "inventory." + part)
+            ?? Dyn.GetStatic(_findType("MyPlayer"), "Instance.inventory." + part)
+            ?? Dyn.GetStatic(_findType("MapController"), "inventory." + part);
+
+        private static string Describe(object? thing) => thing == null ? "nothing" : Dyn.Describe(thing.GetType());
 
         // ------------------------------------------------------------------ what may be used
 

@@ -93,6 +93,65 @@ namespace MegabonkAP.Core
         }
 
         /// <summary>
+        /// Call a method and say how it went: null when it ran, otherwise why it did not (the
+        /// method is missing, or the game threw). A number is turned into the enum or number
+        /// type the method asks for, so a flag can be passed as 2.
+        /// </summary>
+        public static string? Invoke(object? target, string name, out object? result, params object?[] arguments)
+        {
+            result = null;
+            if (target == null) return $"there is nothing to call {name} on";
+            MethodInfo? method = Method(target.GetType(), name, arguments.Length);
+            if (method == null)
+                return $"{target.GetType().Name} has no {name}() with {arguments.Length} argument(s). It has: {Describe(target.GetType())}";
+            try
+            {
+                ParameterInfo[] wanted = method.GetParameters();
+                object?[] fitted = new object?[arguments.Length];
+                for (int i = 0; i < arguments.Length; i++) fitted[i] = Fit(arguments[i], wanted[i].ParameterType);
+                result = method.Invoke(method.IsStatic ? null : target, fitted);
+                return null;
+            }
+            catch (Exception problem)
+            {
+                Exception cause = problem is TargetInvocationException && problem.InnerException != null ? problem.InnerException : problem;
+                return $"{target.GetType().Name}.{name} failed: {cause.GetType().Name}: {cause.Message}";
+            }
+        }
+
+        private static object? Fit(object? value, Type wanted)
+        {
+            if (value == null || wanted.IsInstanceOfType(value)) return value;
+            if (wanted.IsEnum) return Enum.ToObject(wanted, Convert.ToInt32(value));
+            if (wanted.IsPrimitive) return Convert.ChangeType(value, wanted);
+            return value;
+        }
+
+        /// <summary>
+        /// False for a Unity object the game has destroyed: its wrapper outlives it, and so does a
+        /// static "Instance" that still points at it. True for anything that cannot be asked.
+        /// </summary>
+        public static bool Alive(object? thing)
+        {
+            if (thing == null) return false;
+            MethodInfo? exists = AliveChecks.GetOrAdd(thing.GetType(), type =>
+            {
+                for (Type? t = type; t != null; t = t.BaseType)
+                {
+                    if (t.FullName != "UnityEngine.Object") continue;
+                    return t.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly).FirstOrDefault(m =>
+                        m.Name == "op_Implicit" && m.ReturnType == typeof(bool) && m.GetParameters().Length == 1);
+                }
+                return null;
+            });
+            if (exists == null) return true;
+            try { return exists.Invoke(null, new[] { thing }) is bool alive ? alive : true; }
+            catch (Exception) { return true; }
+        }
+
+        private static readonly ConcurrentDictionary<Type, MethodInfo?> AliveChecks = new();
+
+        /// <summary>
         /// Call a method that takes a type instead of arguments: button.GetComponent&lt;CanvasGroup&gt;(),
         /// thing.TryCast&lt;WeaponData&gt;(). Null when it is missing or fails.
         /// </summary>
@@ -232,19 +291,35 @@ namespace MegabonkAP.Core
                 yield break;
             }
 
+            int walked = 0;
             object? enumerator = Get(collection, "GetEnumerator()");
-            if (enumerator == null) yield break;
-            Type type = enumerator.GetType();
-            MethodInfo? moveNext = type.GetMethod("MoveNext", Any, null, Type.EmptyTypes, null);
-            Func<object?, object?>? current = Reader(type, "Current");
-            if (moveNext == null || current == null) yield break;
-            for (int guard = 0; guard < 100000; guard++)
+            Type? type = enumerator?.GetType();
+            MethodInfo? moveNext = type?.GetMethod("MoveNext", Any, null, Type.EmptyTypes, null);
+            Func<object?, object?>? current = type == null ? null : Reader(type, "Current");
+            if (enumerator != null && moveNext != null && current != null)
             {
-                object? more;
-                try { more = moveNext.Invoke(enumerator, null); }
+                for (int guard = 0; guard < 100000; guard++)
+                {
+                    object? more;
+                    try { more = moveNext.Invoke(enumerator, null); }
+                    catch (Exception) { break; }
+                    if (!(more is bool b) || !b) break;
+                    walked++;
+                    yield return current(enumerator);
+                }
+            }
+            if (walked > 0) yield break;
+
+            // a list the game will not walk from outside (one of plain values, say) can still be asked for each place
+            int count = Int(First(collection, "Count", "count")) ?? 0;
+            MethodInfo? at = Method(collection.GetType(), "get_Item", 1);
+            if (count <= 0 || at == null || at.GetParameters()[0].ParameterType != typeof(int)) yield break;
+            for (int i = 0; i < count && i < 100000; i++)
+            {
+                object? value;
+                try { value = at.Invoke(collection, new object[] { i }); }
                 catch (Exception) { yield break; }
-                if (!(more is bool b) || !b) yield break;
-                yield return current(enumerator);
+                yield return value;
             }
         }
 

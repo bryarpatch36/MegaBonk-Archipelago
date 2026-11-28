@@ -11,6 +11,7 @@ An optional mod, MegabonkAP, sends the checks for you and locks what you do not 
 - `<name> Tome`: you may pick that tome at a level-up. You start with two random tomes.
 - `Progressive Forest Tier` and `Progressive Desert Tier`: the first one opens Tier 1 of that map, the second Tier 2, the third Tier 3. You start with Forest Tier 1.
 - `Graveyard Access`: you may play the Graveyard.
+- `Trap - Miniboss`, `Swarm`, `Elite Pack`, `Poison`, `Slow`, `Freeze` (optional, 12 in all): with the mod, it happens in your run when the item arrives. Without the mod they do nothing.
 - `Bonk`: filler. It does nothing.
 
 ## What are the checks?

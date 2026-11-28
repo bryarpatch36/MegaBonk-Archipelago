@@ -54,6 +54,21 @@ namespace MegabonkAP.Core
         private string? _picked;                                 // the character last confirmed in the menu
         private readonly List<Note> _notes = new();
 
+        // traps: items that do something in the game when they arrive, each exactly once
+        private IReadOnlyList<string> _received = Array.Empty<string>();    // every item received, in the server's order
+        private int _itemsActedOn;                               // the traps among the first so many of them are done
+        private bool _trapsReady;                                // the server has said how far an earlier start got
+        private DateTime _nextTrap = DateTime.MinValue;
+
+        /// <summary>A trap that is due: its place among the received items (from 1), its item and what it does.</summary>
+        public sealed record Trap(int Position, string Item, string Effect);
+
+        /// <summary>How long a run must have been going before a trap arrives.</summary>
+        public static readonly TimeSpan TrapDelay = TimeSpan.FromSeconds(10);
+
+        /// <summary>The pause between two traps.</summary>
+        public static readonly TimeSpan TrapGap = TimeSpan.FromSeconds(15);
+
         /// <summary>A line for the player: an item arrived, a check went out, something was refused.</summary>
         public sealed record Note(DateTime At, string Text, bool Bad);
 
@@ -106,6 +121,8 @@ namespace MegabonkAP.Core
                 _stageBosses = 0;
                 _runCounted = false;
                 _refusalSaid = false;
+                DateTime first = _now() + TrapDelay;
+                if (first > _nextTrap) _nextTrap = first;
                 _log.Info($"Run started: {_map ?? "unknown map"}" + (_tier > 0 ? $" Tier {_tier}" : "")
                     + (_character != null ? $" as {_character}" : "") + (_challenge != null ? $", challenge {_challenge}" : ""));
             }
@@ -325,8 +342,64 @@ namespace MegabonkAP.Core
                     }
                     SaveState();
                 }
+                if (_trapsReady && _link.ItemsActedOn is int kept && kept < _itemsActedOn) _link.SetItemsActedOn(_itemsActedOn);
                 CheckGoal();
             }
+        }
+
+        // ------------------------------------------------------------------ traps
+
+        /// <summary>
+        /// The trap to carry out now, or null: the oldest trap item not yet dealt with, once a run
+        /// has been going for a moment and the last trap is a while ago. Traps that arrive outside
+        /// a run wait for the next one.
+        /// </summary>
+        public Trap? NextTrap()
+        {
+            lock (_gate)
+            {
+                if (!_inRun || !_trapsReady || _now() < _nextTrap) return null;
+                for (int i = Math.Max(_itemsActedOn, 0); i < _received.Count; i++)
+                    if (_list.Traps.TryGetValue(_received[i], out string? effect)) return new Trap(i + 1, _received[i], effect);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// The trap was dealt with and will not come again. problem: null when it was carried out,
+        /// otherwise why the game could not be made to do it.
+        /// </summary>
+        public void TrapDone(Trap trap, string? problem = null)
+        {
+            lock (_gate)
+            {
+                if (trap.Position <= _itemsActedOn) return;
+                _itemsActedOn = trap.Position;
+                _nextTrap = _now() + TrapGap;
+                if (problem == null)
+                {
+                    _log.Info($"Trap sprung: {trap.Item}.");
+                    Tell($"Trap sprung: {TrapName(trap.Item)}!", bad: true);
+                }
+                else
+                {
+                    _log.Warn($"{trap.Item} did nothing: {problem}");
+                    Tell($"{trap.Item} did nothing: the game could not be made to do it (see the log).", bad: true);
+                }
+                SaveState();
+                if (_link.Connected) _link.SetItemsActedOn(_itemsActedOn);
+            }
+        }
+
+        private static string TrapName(string item) =>
+            item.StartsWith("Trap - ", StringComparison.Ordinal) ? item.Substring("Trap - ".Length) : item;
+
+        private int TrapsWaiting()
+        {
+            int waiting = 0;
+            for (int i = Math.Max(_itemsActedOn, 0); i < _received.Count; i++)
+                if (_list.Traps.ContainsKey(_received[i])) waiting++;
+            return waiting;
         }
 
         // ------------------------------------------------------------------ what the player holds
@@ -463,6 +536,7 @@ namespace MegabonkAP.Core
                     RunProblem = _inRun ? RunProblem() : null,
                     DeathLink = _deathLink,
                     Minibosses = _huntOn == true ? _minibosses : (int?)null,
+                    TrapsWaiting = _trapsReady ? TrapsWaiting() : 0,
                     Notes = _notes.ToList(),
                 };
             }
@@ -472,6 +546,7 @@ namespace MegabonkAP.Core
         {
             public bool Connected, ItemsKnown, Locking, InRun;
             public int Done, Total, Owed, Tier;
+            public int TrapsWaiting;        // trap items received and not yet carried out
             public int? Minibosses;         // defeated in this seed; null when the seed has no miniboss hunt
             public string? Character, Map, RunProblem, DeathLink;
             public IReadOnlyCollection<string> DoneChecks = Array.Empty<string>();
@@ -508,6 +583,12 @@ namespace MegabonkAP.Core
             {
                 _deathLink = deathLink;
                 _log.Info($"DeathLink is {deathLink}.");
+            }
+            if (_link.ItemsActedOn is int kept && _link.Session == _session)
+            {
+                // another start, or another computer, may have carried out more of them
+                if (kept > _itemsActedOn) { _itemsActedOn = kept; SaveState(); }
+                _trapsReady = true;
             }
             _done = new HashSet<string>(_link.CheckedNames);
             _total = _link.TotalChecks;
@@ -609,8 +690,10 @@ namespace MegabonkAP.Core
         {
             lock (_gate)
             {
+                if (_link.Connected) AdoptSession();        // what was kept from another seed must not be applied to this one
+                IReadOnlyList<string> received = _link.ReceivedItems;
                 var held = new Dictionary<string, int>();
-                foreach (string item in _link.ReceivedItems)
+                foreach (string item in received)
                     held[item] = held.TryGetValue(item, out int copies) ? copies + 1 : 1;
                 if (_itemsKnown)
                 {
@@ -623,6 +706,7 @@ namespace MegabonkAP.Core
                     Tell($"Connected: you hold {held.Values.Sum()} items.");
                 }
                 _held = held;
+                if (_link.Connected) _received = received;
                 _connected = _link.Connected;
                 _refusalSaid = false;       // a new item may have made the run count
                 ReadProgress();
@@ -640,7 +724,10 @@ namespace MegabonkAP.Core
                 _owed.IntersectWith(_earnedThisStart);      // what was kept belongs to another seed
                 _sent.Clear();
                 _minibosses = _minibossesThisStart;
+                _itemsActedOn = 0;
+                _received = Array.Empty<string>();
             }
+            _trapsReady = false;                            // until this seed's own record has been read
             _session = session;
             _goalSent = false;
             SaveState();
@@ -679,6 +766,7 @@ namespace MegabonkAP.Core
                 JsonElement root = document.RootElement;
                 _session = root.TryGetProperty("session", out JsonElement s) ? s.GetString() : null;
                 if (root.TryGetProperty("minibosses", out JsonElement m)) _minibosses = m.GetInt32();
+                if (root.TryGetProperty("items_acted_on", out JsonElement a)) _itemsActedOn = a.GetInt32();
                 foreach (JsonElement e in root.GetProperty("owed").EnumerateArray()) _owed.Add(e.GetString()!);
                 foreach (JsonElement e in root.GetProperty("sent").EnumerateArray()) _sent.Add(e.GetString()!);
             }
@@ -701,6 +789,7 @@ namespace MegabonkAP.Core
                 {
                     ["session"] = _session,
                     ["minibosses"] = _minibosses,
+                    ["items_acted_on"] = _itemsActedOn,
                     ["owed"] = _owed.OrderBy(c => c).ToList(),
                     ["sent"] = _sent.OrderBy(c => c).ToList(),
                 }, new JsonSerializerOptions { WriteIndented = true });
